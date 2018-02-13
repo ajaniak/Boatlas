@@ -1,0 +1,20 @@
+resultats/*.txt
+env/
+.DS_Store
+.DS_Store
+.ipynb_checkpoints/Chapter 2 - First steps-checkpoint.ipynb
+.ipynb_checkpoints/Chapter 5 - Building NLP Applications-checkpoint.ipynb
+.ipynb_checkpoints/
+*-checkpoint.ipynb
+.pyc
+*Copy*.ipynb
+*.pyc
+.~lock*
+__pycache__
+.idea
+pyhum
+pydf
+styles
+*.bak
+pages.csv
+*.sqlite

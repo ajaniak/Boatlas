@@ -1,0 +1,6 @@
+feedparser
+requests
+lxml
+ipython
+jupyter
+flask
