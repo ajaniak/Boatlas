@@ -1,6 +1,3 @@
-feedparser
-requests
-lxml
-ipython
-jupyter
 flask
+flask-sqlalchemy
+flask-login
