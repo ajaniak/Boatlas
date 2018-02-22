@@ -56,3 +56,82 @@ class Place(db.Model):
                  ]
             }
         }
+
+
+    @staticmethod
+    def creer_lieu(nom, latitude, longitude, description, type):
+        erreurs = []
+        if not nom:
+            erreurs.append("Le nom du lieu est obligatoire")
+        if not latitude:
+            erreurs.append("Il faut indiquer la latitude")
+        if not longitude:
+            erreurs.append("Il faut indiquer la longitude")
+
+        # On vérifie que personne n'a utilisé cet email ou ce login
+
+
+        # Si on a au moins une erreur
+        if len(erreurs) > 0:
+            print(erreurs, nom, latitude, description, longitude)
+            return False, erreurs
+
+        lieu = Place(
+            place_nom=nom,
+            place_latitude=latitude,
+            place_longitude=longitude,
+            place_description=description,
+            place_type=type,
+            # changer le nom "type"
+        )
+        print(lieu)
+        try:
+            # On l'ajoute au transport vers la base de données
+            db.session.add(lieu)
+            # On envoie le paquet
+            db.session.commit()
+
+            # On renvoie l'utilisateur
+            return True, lieu
+
+        except Exception as erreur:
+            return False, [str(erreur)]
+
+    @staticmethod
+    def modif_lieu(id, nom, latitude, longitude, description, type):
+        erreurs = []
+        if not nom:
+            erreurs.append("Le nom du lieu est obligatoire")
+        if not latitude:
+            erreurs.append("Il faut indiquer la latitude")
+        if not longitude:
+            erreurs.append("Il faut indiquer la longitude")
+
+        # On vérifie que personne n'a utilisé cet email ou ce login
+
+
+        # Si on a au moins une erreur
+        if len(erreurs) > 0:
+            print(erreurs, nom, latitude, description, longitude)
+            return False, erreurs
+
+        lieu = Place.query.get(id)
+
+        lieu.place_nom = nom
+        lieu.place_latitude = latitude
+        lieu.place_description = description
+        lieu.place_longitude = longitude
+        lieu.place_type = type
+
+        try:
+
+            # On l'ajoute au transport vers la base de données
+            db.session.add(lieu)
+            # On envoie le paquet
+            db.session.commit()
+
+            # On renvoie l'utilisateur
+            return True, lieu
+
+        except Exception as erreur:
+            return False, [str(erreur)]

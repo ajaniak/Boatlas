@@ -5,7 +5,7 @@ from .app import app, login
 from .modeles.donnees import Place
 from .modeles.utilisateurs import User
 from .constantes import LIEUX_PAR_PAGE
-from flask_login import login_user, current_user, logout_user
+from flask_login import login_user, current_user, logout_user, login_required
 
 
 @app.route("/")
