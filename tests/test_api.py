@@ -1,4 +1,4 @@
-from .base import Base
+from tests.base import Base
 from json import loads
 
 

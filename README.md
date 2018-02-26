@@ -1,6 +1,7 @@
 
-# Gazetteer
-
+# Boatlas
+Gazetteer produit dans le cadre du cours Python de l'Ecole Nationales des Chartes
+3 personnes maximum
 
 Il s'agira de modifier l'application Gazetteer développée pendant le cours afin de
 
