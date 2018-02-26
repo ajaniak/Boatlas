@@ -1,5 +1,5 @@
 from flask import render_template, request, flash, redirect
-from flask_login import current_user, login_user, logout_user
+from flask_login import current_user, login_user, logout_user, login_required
 
 from ..app import app, login
 from ..constantes import LIEUX_PAR_PAGE
@@ -134,3 +134,26 @@ def deconnexion():
         logout_user()
     flash("Vous êtes déconnecté-e", "info")
     return redirect("/")
+
+@app.route("/modif_lieu/<int:place_id>")
+@login_required
+def modif_lieu(place_id):
+    status, donnees = Place.modif_lieu(
+        id=place_id,
+        nom=request.args.get("nom", None),
+        latitude=request.args.get("latitude", None),
+        longitude=request.args.get("longitude", None),
+        description=request.args.get("description", None),
+        type=request.args.get("type", None),
+    )
+
+    if status is True :
+        flash("Merci pour votre contribution !", "success")
+        unique_lieu = Place.query.get(place_id)
+        return redirect("/") #vers le lieu qu'il vient de créer.
+
+    else:
+        flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
+        unique_lieu = Place.query.get(place_id)
+        return render_template("pages/modif_lieu.html", lieu=unique_lieu)
+           

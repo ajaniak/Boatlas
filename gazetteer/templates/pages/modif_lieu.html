@@ -1,0 +1,45 @@
+{% extends "conteneur.html" %}
+
+{% block titre %}| Contribuer{%endblock%}
+
+{% block corps %}
+
+<h1>Editer</h1>
+<p>Complétez le formulaire et cliquez sur "Contribuer" pour ajouter un nouveau lieu.</p>
+<form class="form" method="GET" action="{{url_for('modif_lieu', place_id=lieu.place_id)}}">
+  <!-- mettre en post -->
+     <div class="form-group row">
+    <label for="nom" class="col-sm-4 col-form-label">Nom du lieu</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="nom" name="nom" value="{{lieu.place_nom}}">
+    </div>
+</div>
+  <div class="form-group row">
+    <label for="longitude" class="col-sm-4 col-form-label">longitude</label>
+    <div class="col-sm-8">
+      <input type="number" class="form-control" id="longitude" name="longitude" value="{{lieu.place_longitude}}" >
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="latitude" class="col-sm-4 col-form-label">Latitude</label>
+    <div class="col-sm-8">
+      <input type="number" class="form-control" id="latitude" name="latitude" value="{{lieu.place_latitude}}">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="description" class="col-sm-4 col-form-label">Description</label>
+    <div class="col-sm-8">
+      <input  class="form-control" id="description" name="description" value="{{lieu.place_description}}">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="type" class="col-sm-4 col-form-label">Type</label>
+    <div class="col-sm-8">
+      <input  class="form-control" id="type" name="type" placeholder="Type de lieu" value="{{lieu.place_type}}">
+    </div>
+  </div>
+  <div>
+    <button type="submit" class="btn btn-primary">Contribuer</button>
+  </div>
+</form>
+{% endblock %}
