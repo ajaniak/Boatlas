@@ -5,9 +5,9 @@ Gazetteer produit dans le cadre du cours Python de l'Ecole Nationales des Charte
 
 Il s'agira de modifier l'application Gazetteer développée pendant le cours afin de
 
-- Ajouter la capacité de lier des articles ou des ressources bibliographiques à des lieux
-- Ajouter des connexions entre les lieux et les gérer
-- Ajouter des tests et une documentation
+1. Ajouter des connexions entre les lieux et les gérer
+2. Ajouter la capacité de lier des articles ou des ressources bibliographiques à des lieux
+3. Ajouter des tests et une documentation
 
 Compléter l'API :
 - Avec les nouvelles données
