@@ -3,6 +3,12 @@ import datetime
 
 from .. app import db
 
+#création d'une classe connections.
+class Connection (db.Model):
+    __tablename__= "connections"
+    relationship_origin_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
+    relationship_connected_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
+
 
 class Authorship(db.Model):
     __tablename__ = "authorship"
@@ -29,7 +35,12 @@ class Place(db.Model):
     place_latitude = db.Column(db.Float)
     place_type = db.Column(db.String(45))
     authorships = db.relationship("Authorship", back_populates="place")
-
+#Déclaration de la relation many-to-many des lieux.
+    relationship_connected = db.connections(
+        'Place', secondary='Connection',
+        primaryjoin=(Connection.c.relationship_origin_id == id),
+        secondaryjoin=(Connection.c.relationship_connected_id == id),
+        backref=db.backref('part_of', lazy='dynamic'), lazy='dynamic')
     def to_jsonapi_dict(self):
         """ It ressembles a little JSON API format but it is not completely compatible
 
@@ -135,3 +146,17 @@ class Place(db.Model):
 
         except Exception as erreur:
             return False, [str(erreur)]
+
+# ajout d'une méthode pour ajouter et supprimer des relations
+    @staticmethod
+    def part_of(self, place):
+        if not self.is_connected(place):
+            self.connected.append(place)
+
+    def unconnected(self, place):
+        if self.is_connected(place):
+            self.connected.remove(place)
+
+    def is_connected(self, place):
+        return self.connected.filter(
+            Connection.c.relationship_connected_id == place.id).count() > 0
