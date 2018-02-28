@@ -114,3 +114,33 @@ def deconnexion():
         logout_user()
     flash("Vous êtes déconnecté-e", "info")
     return redirect("/")
+
+@app.route('/part_of/<int:place_id>')
+@login_required
+def part_of(place_id):
+    place = Place.query.filter_by(place_id=place_id).first()
+    if place is None:
+        flash('Connection {} not found.'.format(place_id))
+        return redirect(url_for('accueil'))
+    if place_id == current_place_id:
+        flash('A place cannot be connected with itself')
+        return redirect(url_for('place', place_id=place_id))
+    current_place.part_of(place)
+    db.session.commit()
+    flash('A new connection has been established {}!'.format(place_id))
+    return redirect(url_for('place', place_id=place_id))
+
+@app.route('/unfollow/<int:place_id>')
+@login_required
+def unfollow(place_id):
+    place = Place.query.filter_by(place_id=place_id).first()
+    if place is None:
+        flash('Connection {} not found.'.format(place_id))
+        return redirect(url_for('accueil'))
+    if place_id == current_place_id:
+        flash('A place cannot be deconnected with itself')
+        return redirect(url_for('place', place_id=place_id))
+    current_place.part_of(place)
+    db.session.commit()
+    flash('A connection have been broken {}.'.format(place_id))
+    return redirect(url_for('place', place_id=place_id))
