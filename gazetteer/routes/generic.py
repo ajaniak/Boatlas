@@ -156,4 +156,6 @@ def modif_lieu(place_id):
         flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
         unique_lieu = Place.query.get(place_id)
         return render_template("pages/modif_lieu.html", lieu=unique_lieu)
-           
+
+@app.route("/relationship/<int:place_id>")
+@login_required
