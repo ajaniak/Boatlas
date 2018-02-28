@@ -158,7 +158,4 @@ def modif_lieu(place_id):
         return render_template("pages/modif_lieu.html", lieu=unique_lieu)
 
 @app.route("/relationship/<int:place_id>")
-def gestion_relathionship(self):
-    return Post.query.join("connections", (Connection.c.relationship_connected_id == Post.place_id)).filter(
-        Connection.c.relationship_connected_id== self.id).order_by(
-        Post.asc())
+@login_required

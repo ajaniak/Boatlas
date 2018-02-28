@@ -4,8 +4,8 @@ import datetime
 from .. app import db
 
 #création d'une classe connections.
-class Connection (db.Model):
-    __tablename__= "connections"
+class Followers (db.Model):
+    __tablename__= "followers"
     relationship_origin_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
     relationship_connected_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
 
@@ -36,11 +36,12 @@ class Place(db.Model):
     place_type = db.Column(db.String(45))
     authorships = db.relationship("Authorship", back_populates="place")
 #Déclaration de la relation many-to-many des lieux.
-    relationship_connected = db.connections(
-        'Place', secondary='Connection',
-        primaryjoin=(Connection.c.relationship_origin_id == id),
-        secondaryjoin=(Connection.c.relationship_connected_id == id),
-        backref=db.backref('part_of', lazy='dynamic'), lazy='dynamic')
+    Connection = db.relationship(
+        'Place', secondary='Followers',
+        primaryjoin=(Followers.c.relationship_origin_id == id),
+        secondaryjoin=(Followers.c.relationship_connected_id == id),
+        backref=db.backref(Followers, lazy='dynamic'), lazy='dynamic')
+
     def to_jsonapi_dict(self):
         """ It ressembles a little JSON API format but it is not completely compatible
 
@@ -159,4 +160,10 @@ class Place(db.Model):
 
     def is_connected(self, place):
         return self.connected.filter(
-            Connection.c.relationship_connected_id == place.id).count() > 0
+            Followers.c.relationship_connected_id == place.id).count() > 0
+#affichages des relations comme "followed" avec les autres et des relations comme "follower". 
+    def gestion_relationship(self):
+         connected = Place.query.join(
+            'Followers', (Followers.c.relationship_connected_id== Place.place_id)).filter(Followers.c.relationship_connected_id == self.id)
+         own = Place.query.filter_by(place_id=self.id)
+         return connected.union(own).order_by(Place.Place_nom.asc())
