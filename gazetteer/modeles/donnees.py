@@ -135,3 +135,5 @@ class Place(db.Model):
 
         except Exception as erreur:
             return False, [str(erreur)]
+
+
