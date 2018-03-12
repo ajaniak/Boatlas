@@ -3,12 +3,6 @@ import datetime
 
 from .. app import db
 
-#création d'une classe connections.
-class Followers (db.Model):
-    __tablename__= "followers"
-    relationship_origin_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
-    relationship_connected_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
-
 
 class Authorship(db.Model):
     __tablename__ = "authorship"
@@ -35,12 +29,6 @@ class Place(db.Model):
     place_latitude = db.Column(db.Float)
     place_type = db.Column(db.String(45))
     authorships = db.relationship("Authorship", back_populates="place")
-#Déclaration de la relation many-to-many des lieux.
-    Connection = db.relationship(
-        'Place', secondary='Followers',
-        primaryjoin=(Followers.c.relationship_origin_id == id),
-        secondaryjoin=(Followers.c.relationship_connected_id == id),
-        backref=db.backref(Followers, lazy='dynamic'), lazy='dynamic')
 
     def to_jsonapi_dict(self):
         """ It ressembles a little JSON API format but it is not completely compatible
@@ -147,23 +135,3 @@ class Place(db.Model):
 
         except Exception as erreur:
             return False, [str(erreur)]
-
-# ajout d'une méthode pour ajouter et supprimer des relations
-    @staticmethod
-    def part_of(self, place):
-        if not self.is_connected(place):
-            self.connected.append(place)
-
-    def unconnected(self, place):
-        if self.is_connected(place):
-            self.connected.remove(place)
-
-    def is_connected(self, place):
-        return self.connected.filter(
-            Followers.c.relationship_connected_id == place.id).count() > 0
-#affichages des relations comme "followed" avec les autres et des relations comme "follower". 
-    def gestion_relationship(self):
-         connected = Place.query.join(
-            'Followers', (Followers.c.relationship_connected_id== Place.place_id)).filter(Followers.c.relationship_connected_id == self.id)
-         own = Place.query.filter_by(place_id=self.id)
-         return connected.union(own).order_by(Place.Place_nom.asc())
