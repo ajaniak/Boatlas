@@ -3,28 +3,32 @@ import datetime
 
 from .. app import db
 
-#création d'une classe connections.
-class Followers (db.Model):
-    __tablename__= "followers"
-    relationship_origin_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
-    relationship_connected_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
+#création d'une classe Relation pour la classe Biblio
+class Relation(db.Model):
+    __tablename__ = "relation"
+    relation_id = db.Column(db.Integer, nullable=False, autoincrement=True, primary_key=True)
+    relation_place_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
+    relation_biblio_id = db.Column(db.Integer, db.ForeignKey('biblio.biblio_id'))
+    authorship_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    biblio = db.relationship("Biblio", back_populates="relations")
+    place = db.relationship("Place", back_populates="relations")
 
 
 class Authorship(db.Model):
     __tablename__ = "authorship"
-    authorship_id = db.Column(db.Integer, nullable=True, autoincrement=True, primary_key=True)
+    authorship_id = db.Column(db.Integer, nullable=False, autoincrement=True, primary_key=True)
     authorship_place_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
     authorship_user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
     authorship_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     user = db.relationship("User", back_populates="authorships")
     place = db.relationship("Place", back_populates="authorships")
 
+
     def author_to_json(self):
         return {
             "author": self.user.to_jsonapi_dict(),
             "on": self.authorship_date
         }
-
 
 # On crée notre modèle
 class Place(db.Model):
@@ -35,12 +39,10 @@ class Place(db.Model):
     place_latitude = db.Column(db.Float)
     place_type = db.Column(db.String(45))
     authorships = db.relationship("Authorship", back_populates="place")
+    relations = db.relationship("Relation", back_populates="place")
+    #ajout de la relation Relation entre les tables biblio et Place
+
 #Déclaration de la relation many-to-many des lieux.
-    Connection = db.relationship(
-        'Place', secondary='Followers',
-        primaryjoin=(Followers.c.relationship_origin_id == id),
-        secondaryjoin=(Followers.c.relationship_connected_id == id),
-        backref=db.backref(Followers, lazy='dynamic'), lazy='dynamic')
 
     def to_jsonapi_dict(self):
         """ It ressembles a little JSON API format but it is not completely compatible
@@ -93,7 +95,7 @@ class Place(db.Model):
             place_latitude=latitude,
             place_longitude=longitude,
             place_description=description,
-            place_type=type,
+            place_type=typed,
             # changer le nom "type"
         )
         print(lieu)
@@ -148,22 +150,48 @@ class Place(db.Model):
         except Exception as erreur:
             return False, [str(erreur)]
 
-# ajout d'une méthode pour ajouter et supprimer des relations
+class Biblio(db.Model):
+    biblio_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
+    biblio_titre = db.Column(db.Text, nullable=False)
+    biblio_auteur = db.Column(db.Text, nullable=False)
+    biblio_date = db.Column(db.Text)
+    biblio_lieu = db.Column(db.Text)
+    biblio_type = db.Column(db.Text, nullable=False)
+    relations = db.relationship("Relation", back_populates="biblio")
+    #création de la relation entre Biblio et Place
+
     @staticmethod
-    def part_of(self, place):
-        if not self.is_connected(place):
-            self.connected.append(place)
+    def creer_biblio(titre, auteur, date, lieu, typed):
+        erreurs = []
+        if not titre:
+            erreurs.append("Le titre de l'oeuvre est obligatoire")
+        if not auteur:
+            erreurs.append("Il faut indiquer l'auteur")
+        if not typed:
+            erreurs.append("Il faut indiquer le type d'oeuvre : article ou livre")
 
-    def unconnected(self, place):
-        if self.is_connected(place):
-            self.connected.remove(place)
+        # Si on a au moins une erreur
+        if len(erreurs) > 0:
+            print(erreurs, titre, auteur, typed)
+            return False, erreurs
 
-    def is_connected(self, place):
-        return self.connected.filter(
-            Followers.c.relationship_connected_id == place.id).count() > 0
-#affichages des relations comme "followed" avec les autres et des relations comme "follower". 
-    def gestion_relationship(self):
-         connected = Place.query.join(
-            'Followers', (Followers.c.relationship_connected_id== Place.place_id)).filter(Followers.c.relationship_connected_id == self.id)
-         own = Place.query.filter_by(place_id=self.id)
-         return connected.union(own).order_by(Place.Place_nom.asc())
+        biblio = Biblio(
+            biblio_titre=titre,
+            biblio_auteur=auteur,
+            biblio_date=date,
+            biblio_lieu=lieu,
+            biblio_type=typed,
+            # changer le nom "type"
+        )
+        print(biblio)
+        try:
+            # On l'ajoute au transport vers la base de données
+            db.session.add(biblio)
+            # On envoie le paquet
+            db.session.commit()
+
+            # On renvoie l'utilisateur
+            return True, biblio
+
+        except Exception as erreur:
+            return False, [str(erreur)]
