@@ -3,7 +3,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 
 from ..app import app, login
 from ..constantes import LIEUX_PAR_PAGE
-from ..modeles.donnees import Place
+from ..modeles.donnees import Place, Biblio
 from ..modeles.utilisateurs import User
 
 
@@ -25,6 +25,16 @@ def lieu(place_id):
     # On a bien sûr aussi modifié le template pour refléter le changement
     unique_lieu = Place.query.get(place_id)
     return render_template("pages/place.html", nom="Gazetteer", lieu=unique_lieu)
+
+@app.route("/bibliographie/<int:biblio_id>")
+def biblio():
+    """ Route permettant l'affichage des données d'un lieu
+
+    :param place_id: Identifiant numérique du lieu
+    """
+    # On a bien sûr aussi modifié le template pour refléter le changement
+    unique_titre = Biblio.query.get(biblio_id)
+    return render_template("pages/bibliographie.html", nom="Gazetteer", biblio=unique_titre)
 
 
 @app.route("/recherche")
@@ -157,5 +167,24 @@ def modif_lieu(place_id):
         unique_lieu = Place.query.get(place_id)
         return render_template("pages/modif_lieu.html", lieu=unique_lieu)
 
-@app.route("/relationship/<int:place_id>")
+@app.route("/creer_biblio/<int:biblio_id>", methods=["GET"])
 @login_required
+def creer_biblio():
+    status, donnees = Biblio.creer_biblio(
+    titre=request.args.get("titre", None),
+    auteur=request.args.get("auteur", None),
+    date=request.args.get("date", None),
+    lieu=request.args.get("lieu", None),
+    typed=request.args.get("type", None),
+    )
+
+    if status is True :
+        flash("Merci pour votre contribution !", "success")
+        unique_biblio = Biblio.query.get(biblio_id)
+
+        return redirect("/") #vers le lieu qu'il vient de créer.
+
+    else:
+        flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
+
+        return render_template("pages/creer_biblio.html")
