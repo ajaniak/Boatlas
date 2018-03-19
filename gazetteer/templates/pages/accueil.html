@@ -11,6 +11,7 @@
                 <li><a href="{{url_for('lieu', place_id=lieu.place_id)}}">{{lieu.place_nom}}</a></li>
             {% endfor %}
         </ul>
+      
     {% else %}
         <p>La base de données est en cours de constitution</p>
     {% endif %}
