@@ -177,12 +177,13 @@ def creer_biblio():
 
         return render_template("pages/creer_biblio.html")
 
-@app.route("/bibliographie/<int:biblio_id>")
-def biblio():
+@app.route("/biblio/<int:biblio_id>")
+def biblio(biblio_id):
     """ Route permettant l'affichage des données d'un lieu
 
     :param biblio_id: Identifiant numérique de la référence bibliographique
     """
     # On récupère le tuple correspondant aux champs de la classe Biblio
-    biblio = Biblio.query.get(biblio_id)
-    return render_template("pages/bibliographie.html", nom="Gazetteer", biblio=biblio)
+    unique_biblio = Biblio.query.get(biblio_id)
+    print(unique_biblio)
+    return render_template("pages/biblio.html", nom="Gazetteer", biblio=unique_biblio)
