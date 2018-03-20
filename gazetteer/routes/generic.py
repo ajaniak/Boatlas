@@ -26,16 +26,6 @@ def lieu(place_id):
     unique_lieu = Place.query.get(place_id)
     return render_template("pages/place.html", nom="Gazetteer", lieu=unique_lieu)
 
-@app.route("/bibliographie/<int:biblio_id>")
-def biblio():
-    """ Route permettant l'affichage des données d'un lieu
-
-    :param place_id: Identifiant numérique du lieu
-    """
-    # On a bien sûr aussi modifié le template pour refléter le changement
-    unique_titre = Biblio.query.get(biblio_id)
-    return render_template("pages/bibliographie.html", nom="Gazetteer", biblio=unique_titre)
-
 
 @app.route("/recherche")
 def recherche():
@@ -70,7 +60,6 @@ def recherche():
         keyword=motclef
     )
 
-
 @app.route("/browse")
 def browse():
     """ Route permettant la recherche plein-texte
@@ -90,7 +79,6 @@ def browse():
         "pages/browse.html",
         resultats=resultats
     )
-
 
 @app.route("/register", methods=["GET", "POST"])
 def inscription():
@@ -167,7 +155,7 @@ def modif_lieu(place_id):
         unique_lieu = Place.query.get(place_id)
         return render_template("pages/modif_lieu.html", lieu=unique_lieu)
 
-@app.route("/creer_biblio/<int:biblio_id>", methods=["GET"])
+@app.route("/creer_biblio")
 @login_required
 def creer_biblio():
     status, donnees = Biblio.creer_biblio(
@@ -180,11 +168,21 @@ def creer_biblio():
 
     if status is True :
         flash("Merci pour votre contribution !", "success")
-        unique_biblio = Biblio.query.get(biblio_id)
 
-        return redirect("/") #vers le lieu qu'il vient de créer.
+
+        return redirect("/") #vers la référence bibliographique qu'il vient de créer.
 
     else:
         flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
 
         return render_template("pages/creer_biblio.html")
+
+@app.route("/bibliographie/<int:biblio_id>")
+def biblio():
+    """ Route permettant l'affichage des données d'un lieu
+
+    :param biblio_id: Identifiant numérique de la référence bibliographique
+    """
+    # On récupère le tuple correspondant aux champs de la classe Biblio
+    biblio = Biblio.query.get(biblio_id)
+    return render_template("pages/bibliographie.html", nom="Gazetteer", biblio=biblio)

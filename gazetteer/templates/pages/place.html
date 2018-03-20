@@ -16,35 +16,16 @@
 
     {% elif biblio %}
 
-            <dl>
-                <dt>Titre</dt>{{biblio_titre}}</h1>
-                <dt>Auteur</dt><dd>{{biblio_auteur}}</dd>
-                <dt>Date de publication</dt><dd>{{biblio_date}}</dd>
-                <dt>Lieu de publication </dt><dd>{{biblio_lieu}}</dd>
-                <dt>Lieu de publication </dt><dd>{{biblio_type}}</dd>
-
-
-            </dl>
+            <p>biblio</p>
 
     {% else %}
         <p>La base de données est en cours de constitution</p>
     {% endif %}
 
-    {% if biblio %}
-
-            <dl>
-                <dt>Titre</dt>{{biblio_titre}}</h1>
-                <dt>Auteur</dt><dd>{{biblio_auteur}}</dd>
-                <dt>Date de publication</dt><dd>{{biblio_date}}</dd>
-                <dt>Lieu de publication </dt><dd>{{biblio_lieu}}</dd>
-                <dt>Lieu de publication </dt><dd>{{biblio_type}}</dd>
-            </dl>
-    {% endif %}
     <p><a href="{{url_for('accueil')}}">Retour à l'accueil</a></p>
     {% if current_user.is_authenticated %}
-    <p><a class="nav-link" href="{{url_for('modif_lieu', place_id=lieu.place_id)}}">Editer le lieu</a></p>
-    <!-- Je renvoie vers ma route qui prend un chemin, je spécifie ce que signifie biblio_id par rapport à ma classe-->
-    <p><a class="nav-link" href="{{url_for('creer_biblio', biblio_id=biblio_id)}}">Bibliographie</a></p>
-
-        {%endif %}
+    <p><a class="nav-link" href="{{url_for('modif_lieu', place_id=lieu.place_id)}}">Editer le lieu</a>
+    <!-- Je renvoie vers ma route qui renvoie vers un formulaire où biblio_id = la liste définie d'après ma classe -->
+    <a class="nav-link" href="{{url_for('creer_biblio', biblio_id=biblio_id)}}">Editer la bibliographie</a></p>
+{%endif %}
 {% endblock %}

@@ -1,6 +1,7 @@
 from warnings import warn
 
 LIEUX_PAR_PAGE = 2
+BIBLIOS_PAR_PAGE = 2
 SECRET_KEY = "JE SUIS UN SECRET !"
 API_ROUTE = "/api"
 

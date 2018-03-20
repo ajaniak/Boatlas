@@ -1,18 +1,9 @@
 from flask import url_for
 import datetime
 
-from .. app import db
+from ..app import db
 
 #création d'une classe Relation pour la classe Biblio
-class Relation(db.Model):
-    __tablename__ = "relation"
-    relation_id = db.Column(db.Integer, nullable=False, autoincrement=True, primary_key=True)
-    relation_place_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
-    relation_biblio_id = db.Column(db.Integer, db.ForeignKey('biblio.biblio_id'))
-    authorship_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    biblio = db.relationship("Biblio", back_populates="relations")
-    place = db.relationship("Place", back_populates="relations")
-
 
 class Authorship(db.Model):
     __tablename__ = "authorship"
@@ -39,7 +30,7 @@ class Place(db.Model):
     place_latitude = db.Column(db.Float)
     place_type = db.Column(db.String(45))
     authorships = db.relationship("Authorship", back_populates="place")
-    relations = db.relationship("Relation", back_populates="place")
+
     #ajout de la relation Relation entre les tables biblio et Place
 
 #Déclaration de la relation many-to-many des lieux.
@@ -121,9 +112,6 @@ class Place(db.Model):
         if not longitude:
             erreurs.append("Il faut indiquer la longitude")
 
-        # On vérifie que personne n'a utilisé cet email ou ce login
-
-
         # Si on a au moins une erreur
         if len(erreurs) > 0:
             print(erreurs, nom, latitude, description, longitude)
@@ -157,11 +145,16 @@ class Biblio(db.Model):
     biblio_date = db.Column(db.Text)
     biblio_lieu = db.Column(db.Text)
     biblio_type = db.Column(db.Text, nullable=False)
-    relations = db.relationship("Relation", back_populates="biblio")
-    #création de la relation entre Biblio et Place
 
     @staticmethod
     def creer_biblio(titre, auteur, date, lieu, typed):
+        """ Crée une nouvelle référence bibliographique et renvoie les informations entrées par l'utilisateur
+        :param titre: Titre de la référence
+        :param auteur: Auteur de la référence
+        :param date: Date de publication de la référence
+        :param lieu: Lieu de publication de la référence
+        :param typed: Type de publication
+        """
         erreurs = []
         if not titre:
             erreurs.append("Le titre de l'oeuvre est obligatoire")
@@ -183,14 +176,14 @@ class Biblio(db.Model):
             biblio_type=typed,
             # changer le nom "type"
         )
-        print(biblio)
+        print (biblio)
+
         try:
             # On l'ajoute au transport vers la base de données
             db.session.add(biblio)
-            # On envoie le paquet
+            # On envoie la référence
             db.session.commit()
 
-            # On renvoie l'utilisateur
             return True, biblio
 
         except Exception as erreur:
