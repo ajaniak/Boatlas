@@ -1,9 +1,14 @@
 from flask import url_for
 import datetime
 
+<<<<<<< HEAD
 from ..app import db
 
 #création d'une classe Relation pour la classe Biblio
+=======
+from .. app import db
+
+>>>>>>> upstream/master
 
 class Authorship(db.Model):
     __tablename__ = "authorship"
@@ -30,10 +35,13 @@ class Place(db.Model):
     place_latitude = db.Column(db.Float)
     place_type = db.Column(db.String(45))
     authorships = db.relationship("Authorship", back_populates="place")
+<<<<<<< HEAD
 
     #ajout de la relation Relation entre les tables biblio et Place
 
 #Déclaration de la relation many-to-many des lieux.
+=======
+>>>>>>> upstream/master
 
     def to_jsonapi_dict(self):
         """ It ressembles a little JSON API format but it is not completely compatible

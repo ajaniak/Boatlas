@@ -52,6 +52,10 @@ def recherche():
         resultats = Place.query.filter(
             Place.place_nom.like("%{}%".format(motclef))
         ).paginate(page=page, per_page=LIEUX_PAR_PAGE)
+    else:
+        resultats = Biblio.query.filter(
+        Biblio.biblio_titre.like("%{}%".format(motclef))
+        ).paginate(page=page, per_page=BIBLIOS_PAR_PAGE)
         titre = "Résultat pour la recherche `" + motclef + "`"
 
     return render_template(
