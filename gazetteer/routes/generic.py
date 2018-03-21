@@ -133,6 +133,25 @@ def deconnexion():
     flash("Vous êtes déconnecté-e", "info")
     return redirect("/")
 
+@app.route("/depot", methods=["POST", "GET"])
+def depot():
+    if request.method == "POST":
+        statut, donnees = Place.creer_lieu(
+            lieu=request.form.get("lieu", None),
+            lat=request.form.get("lat", None),
+            longt=request.form.get("longt", None),
+            desc=request.form.get("desc", None),
+            typep=request.form.get("typep", None)
+        )
+        if statut is True:
+            flash("Enregistrement effectué. Vous avez ajouté un nouveau lieu", "success")
+            return redirect("/")
+        else:
+            flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
+            return render_template("pages/depot.html")
+    else:
+        return render_template("pages/depot.html")
+
 @app.route("/modif_lieu/<int:place_id>")
 @login_required
 def modif_lieu(place_id):
@@ -163,7 +182,7 @@ def creer_biblio():
     auteur=request.args.get("auteur", None),
     date=request.args.get("date", None),
     lieu=request.args.get("lieu", None),
-    typed=request.args.get("type", None),
+    type=request.args.get("type", None),
     )
 
     if status is True :
@@ -176,6 +195,29 @@ def creer_biblio():
         flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
 
         return render_template("pages/creer_biblio.html")
+
+@app.route("/modif_biblio/<int:biblio_id>")
+@login_required
+def modif_biblio(biblio_id):
+    status, donnees = Biblio.modif_biblio(
+        id=biblio_id,
+        titre=request.args.get("titre", None),
+        auteur=request.args.get("auteur", None),
+        date=request.args.get("date", None),
+        lieu=request.args.get("lieu", None),
+        type=request.args.get("type", None),
+    )
+
+    if status is True :
+        flash("Merci pour votre contribution !", "success")
+        unique_biblio = Biblio.query.get(biblio_id)
+        return redirect("/") #vers le lieu qu'il vient de créer.
+
+    else:
+        flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
+        unique_biblio = Biblio.query.get(biblio_id)
+        return render_template("pages/modif_biblio.html", lieu=unique_biblio)
+
 
 @app.route("/biblio/<int:biblio_id>")
 def biblio(biblio_id):

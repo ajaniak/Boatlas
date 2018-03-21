@@ -22,6 +22,6 @@
     {% if current_user.is_authenticated %}
 
     <!-- Je renvoie vers ma route qui renvoie vers un formulaire où biblio_id = la liste définie d'après ma classe -->
-    <p><a class="nav-link" href="{{url_for('creer_biblio', biblio_id=biblio_id)}}">Editer la bibliographie</a></p>
+    <p><a class="nav-link" href="{{url_for('modif_biblio', biblio_id=biblio.biblio_id)}}">Editer la bibliographie</a></p>
 {%endif %}
 {% endblock %}

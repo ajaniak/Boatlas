@@ -1,0 +1,45 @@
+{% extends "conteneur.html" %}
+
+{% block titre %}| Contribuer{%endblock%}
+
+{% block corps %}
+
+<h1>Editer</h1>
+<p>Complétez le formulaire et cliquez sur "Contribuer" pour modifier la référence bibliographique.</p>
+<form class="form" method="GET" action="{{url_for('modif_biblio', biblio_id=biblio.biblio_id)}}">
+  <!-- mettre en post -->
+     <div class="form-group row">
+    <label for="nom" class="col-sm-4 col-form-label">Titre de la référence</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="titre" name="titre" value="{{biblio_titre}}">
+    </div>
+</div>
+  <div class="form-group row">
+    <label for="longitude" class="col-sm-4 col-form-label">Auteur de la référence</label>
+    <div class="col-sm-8">
+      <input type="number" class="form-control" id="auteur" name="auteur" value="{{biblio_auteur}}" >
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="latitude" class="col-sm-4 col-form-label">Date de publication</label>
+    <div class="col-sm-8">
+      <input type="number" class="form-control" id="date" name="date" value="{{biblio_date}}">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="description" class="col-sm-4 col-form-label">Lieu de publication</label>
+    <div class="col-sm-8">
+      <input  class="form-control" id="lieu" name="lieu" value="{{biblio_lieu}}">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="type" class="col-sm-4 col-form-label">Type de référence</label>
+    <div class="col-sm-8">
+      <input  class="form-control" id="typed" name="typed" placeholder="Type de lieu" value="{{biblio_type}}">
+    </div>
+  </div>
+  <div>
+    <button type="submit" class="btn btn-primary">Contribuer</button>
+  </div>
+</form>
+{% endblock %}
