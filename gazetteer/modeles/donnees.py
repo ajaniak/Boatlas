@@ -3,13 +3,6 @@ import datetime
 
 from .. app import db
 
-#création d'une classe connections.
-class Followers (db.Model):
-    __tablename__= "followers"
-    relationship_origin_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
-    relationship_connected_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
-
-
 class Authorship(db.Model):
     __tablename__ = "authorship"
     authorship_id = db.Column(db.Integer, nullable=True, autoincrement=True, primary_key=True)
@@ -25,6 +18,17 @@ class Authorship(db.Model):
             "on": self.authorship_date
         }
 
+#création d'une table d'association
+class Followers(db.Model):
+    __tablename__="following"
+    f_connection_id= db.Column(db.Integer, primary_key=True, autoincrement=True)
+    f_place_from = db.Column(db.Integer, db.ForeignKey('place.place_id'))
+    f_place_to = db.Column(db.Integer, db.ForeignKey('place.place_id'))
+    pfrom = db.relationship("Place", back_populates="place_from")
+
+
+#Il faut définir la relation mais à quel endroit??
+#following = Followers(extra_field=0 , to=self , from=link_place)
 
 # On crée notre modèle
 class Place(db.Model):
@@ -34,13 +38,10 @@ class Place(db.Model):
     place_longitude = db.Column(db.Float)
     place_latitude = db.Column(db.Float)
     place_type = db.Column(db.String(45))
+    place_connection = db.Colum(db.Integer, ForeignKey('Followers.f_place_to'))
     authorships = db.relationship("Authorship", back_populates="place")
-#Déclaration de la relation many-to-many des lieux.
-    Connection = db.relationship(
-        'Place', secondary='Followers',
-        primaryjoin=(Followers.c.relationship_origin_id == id),
-        secondaryjoin=(Followers.c.relationship_connected_id == id),
-        backref=db.backref(Followers, lazy='dynamic'), lazy='dynamic')
+    place_from = db.relationship ("Followers", back_populates="pfrom")
+
 
     def to_jsonapi_dict(self):
         """ It ressembles a little JSON API format but it is not completely compatible
@@ -109,6 +110,23 @@ class Place(db.Model):
         except Exception as erreur:
             return False, [str(erreur)]
 
+
+    def follow(self, place):
+        if not self.is_following(place):
+            self.followed.append(place)
+
+    def unfollow(self, place):
+        if self.is_following(place):
+            self.followed.remove(place)
+
+    def is_following(self, place):
+        return self.followed.filter(followers.c.f_place_to == place_id).count() > 0
+
+    def followed_connection(self):
+        followed = connection.query.join(followers, (followers.c.f_place_to == connection.place_id)).filter(followers.c.f_place_from == self.id)
+        own = connection.query.filter_by(place_id=self.id)
+        return followed.union(own)
+
     @staticmethod
     def modif_lieu(id, nom, latitude, longitude, description, type):
         erreurs = []
@@ -147,23 +165,3 @@ class Place(db.Model):
 
         except Exception as erreur:
             return False, [str(erreur)]
-
-# ajout d'une méthode pour ajouter et supprimer des relations
-    @staticmethod
-    def part_of(self, place):
-        if not self.is_connected(place):
-            self.connected.append(place)
-
-    def unconnected(self, place):
-        if self.is_connected(place):
-            self.connected.remove(place)
-
-    def is_connected(self, place):
-        return self.connected.filter(
-            Followers.c.relationship_connected_id == place.id).count() > 0
-#affichages des relations comme "followed" avec les autres et des relations comme "follower". 
-    def gestion_relationship(self):
-         connected = Place.query.join(
-            'Followers', (Followers.c.relationship_connected_id== Place.place_id)).filter(Followers.c.relationship_connected_id == self.id)
-         own = Place.query.filter_by(place_id=self.id)
-         return connected.union(own).order_by(Place.Place_nom.asc())
