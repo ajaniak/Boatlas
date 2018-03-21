@@ -157,5 +157,32 @@ def modif_lieu(place_id):
         unique_lieu = Place.query.get(place_id)
         return render_template("pages/modif_lieu.html", lieu=unique_lieu)
 
-@app.route("/relationship/<int:place_id>")
+@app.route('/follow/<place_id>')
 @login_required
+def follow(place_id):
+    user = User.query.filter_by(place_id=place_id).first()
+    if place is None:
+        flash('Place {} not found.'.format(place_id))
+        return redirect(url_for('index'))
+    if place == current_place:
+        flash('A place cannot be linked with itself!')
+        return redirect(url_for('place', place_id=place_id))
+    current_place.follow(place)
+    db.session.commit()
+    flash('The place is linked {}!'.format(place_id))
+    return redirect(url_for('user', place_id=place_id))
+
+@app.route('/unfollow/<place_id>')
+@login_required
+def unfollow(place_id):
+    user = User.query.filter_by(place_id=place_id).first()
+    if user is None:
+        flash('Place {} not found.'.format(place_id))
+        return redirect(url_for('index'))
+    if place == current_place:
+        flash('A place cannot unlinked itself!')
+        return redirect(url_for('user',place_id=place_id))
+    current_place.unfollow(place)
+    db.session.commit()
+    flash('The place are not connected anymore {}.'.format(place_id))
+    return redirect(url_for('user', place_id=place_id))
