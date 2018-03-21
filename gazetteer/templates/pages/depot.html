@@ -1,0 +1,44 @@
+{% extends "conteneur.html" %}
+
+{% block titre %}| Inscription{%endblock%}
+
+{% block corps %}
+
+<h1>Nouveau lieu</h1>
+<p>Complétez le formulaire et cliquez sur "Ajouter".</p>
+<form class="form" method="POST" action="{{url_for("depot")}}">
+  <div class="form-group row">
+    <label for="place-name" class="col-sm-2 col-form-label">Nom du lieu</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="place-name" name="lieu" placeholder="Nom du lieu crée">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="place-lat" class="col-sm-2 col-form-label">Coordonnées : Latitude</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="place-lat" placeholder="Latitude du lieu" name="lat">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="place-longt" class="col-sm-2 col-form-label">Coordonnées : Longitude</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="place-long" placeholder="Longitude du lieu" name="longt">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="place-desc" class="col-sm-2 col-form-label">Description du lieu</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="place-desc" placeholder="Description du lieu" name="desc">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="place-typep" class="col-sm-2 col-form-label">Type de Lieu</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="place-type" placeholder="Type du lieu" name="typep">
+    </div>
+  </div>
+  <div>
+    <button type="submit" class="btn btn-primary">Ajouter</button>
+  </div>
+</form>
+{% endblock %}
