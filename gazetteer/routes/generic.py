@@ -174,7 +174,7 @@ def modif_lieu(place_id):
         unique_lieu = Place.query.get(place_id)
         return render_template("pages/modif_lieu.html", lieu=unique_lieu)
 
-<<<<<<< HEAD
+
 @app.route('/follow/<place_id>')
 @login_required
 def follow(place_id):
@@ -204,7 +204,7 @@ def unfollow(place_id):
     db.session.commit()
     flash('The place are not connected anymore {}.'.format(place_id))
     return redirect(url_for('user', place_id=place_id))
-=======
+
 @app.route("/creer_biblio")
 @login_required
 def creer_biblio():
