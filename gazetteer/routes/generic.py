@@ -260,4 +260,3 @@ def biblio(biblio_id):
     unique_biblio = Biblio.query.get(biblio_id)
     print(unique_biblio)
     return render_template("pages/biblio.html", nom="Gazetteer", biblio=unique_biblio)
->>>>>>> upstream/master
