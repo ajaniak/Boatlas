@@ -1,12 +1,11 @@
 from flask import url_for
 import datetime
-
 from .. app import db
 
 
 class Authorship(db.Model):
     __tablename__ = "authorship"
-    authorship_id = db.Column(db.Integer, nullable=True, autoincrement=True, primary_key=True)
+    authorship_id = db.Column(db.Integer, nullable=False, autoincrement=True, primary_key=True)
     authorship_place_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
     authorship_user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
     authorship_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
@@ -19,8 +18,7 @@ class Authorship(db.Model):
             "on": self.authorship_date
         }
 
-
-# On crée notre modèle
+# On crée notre modèle de lieux
 class Place(db.Model):
     place_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
     place_nom = db.Column(db.Text)
@@ -29,6 +27,7 @@ class Place(db.Model):
     place_latitude = db.Column(db.Float)
     place_type = db.Column(db.String(45))
     authorships = db.relationship("Authorship", back_populates="place")
+    relations = db.relationship("Relation", back_populates="place")
 
     def to_jsonapi_dict(self):
         """ It ressembles a little JSON API format but it is not completely compatible
@@ -81,7 +80,7 @@ class Place(db.Model):
             place_latitude=latitude,
             place_longitude=longitude,
             place_description=description,
-            place_type=type,
+            place_type=typed,
             # changer le nom "type"
         )
         print(lieu)
@@ -107,9 +106,6 @@ class Place(db.Model):
         if not longitude:
             erreurs.append("Il faut indiquer la longitude")
 
-        # On vérifie que personne n'a utilisé cet email ou ce login
-
-
         # Si on a au moins une erreur
         if len(erreurs) > 0:
             print(erreurs, nom, latitude, description, longitude)
@@ -117,11 +113,11 @@ class Place(db.Model):
 
         lieu = Place.query.get(id)
 
-        lieu.place_nom = nom
-        lieu.place_latitude = latitude
-        lieu.place_description = description
-        lieu.place_longitude = longitude
-        lieu.place_type = type
+        lieu.place_nom=nom
+        lieu.place_latitude=latitude
+        lieu.place_description=description
+        lieu.place_longitude=longitude
+        lieu.place_type=typed
 
         try:
 
@@ -135,3 +131,99 @@ class Place(db.Model):
 
         except Exception as erreur:
             return False, [str(erreur)]
+
+#on crée notre classe de références bibliographiques
+class Biblio(db.Model):
+    biblio_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
+    biblio_titre = db.Column(db.Text, nullable=False)
+    biblio_auteur = db.Column(db.Text, nullable=False)
+    biblio_date = db.Column(db.Text)
+    biblio_lieu = db.Column(db.Text)
+    biblio_type = db.Column(db.Text, nullable=False)
+    relations = db.relationship("Relation", back_populates="biblio")
+
+    @staticmethod
+    def creer_biblio(titre, auteur, date, lieu, type):
+        """ Crée une nouvelle référence bibliographique et renvoie les informations entrées par l'utilisateur
+        :param titre: Titre de la référence
+        :param auteur: Auteur de la référence
+        :param date: Date de publication de la référence
+        :param lieu: Lieu de publication de la référence
+        :param type: Type de publication
+        """
+        erreurs = []
+        if not titre:
+            erreurs.append("Le titre de l'oeuvre est obligatoire")
+        if not auteur:
+            erreurs.append("Il faut indiquer l'auteur")
+        if not type:
+            erreurs.append("Il faut indiquer le type d'oeuvre : article ou livre")
+
+        # Si on a au moins une erreur
+        if len(erreurs) > 0:
+            print(erreurs, titre, auteur, type)
+            return False, erreurs
+
+        biblio = Biblio(
+            biblio_titre=titre,
+            biblio_auteur=auteur,
+            biblio_date=date,
+            biblio_lieu=lieu,
+            biblio_type=typed,
+            # changer le nom "type"
+        )
+        print (biblio)
+
+        try:
+            # On l'ajoute au transport vers la base de données
+            db.session.add(biblio)
+            # On envoie la référence
+            db.session.commit()
+
+            return True, biblio
+
+        except Exception as erreur:
+            return False, [str(erreur)]
+
+    @staticmethod
+    def modif_biblio(id, titre, auteur, date, lieu, type):
+        erreurs = []
+        if not titre:
+            erreurs.append("Le titre de la référence est obligatoire")
+        if not auteur:
+            erreurs.append("Il faut indiquer l'auteur de la référence'")
+        if not type:
+            erreurs.append("Il faut indiquer le type de la référence : roman, article scientifique, etc.")
+
+        # Si on a au moins une erreur
+        if len(erreurs) > 0:
+            print(erreurs, titre, auteur, type)
+            return False, erreurs
+
+        biblio = Biblio.query.get(id)
+
+        biblio.biblio_titre = titre
+        biblio.biblio_auteur = auteur
+        biblio.biblio_date = date
+        biblio.biblio_lieu = lieu
+        biblio.biblio_type = typed
+
+        try:
+            # On l'ajoute au transport vers la base de données
+            db.session.add(biblio)
+                # On envoie le paquet
+            db.session.commit()
+
+                # On renvoie l'utilisateur
+            return True, biblio
+
+        except Exception as erreur:
+            return False, [str(erreur)]
+
+class Relation(db.Model):
+    __tablename__ = "relation"
+    relation_id = db.Column(db.Integer, nullable=False, autoincrement=True, primary_key=True)
+    relation_place_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
+    relation_biblio_id = db.Column(db.Integer, db.ForeignKey('biblio.biblio_id'))
+    biblio = db.relationship("Biblio", back_populates="relations")
+    place = db.relationship("Place", back_populates="relations")

@@ -1,0 +1,47 @@
+{% extends "conteneur.html" %}
+
+{% block titre %}| Contribuer{%endblock%}
+
+{% block corps %}
+
+<h1>Editer</h1>
+<p>Complétez le formulaire et cliquez sur "Contribuer" pour ajouter un nouveau lieu.</p>
+<form class="form" method="GET" action="{{url_for('creer_biblio', biblio_id=biblio_id)}}">
+  <!-- mettre en post -->
+     <div class="form-group row">
+    <label for="titre" class="col-sm-4 col-form-label">Titre du livre ou de l'article</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="titre" name="titre" value="{{biblio_titre}}">
+    </div>
+</div>
+  <div class="form-group row">
+    <label for="auteur" class="col-sm-4 col-form-label">Nom de l'auteur</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="auteur" name="auteur" value="{{biblio_auteur}}" >
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="date_publication" class="col-sm-4 col-form-label">Date de publication</label>
+    <div class="col-sm-8">
+      <input type="number" class="form-control" id="date" name="date" value="{{biblio_date}}">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="lieu_publication" class="col-sm-4 col-form-label">Lieu de publication</label>
+    <div class="col-sm-8">
+      <input  type="text" class="form-control" id="lieu" name="lieu" value="{{biblio_lieu}}">
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="lieu_publication" class="col-sm-4 col-form-label">Type de publication</label>
+    <div class="col-sm-8">
+      <input  type="text" class="form-control" id="type" name="type" value="{{biblio_type}}">
+    </div>
+  </div>
+
+  <div>
+    <button type="submit" class="btn btn-primary">Contribuer</button>
+  </div>
+</form>
+{% endblock %}
