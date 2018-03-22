@@ -17,17 +17,12 @@ class Authorship(db.Model):
             "on": self.authorship_date
         }
 
-#création d'une table d'association
-class Followers(db.Model):
-    __tablename__="following"
-    f_connection_id= db.Column(db.Integer, primary_key=True, autoincrement=True)
-    f_place_from = db.Column(db.Integer, db.ForeignKey('place.place_id'))
-    f_place_to = db.Column(db.Integer, db.ForeignKey('place.place_id'))
-    pfrom = db.relationship("Place", back_populates="place_from")
-
-
-#Il faut définir la relation mais à quel endroit??
-#following = Followers(extra_field=0 , to=self , from=link_place)
+#création d'une table d'association pour les connexions entre les lieux
+link_lieu = db.Table('link_lieu',
+    db.Column('link_id',db.Integer, autoincrement=True),
+    db.Column('link_parent', db.Integer, db.ForeignKey('place.place_id'), primary_key=True),
+    db.Column('link_child',db.Integer, db.ForeignKey('place.place_id'), primary_key=True)
+    )
 
 # On crée notre modèle
 class Place(db.Model):
@@ -37,10 +32,12 @@ class Place(db.Model):
     place_longitude = db.Column(db.Float)
     place_latitude = db.Column(db.Float)
     place_type = db.Column(db.String(45))
-    place_connection = db.relationship(db.Integer, ForeignKey('Followers.f_place_to'))
     authorships = db.relationship("Authorship", back_populates="place")
-    place_from = db.relationship ("Followers", back_populates="pfrom")
-
+    liaisons = db.relationship(
+        'Place', secondary=link_lieu,
+        primaryjoin= id ==link_lieu.c.link_parent,
+        secondaryjoin= id ==link_lieu.c.link_child,
+        backref="link_parent")
 
     def to_jsonapi_dict(self):
         """ It ressembles a little JSON API format but it is not completely compatible
@@ -109,23 +106,6 @@ class Place(db.Model):
         except Exception as erreur:
             return False, [str(erreur)]
 
-
-    def follow(self, place):
-        if not self.is_following(place):
-            self.followed.append(place)
-
-    def unfollow(self, place):
-        if self.is_following(place):
-            self.followed.remove(place)
-
-    def is_following(self, place):
-        return self.followed.filter(followers.c.f_place_to == place_id).count() > 0
-
-    def followed_connection(self):
-        followed = connection.query.join(followers, (followers.c.f_place_to == connection.place_id)).filter(followers.c.f_place_from == self.id)
-        own = connection.query.filter_by(place_id=self.id)
-        return followed.union(own)
-
     @staticmethod
     def modif_lieu(id, nom, latitude, longitude, description, type):
         erreurs = []
@@ -158,6 +138,164 @@ class Place(db.Model):
 
             # On renvoie l'utilisateur
             return True, lieu
+
+        except Exception as erreur:
+            return False, [str(erreur)]
+
+            #on crée notre classe de références bibliographiques
+class Biblio(db.Model):
+    biblio_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
+    biblio_titre = db.Column(db.Text, nullable=False)
+    biblio_auteur = db.Column(db.Text, nullable=False)
+    biblio_date = db.Column(db.Text)
+    biblio_lieu = db.Column(db.Text)
+    biblio_type = db.Column(db.Text, nullable=False)
+    relations = db.relationship("Relation", back_populates="biblio")
+
+    @staticmethod
+    def creer_biblio(titre, auteur, date, lieu, type):
+        """ Crée une nouvelle référence bibliographique et renvoie les informations entrées par l'utilisateur
+        :param titre: Titre de la référence
+        :param auteur: Auteur de la référence
+        :param date: Date de publication de la référence
+        :param lieu: Lieu de publication de la référence
+        :param type: Type de publication
+        """
+        erreurs = []
+        if not titre:
+            erreurs.append("Le titre de l'oeuvre est obligatoire")
+        if not auteur:
+            erreurs.append("Il faut indiquer l'auteur")
+        if not type:
+            erreurs.append("Il faut indiquer le type d'oeuvre : article ou livre")
+
+        # Si on a au moins une erreur
+        if len(erreurs) > 0:
+            print(erreurs, titre, auteur, type)
+            return False, erreurs
+
+        biblio = Biblio(
+            biblio_titre=titre,
+            biblio_auteur=auteur,
+            biblio_date=date,
+            biblio_lieu=lieu,
+            biblio_type=typed,
+            # changer le nom "type"
+        )
+        print (biblio)
+
+        try:
+            # On l'ajoute au transport vers la base de données
+            db.session.add(biblio)
+            # On envoie la référence
+            db.session.commit()
+
+            return True, biblio
+
+        except Exception as erreur:
+            return False, [str(erreur)]
+
+    @staticmethod
+    def modif_biblio(id, titre, auteur, date, lieu, type):
+        erreurs = []
+        if not titre:
+            erreurs.append("Le titre de la référence est obligatoire")
+        if not auteur:
+            erreurs.append("Il faut indiquer l'auteur de la référence'")
+        if not type:
+            erreurs.append("Il faut indiquer le type de la référence : roman, article scientifique, etc.")
+
+        # Si on a au moins une erreur
+        if len(erreurs) > 0:
+            print(erreurs, titre, auteur, type)
+            return False, erreurs
+
+        biblio = Biblio.query.get(id)
+
+        biblio.biblio_titre = titre
+        biblio.biblio_auteur = auteur
+        biblio.biblio_date = date
+        biblio.biblio_lieu = lieu
+        biblio.biblio_type = typed
+
+        try:
+            # On l'ajoute au transport vers la base de données
+            db.session.add(biblio)
+                # On envoie le paquet
+            db.session.commit()
+
+                # On renvoie l'utilisateur
+            return True, biblio
+
+        except Exception as erreur:
+            return False, [str(erreur)]
+
+class Relation(db.Model):
+    __tablename__ = "relation"
+    relation_id = db.Column(db.Integer, nullable=False, autoincrement=True, primary_key=True)
+    relation_place_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
+    relation_biblio_id = db.Column(db.Integer, db.ForeignKey('biblio.biblio_id'))
+    biblio = db.relationship("Biblio", back_populates="relations")
+    place = db.relationship("Place", back_populates="relations")
+
+    # création de la gestions des liens entre les lieux.
+    @staticmethod
+    def creer_liaison(nom_lieu_1, nom_lieu_2):
+        erreurs = []
+        if not nom_lieu_1:
+            erreurs.append("Le nom du lieu parent est obligatoire")
+        if not nom_lieu_2:
+            erreurs.append("Il faut indiquer le nom du lieu enfant")
+
+        # Si on a au moins une erreur
+        if len(erreurs) > 0:
+            print(erreurs, nom_lieu_1, nom_lieu_2)
+            return False, erreurs
+
+        lieu_liaison = Place(
+            link_parent=nom_lieu_1,
+            link_child=nom_lieu_2,
+        )
+        print(lieu_liaison)
+        try:
+            # On l'ajoute au transport vers la base de données
+            db.session.add(lieu_liaison)
+            # On envoie le paquet
+            db.session.commit()
+
+            # On renvoie l'utilisateur
+            return True, lieu_liaison
+
+        except Exception as erreur:
+            return False, [str(erreur)]
+
+    @staticmethod
+    def modif_liaison(id, nom_lieu_1, nom_lieu_2):
+        erreurs = []
+        if not nom_lieu_1:
+            erreurs.append("Le nom du lieu est obligatoire")
+        if not nom_lieu_2:
+            erreurs.append("Il faut indiquer la latitude")
+
+        # Si on a au moins une erreur
+        if len(erreurs) > 0:
+            print(erreurs, nom_lieu_1, nom_lieu_2)
+            return False, erreurs
+
+        lieu_liaison = link_lieu.query.get(id)
+
+        lieu_liaison.link_parent=nom_lieu_1
+        lieu_liaison.link_child=nom_lieu_2
+
+        try:
+
+            # On l'ajoute au transport vers la base de données
+            db.session.add(lieu_liaison)
+            # On envoie le paquet
+            db.session.commit()
+
+            # On renvoie l'utilisateur
+            return True, lieu_liaison
 
         except Exception as erreur:
             return False, [str(erreur)]
