@@ -102,6 +102,7 @@ class Place(db.Model):
         except Exception as erreur:
             return False, [str(erreur)]
 
+
     @staticmethod
     def modif_lieu(id, nom, latitude, longitude, description, typep):
         erreurs = []
@@ -139,19 +140,19 @@ class Place(db.Model):
             return False, [str(erreur)]
 
     @staticmethod
-    def follow(self, place):
-        if not self.is_following(place):
-            self.followed.append(user)
-
-    @staticmethod
-    def unfollow(self, place):
-        if self.is_following(place):
-            self.followed.remove(place)
-
-    @staticmethod
-    def is_following(self, place):
-        return self.followed.filter(
-            followers.c.followed_id == place.place_id).count() > 0
+    def liaison_biblio(place):
+        place = Place.query.get(place_id)
+        print(place.place_nom)
+# Executer l'insertion une seule fois
+        if Biblio.query.count() == 0:
+            place.biblios_titre.append(Biblio(biblio_titre="Garonne"))
+            place.v.append(Variante(variante_nom="Garona"))
+            db.session.add(place)
+            db.session.commit()
+# Cette ligne affiche "Garonne"
+        print(Biblio.query.get(place_id).biblio_titre)
+# Cette ligne affiche ['Garonne', 'Garona']
+        print([b.biblio_titre for b in biblio.query.get(place_id).biblios_titre])
 
 #on crée notre classe de références bibliographiques
 class Biblio(db.Model):
@@ -162,6 +163,28 @@ class Biblio(db.Model):
     biblio_lieu = db.Column(db.Text)
     biblio_type = db.Column(db.Text, nullable=False)
     relations = db.relationship("Relation", back_populates="biblio")
+
+    def to_jsonapi_dict(self):
+        """ It ressembles a little JSON API format but it is not completely compatible
+
+        :return:
+        """
+        return {
+            "type": "biblio",
+            "id": self.biblio_id,
+            "attributes": {
+                "titre": self.biblio_titre,
+                "auteur": self.biblio_auteur,
+                "date": self.biblio_date,
+                "lieu": self.biblio_lieu,
+                "category": self.place_type
+            },
+            "links": {
+                "self": url_for("biblio", biblio_id=self.biblio_id, _external=True),
+                "json": url_for("api_biblios_single", biblio_id=self.biblio_id, _external=True)
+            },
+
+        }
 
     @staticmethod
     def creer_biblio(titre, auteur, date, lieu, typep):
