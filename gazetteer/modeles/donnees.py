@@ -17,6 +17,10 @@ class Authorship(db.Model):
             "author": self.user.to_jsonapi_dict(),
             "on": self.authorship_date
         }
+followers = db.Table('followers',
+    db.Column('follower_id', db.Integer, db.ForeignKey('place.place_id')),
+    db.Column('followed_id', db.Integer, db.ForeignKey('place.place_id'))
+)
 
 # On crée notre modèle de lieux
 class Place(db.Model):
@@ -28,6 +32,11 @@ class Place(db.Model):
     place_type = db.Column(db.String(45))
     authorships = db.relationship("Authorship", back_populates="place")
     relations = db.relationship("Relation", back_populates="place")
+    followed = db.relationship(
+    'Place', secondary=followers, primaryjoin=(followers.c.follower_id == place_id),
+    secondaryjoin=(followers.c.followed_id==place_id),
+    backref=db.backref('followers', lazy='dynamic'), lazy='dynamic'
+    )
 
     def to_jsonapi_dict(self):
         """ It ressembles a little JSON API format but it is not completely compatible
@@ -58,7 +67,7 @@ class Place(db.Model):
 
 
     @staticmethod
-    def creer_lieu(nom, latitude, longitude, description, type):
+    def creer_lieu(nom, latitude, longitude, description, typep):
         erreurs = []
         if not nom:
             erreurs.append("Le nom du lieu est obligatoire")
@@ -66,9 +75,6 @@ class Place(db.Model):
             erreurs.append("Il faut indiquer la latitude")
         if not longitude:
             erreurs.append("Il faut indiquer la longitude")
-
-        # On vérifie que personne n'a utilisé cet email ou ce login
-
 
         # Si on a au moins une erreur
         if len(erreurs) > 0:
@@ -80,7 +86,7 @@ class Place(db.Model):
             place_latitude=latitude,
             place_longitude=longitude,
             place_description=description,
-            place_type=typed,
+            place_type=typep,
             # changer le nom "type"
         )
         print(lieu)
@@ -97,7 +103,7 @@ class Place(db.Model):
             return False, [str(erreur)]
 
     @staticmethod
-    def modif_lieu(id, nom, latitude, longitude, description, type):
+    def modif_lieu(id, nom, latitude, longitude, description, typep):
         erreurs = []
         if not nom:
             erreurs.append("Le nom du lieu est obligatoire")
@@ -117,7 +123,7 @@ class Place(db.Model):
         lieu.place_latitude=latitude
         lieu.place_description=description
         lieu.place_longitude=longitude
-        lieu.place_type=typed
+        lieu.place_type=typep
 
         try:
 
@@ -132,6 +138,21 @@ class Place(db.Model):
         except Exception as erreur:
             return False, [str(erreur)]
 
+    @staticmethod
+    def follow(self, place):
+        if not self.is_following(place):
+            self.followed.append(user)
+
+    @staticmethod
+    def unfollow(self, place):
+        if self.is_following(place):
+            self.followed.remove(place)
+
+    @staticmethod
+    def is_following(self, place):
+        return self.followed.filter(
+            followers.c.followed_id == place.place_id).count() > 0
+
 #on crée notre classe de références bibliographiques
 class Biblio(db.Model):
     biblio_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
@@ -143,7 +164,7 @@ class Biblio(db.Model):
     relations = db.relationship("Relation", back_populates="biblio")
 
     @staticmethod
-    def creer_biblio(titre, auteur, date, lieu, type):
+    def creer_biblio(titre, auteur, date, lieu, typep):
         """ Crée une nouvelle référence bibliographique et renvoie les informations entrées par l'utilisateur
         :param titre: Titre de la référence
         :param auteur: Auteur de la référence
@@ -156,12 +177,12 @@ class Biblio(db.Model):
             erreurs.append("Le titre de l'oeuvre est obligatoire")
         if not auteur:
             erreurs.append("Il faut indiquer l'auteur")
-        if not type:
+        if not typep:
             erreurs.append("Il faut indiquer le type d'oeuvre : article ou livre")
 
         # Si on a au moins une erreur
         if len(erreurs) > 0:
-            print(erreurs, titre, auteur, type)
+            print(erreurs, titre, auteur, typep)
             return False, erreurs
 
         biblio = Biblio(
@@ -169,7 +190,7 @@ class Biblio(db.Model):
             biblio_auteur=auteur,
             biblio_date=date,
             biblio_lieu=lieu,
-            biblio_type=typed,
+            biblio_type=typep,
             # changer le nom "type"
         )
         print (biblio)
@@ -186,35 +207,36 @@ class Biblio(db.Model):
             return False, [str(erreur)]
 
     @staticmethod
-    def modif_biblio(id, titre, auteur, date, lieu, type):
+    def modif_biblio(id, titre, auteur, date, lieu, typep):
         erreurs = []
         if not titre:
             erreurs.append("Le titre de la référence est obligatoire")
         if not auteur:
-            erreurs.append("Il faut indiquer l'auteur de la référence'")
-        if not type:
-            erreurs.append("Il faut indiquer le type de la référence : roman, article scientifique, etc.")
+            erreurs.append("Il faut indiquer l'auteur")
+        if not typep:
+            erreurs.append("Il faut indiquer le type de publication")
 
         # Si on a au moins une erreur
         if len(erreurs) > 0:
-            print(erreurs, titre, auteur, type)
+            print(erreurs, titre, auteur, date, lieu, typep)
             return False, erreurs
 
         biblio = Biblio.query.get(id)
 
-        biblio.biblio_titre = titre
-        biblio.biblio_auteur = auteur
-        biblio.biblio_date = date
-        biblio.biblio_lieu = lieu
-        biblio.biblio_type = typed
+        biblio.biblio_titre=titre
+        biblio.biblio_auteur=auteur
+        biblio.biblio_date=date
+        biblio.biblio_lieu=lieu
+        biblio.biblio_type=typep
 
         try:
+
             # On l'ajoute au transport vers la base de données
             db.session.add(biblio)
-                # On envoie le paquet
+            # On envoie le paquet
             db.session.commit()
 
-                # On renvoie l'utilisateur
+            # On renvoie l'utilisateur
             return True, biblio
 
         except Exception as erreur:
