@@ -1,17 +1,14 @@
-DROP TABLE IF EXISTS `gazetteer`.`following` ;
+DROP TABLE IF EXISTS `gazetteer`.`link_lieu` ;
 
-CREATE TABLE IF NOT EXISTS `gazetteer`.`following` (
-  `f_connection_id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `f_place_from` INT NOT NULL,
-  `f_place_to` INT NOT NULL,
-  CONSTRAINT `fk_following_1`
-    FOREIGN KEY (`f_place_from`)
+CREATE TABLE IF NOT EXISTS `gazetteer`.`link_lieu` (
+  `link_id` INT NOT NULL,
+  `link_parent` INT NOT NULL,
+  `link_child` INT NOT NULL,
+  PRIMARY KEY (`link_parent`, `link_child`),
+  INDEX `fk_link_1_idx` (`link_parent` ASC),
+  CONSTRAINT `fk_link_1`
+    FOREIGN KEY (`link_parent`)
     REFERENCES `gazetteer`.`place` (`place_id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_following_2`
-  FOREIGN KEY (`f_place_to`)
-  REFERENCES `gazetteer`.`place` (`place_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
