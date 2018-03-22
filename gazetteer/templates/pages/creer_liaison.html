@@ -1,0 +1,26 @@
+{% extends "conteneur.html" %}
+
+{% block titre %}| Créer une nouvelle liaison entre deux lieux{%endblock%}
+
+{% block corps %}
+
+<h1>Nouveau lieu</h1>
+<p>Complétez le formulaire et cliquez sur "Ajouter".</p>
+<form class="form" method="POST" action="{{url_for("creer_liaison")}}">
+  <div class="form-group row">
+    <label for="place-name" class="col-sm-2 col-form-label">Nom du lieu 1</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="link_parent" name="nom_lieu_1" placeholder="Nom du lieu">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="place-lat" class="col-sm-2 col-form-label">Nom du lieu 2</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="link_child" placeholder="Nom du lieu 2" name="nom_lieu_2">
+    </div>
+  </div>
+  <div>
+    <button type="submit" class="btn btn-primary">Ajouter</button>
+  </div>
+</form>
+{% endblock %}
