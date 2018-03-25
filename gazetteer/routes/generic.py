@@ -195,6 +195,17 @@ def creer_biblio():
         return render_template("pages/creer_biblio.html")
 
 
+@app.route("/biblio/<int:biblio_id>")
+def biblio(biblio_id):
+    """ Route permettant l'affichage des données d'un lieu
+
+    :param biblio_id: Identifiant numérique de la référence bibliographique
+    """
+    # On récupère le tuple correspondant aux champs de la classe Biblio
+    unique_biblio = Biblio.query.get(biblio_id)
+    print(unique_biblio)
+    return render_template("pages/biblio.html", nom="Gazetteer", biblio=unique_biblio)
+
 @app.route("/modif_biblio/<int:biblio_id>")
 @login_required
 def modif_biblio(biblio_id):
@@ -214,17 +225,5 @@ def modif_biblio(biblio_id):
 
     else:
         flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
-        unique_biblio = Place.query.get(biblio_id)
-        return render_template("pages/modif_biblio.html", lieu=unique_biblio)
-
-
-@app.route("/biblio/<int:biblio_id>")
-def biblio(biblio_id):
-    """ Route permettant l'affichage des données d'un lieu
-
-    :param biblio_id: Identifiant numérique de la référence bibliographique
-    """
-    # On récupère le tuple correspondant aux champs de la classe Biblio
-    unique_biblio = Biblio.query.get(biblio_id)
-    print(unique_biblio)
-    return render_template("pages/biblio.html", nom="Gazetteer", biblio=unique_biblio)
+        unique_biblio = Biblio.query.get(biblio_id)
+        return render_template("pages/modif_biblio.html", biblio=unique_biblio)

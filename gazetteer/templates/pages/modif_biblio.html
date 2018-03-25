@@ -6,7 +6,7 @@
 
 <h1>Editer</h1>
 <p>Complétez le formulaire et cliquez sur "Contribuer" pour modifier la référence.</p>
-<form class="form" method="GET" action="{{url_for('modif_biblio', biblio_id=biblio.biblio_id)}}">
+<form class="form" method="POST" action="{{url_for('modif_biblio', biblio_id=biblio.biblio_id)}}" >
  <!-- mettre en post -->
      <div class="form-group row">
     <label for="nom" class="col-sm-4 col-form-label">Nom de la référence</label>

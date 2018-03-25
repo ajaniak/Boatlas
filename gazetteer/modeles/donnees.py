@@ -233,11 +233,11 @@ class Biblio(db.Model):
     def modif_biblio(id, titre, auteur, date, lieu, typep):
         erreurs = []
         if not titre:
-            erreurs.append("Le titre de la référence est obligatoire")
+            erreurs.append("Le titre est obligatoire")
         if not auteur:
-            erreurs.append("Il faut indiquer l'auteur")
+            erreurs.append("L'auteur est obligatoire")
         if not typep:
-            erreurs.append("Il faut indiquer le type de publication")
+            erreurs.append("Il faut indiquer le type d'ouvrage")
 
         # Si on a au moins une erreur
         if len(erreurs) > 0:
