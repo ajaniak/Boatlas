@@ -206,7 +206,7 @@ def biblio(biblio_id):
     print(unique_biblio)
     return render_template("pages/biblio.html", nom="Gazetteer", biblio=unique_biblio)
 
-@app.route("/modif_biblio/<int:biblio_id>")
+@app.route("/modif_biblio/<int:biblio_id>", methods=["POST", "GET"])
 @login_required
 def modif_biblio(biblio_id):
     status, donnees = Biblio.modif_biblio(
