@@ -60,6 +60,39 @@ def recherche():
         keyword=motclef
     )
 
+@app.route("/recherche_biblio")
+def recherche_biblio():
+    """ Route permettant la recherche plein-texte
+    """
+    # On préfèrera l'utilisation de .get() ici
+    #   qui nous permet d'éviter un if long (if "clef" in dictionnaire and dictonnaire["clef"])
+    motclef = request.args.get("keyword", None)
+    page = request.args.get("page", 1)
+
+    if isinstance(page, str) and page.isdigit():
+        page = int(page)
+    else:
+        page = 1
+
+    # On crée une liste vide de résultat (qui restera vide par défaut
+    #   si on n'a pas de mot clé)
+    resultats = []
+
+    # On fait de même pour le titre de la page
+    titre = "Recherche_biblio"
+    if motclef:
+        resultats = Biblio.query.filter(
+            Biblio.biblio_titre.like("%{}%".format(motclef))
+        ).paginate(page=page, per_page=LIEUX_PAR_PAGE)
+        titre = "Résultat pour la recherche `" + motclef + "`"
+
+    return render_template(
+        "pages/recherche_biblio.html",
+        resultats=resultats,
+        titre=titre,
+        keyword=motclef
+    )
+
 @app.route("/browse")
 def browse():
     """ Route permettant la recherche plein-texte
