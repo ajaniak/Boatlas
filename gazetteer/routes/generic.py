@@ -265,9 +265,7 @@ def modif_biblio(biblio_id):
     else:
         flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
         unique_biblio = Biblio.query.get(biblio_id)
-<<<<<<< HEAD
-        return render_template("pages/modif_biblio.html", lieu=unique_biblio)
-
+        return render_template("pages/modif_biblio.html", biblio=unique_biblio)
 
 @app.route("/biblio/<int:biblio_id>")
 def biblio(biblio_id):
@@ -326,6 +324,3 @@ def modif_liaison(link_id):
         flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
         unique_lieu = Place.query.get(place_id)
         return render_template("pages/modif_lieu.html", lieu=unique_lieu)
-=======
-        return render_template("pages/modif_biblio.html", biblio=unique_biblio)
->>>>>>> upstream/master
