@@ -208,13 +208,10 @@ def modif_lieu(place_id):
         unique_lieu = Place.query.get(place_id)
         return render_template("pages/modif_lieu.html", lieu=unique_lieu)
 
-<<<<<<< HEAD
 
 @app.route("/creer_biblio")
 @login_required
-=======
 @app.route("/creer_biblio", methods=["POST", "GET"])
->>>>>>> upstream/master
 def creer_biblio():
     if request.method == "POST":
         statut, donnees = Biblio.creer_biblio(
