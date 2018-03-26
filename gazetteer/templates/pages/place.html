@@ -21,14 +21,9 @@
 
     <p><a href="{{url_for('accueil')}}">Retour à l'accueil</a></p>
     {% if current_user.is_authenticated %}
-<<<<<<< HEAD
-        <a class="nav-link" href="{{url_for('modif_lieu', place_id=lieu.place_id)}}">Editer</a>
-        {%endif %}
-=======
     <p><a class="nav-link" href="{{url_for('modif_lieu', place_id=lieu.place_id)}}">Editer le lieu</a></p>
-    
+
     <!-- Je renvoie vers ma route qui renvoie vers un formulaire où biblio_id = la liste définie d'après ma classe -->
 
 {%endif %}
->>>>>>> upstream/master
 {% endblock %}
