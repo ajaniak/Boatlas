@@ -16,10 +16,6 @@ class Authorship(db.Model):
             "author": self.user.to_jsonapi_dict(),
             "on": self.authorship_date
         }
-followers = db.Table('followers',
-    db.Column('follower_id', db.Integer, db.ForeignKey('place.place_id')),
-    db.Column('followed_id', db.Integer, db.ForeignKey('place.place_id'))
-)
 
 #création d'une table d'association pour les connexions entre les lieux
 link_lieu = db.Table('link_lieu',
@@ -38,7 +34,7 @@ class Place(db.Model):
     authorships = db.relationship("Authorship", back_populates="place")
     relations = db.relationship("Relation", back_populates="place")
     liaisons = db.relationship(
-        'Place', secondary=link_lieu,
+        "Place", secondary=link_lieu,
         primaryjoin= id ==link_lieu.c.link_parent,
         secondaryjoin= id ==link_lieu.c.link_child,
         backref="liens")
