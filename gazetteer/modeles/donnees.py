@@ -37,19 +37,11 @@ class Place(db.Model):
     place_type = db.Column(db.String(45))
     authorships = db.relationship("Authorship", back_populates="place")
     relations = db.relationship("Relation", back_populates="place")
-<<<<<<< HEAD
-#    liaisons = db.relationship(
-#        'Place', secondary=link_lieu,
-#        primaryjoin= id ==link_lieu.c.link_parent,
-#        secondaryjoin= id ==link_lieu.c.link_child,
-#        backref="liens")
-=======
-    followed = db.relationship(
-    'Place', secondary=followers, primaryjoin=(followers.c.follower_id == place_id),
-    secondaryjoin=(followers.c.followed_id==place_id),
-    backref=db.backref('followers', lazy='dynamic'), lazy='dynamic'
-    )
->>>>>>> upstream/master
+    liaisons = db.relationship(
+        'Place', secondary=link_lieu,
+        primaryjoin= id ==link_lieu.c.link_parent,
+        secondaryjoin= id ==link_lieu.c.link_child,
+        backref="liens")
 
     def to_jsonapi_dict(self):
         """ It ressembles a little JSON API format but it is not completely compatible
@@ -152,26 +144,8 @@ class Place(db.Model):
         except Exception as erreur:
             return False, [str(erreur)]
 
-<<<<<<< HEAD
-            #on crée notre classe de références bibliographiques
-=======
-    @staticmethod
-    def liaison_biblio(place):
-        place = Place.query.get(place_id)
-        print(place.place_nom)
-# Executer l'insertion une seule fois
-        if Biblio.query.count() == 0:
-            place.biblios_titre.append(Biblio(biblio_titre="Garonne"))
-            place.v.append(Variante(variante_nom="Garona"))
-            db.session.add(place)
-            db.session.commit()
-# Cette ligne affiche "Garonne"
-        print(Biblio.query.get(place_id).biblio_titre)
-# Cette ligne affiche ['Garonne', 'Garona']
-        print([b.biblio_titre for b in biblio.query.get(place_id).biblios_titre])
 
-#on crée notre classe de références bibliographiques
->>>>>>> upstream/master
+            #on crée notre classe de références bibliographiques
 class Biblio(db.Model):
     biblio_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
     biblio_titre = db.Column(db.Text, nullable=False)
