@@ -19,10 +19,9 @@ class Authorship(db.Model):
 
 #création d'une table d'association pour les connexions entre les lieux
 link_lieu = db.Table('link_lieu',
-    db.Column('link_id',db.Integer, autoincrement=True),
-    db.Column('link_parent', db.Integer, db.ForeignKey('place.place_id'), primary_key=True),
-    db.Column('link_child',db.Integer, db.ForeignKey('place.place_id'), primary_key=True)
-    )
+    db.Column('link_id',db.Integer, autoincrement=True, primary_key=True),
+    db.Column('link_parent', db.Integer, db.ForeignKey('place.place_id'),
+    db.Column('link_child',db.Integer, db.ForeignKey('place.place_id'))
 
 # On crée notre modèle
 class Place(db.Model):
@@ -33,11 +32,12 @@ class Place(db.Model):
     place_latitude = db.Column(db.Float)
     place_type = db.Column(db.String(45))
     authorships = db.relationship("Authorship", back_populates="place")
-    liaisons = db.relationship(
-        'Place', secondary=link_lieu,
-        primaryjoin= id ==link_lieu.c.link_parent,
-        secondaryjoin= id ==link_lieu.c.link_child,
-        backref="link_parent")
+    relations = db.relationship("Relation", back_populates="place")
+#    liaisons = db.relationship(
+#        'Place', secondary=link_lieu,
+#        primaryjoin= id ==link_lieu.c.link_parent,
+#        secondaryjoin= id ==link_lieu.c.link_child,
+#        backref="liens")
 
     def to_jsonapi_dict(self):
         """ It ressembles a little JSON API format but it is not completely compatible
