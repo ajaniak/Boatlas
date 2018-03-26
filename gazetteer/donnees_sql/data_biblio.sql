@@ -1,0 +1,6 @@
+INSERT INTO `gazetteer`.`biblio` (`biblio_id`,`biblio_titre`, `biblio_auteur`, `biblio_date`, `biblio_lieu`, `biblio_type`) VALUES ( 1, 'Versailles, un palais pour la sculpture', 'Alexandre Maral', '2013', 'Dijon', 'parution scientifique');
+INSERT INTO `gazetteer`.`biblio` (`biblio_id`,`biblio_titre`, `biblio_auteur`, `biblio_date`, `biblio_lieu`, `biblio_type`) VALUES ( 2, 'Le Banquet', 'Platon', 'Ve siècle av.J.-C.', 'Athènes', 'traité philosophique');
+INSERT INTO `gazetteer`.`biblio` (`biblio_id`,`biblio_titre`, `biblio_auteur`, `biblio_date`, `biblio_lieu`, `biblio_type`) VALUES ( 3, 'Le Phèdre','Platon', 'Ve siècle av.J.-C.', 'Athènes', 'traité philosophique');
+INSERT INTO `gazetteer`.`biblio` (`biblio_id`, `biblio_titre`, `biblio_auteur`, `biblio_date`, `biblio_lieu`, `biblio_type`) VALUES ( 4, 'Iliade', 'Homère', '', '', 'épopée');
+INSERT INTO `gazetteer`.`biblio` (`biblio_id`, `biblio_titre`, `biblio_auteur`, `biblio_date`, `biblio_lieu`, `biblio_type`) VALUES ( 5, 'Odyssée', 'Homère', '', '', 'épopée');
+INSERT INTO `gazetteer`.`biblio` (`biblio_id`, `biblio_titre`, `biblio_auteur`, `biblio_date`, `biblio_lieu`, `biblio_type`) VALUES ( 6, 'Les Travaux et les Jours', 'Hésiode', '', '', 'poème');

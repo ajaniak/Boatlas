@@ -60,6 +60,39 @@ def recherche():
         keyword=motclef
     )
 
+@app.route("/recherche_biblio")
+def recherche_biblio():
+    """ Route permettant la recherche plein-texte
+    """
+    # On préfèrera l'utilisation de .get() ici
+    #   qui nous permet d'éviter un if long (if "clef" in dictionnaire and dictonnaire["clef"])
+    motclef = request.args.get("keyword", None)
+    page = request.args.get("page", 1)
+
+    if isinstance(page, str) and page.isdigit():
+        page = int(page)
+    else:
+        page = 1
+
+    # On crée une liste vide de résultat (qui restera vide par défaut
+    #   si on n'a pas de mot clé)
+    resultats = []
+
+    # On fait de même pour le titre de la page
+    titre = "Recherche_biblio"
+    if motclef:
+        resultats = Biblio.query.filter(
+            Biblio.biblio_titre.like("%{}%".format(motclef))
+        ).paginate(page=page, per_page=LIEUX_PAR_PAGE)
+        titre = "Résultat pour la recherche `" + motclef + "`"
+
+    return render_template(
+        "pages/recherche_biblio.html",
+        resultats=resultats,
+        titre=titre,
+        keyword=motclef
+    )
+
 @app.route("/browse")
 def browse():
     """ Route permettant la recherche plein-texte
@@ -134,16 +167,17 @@ def deconnexion():
     return redirect("/")
 
 @app.route("/depot", methods=["POST", "GET"])
+@login_required
 def depot():
     if request.method == "POST":
-        statut, donnees = Place.creer_lieu(
-            lieu=request.form.get("lieu", None),
-            lat=request.form.get("lat", None),
-            longt=request.form.get("longt", None),
-            desc=request.form.get("desc", None),
+        status, donnees = Place.creer_lieu(
+            nom=request.form.get("nom", None),
+            latitude=request.form.get("lat", None),
+            longitude=request.form.get("longt", None),
+            description=request.form.get("desc", None),
             typep=request.form.get("typep", None)
         )
-        if statut is True:
+        if status is True:
             flash("Enregistrement effectué. Vous avez ajouté un nouveau lieu", "success")
             return redirect("/")
         else:
@@ -161,7 +195,7 @@ def modif_lieu(place_id):
         latitude=request.args.get("latitude", None),
         longitude=request.args.get("longitude", None),
         description=request.args.get("description", None),
-        type=request.args.get("type", None),
+        typep=request.args.get("typep", None),
     )
 
     if status is True :
@@ -174,49 +208,24 @@ def modif_lieu(place_id):
         unique_lieu = Place.query.get(place_id)
         return render_template("pages/modif_lieu.html", lieu=unique_lieu)
 
-@app.route("/creer_biblio")
-@login_required
+@app.route("/creer_biblio", methods=["POST", "GET"])
 def creer_biblio():
-    status, donnees = Biblio.creer_biblio(
-    titre=request.args.get("titre", None),
-    auteur=request.args.get("auteur", None),
-    date=request.args.get("date", None),
-    lieu=request.args.get("lieu", None),
-    type=request.args.get("type", None),
-    )
-
-    if status is True :
-        flash("Merci pour votre contribution !", "success")
-
-
-        return redirect("/") #vers la référence bibliographique qu'il vient de créer.
-
+    if request.method == "POST":
+        statut, donnees = Biblio.creer_biblio(
+            titre=request.form.get("titre", None),
+            auteur=request.form.get("auteur", None),
+            date=request.form.get("date", None),
+            lieu=request.form.get("lieu", None),
+            typep=request.form.get("typep", None)
+        )
+        if statut is True:
+            flash("Enregistrement effectué. Vous avez ajouté une nouvelle référence bibliographique", "success")
+            return redirect("/")
+        else:
+            flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
+            return render_template("pages/creer_biblio.html")
     else:
-        flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
-
         return render_template("pages/creer_biblio.html")
-
-@app.route("/modif_biblio/<int:biblio_id>")
-@login_required
-def modif_biblio(biblio_id):
-    status, donnees = Biblio.modif_biblio(
-        id=biblio_id,
-        titre=request.args.get("titre", None),
-        auteur=request.args.get("auteur", None),
-        date=request.args.get("date", None),
-        lieu=request.args.get("lieu", None),
-        type=request.args.get("type", None),
-    )
-
-    if status is True :
-        flash("Merci pour votre contribution !", "success")
-        unique_biblio = Biblio.query.get(biblio_id)
-        return redirect("/") #vers le lieu qu'il vient de créer.
-
-    else:
-        flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
-        unique_biblio = Biblio.query.get(biblio_id)
-        return render_template("pages/modif_biblio.html", lieu=unique_biblio)
 
 
 @app.route("/biblio/<int:biblio_id>")
@@ -229,3 +238,25 @@ def biblio(biblio_id):
     unique_biblio = Biblio.query.get(biblio_id)
     print(unique_biblio)
     return render_template("pages/biblio.html", nom="Gazetteer", biblio=unique_biblio)
+
+@app.route("/modif_biblio/<int:biblio_id>", methods=["POST", "GET"])
+@login_required
+def modif_biblio(biblio_id):
+    status, donnees = Biblio.modif_biblio(
+        id=biblio_id,
+        titre=request.args.get("titre", None),
+        auteur=request.args.get("auteur", None),
+        date=request.args.get("date", None),
+        lieu=request.args.get("lieu", None),
+        typep=request.args.get("typep", None),
+    )
+
+    if status is True :
+        flash("Merci pour votre contribution !", "success")
+        unique_biblio = Biblio.query.get(biblio_id)
+        return redirect("/") #vers le lieu qu'il vient de créer.
+
+    else:
+        flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
+        unique_biblio = Biblio.query.get(biblio_id)
+        return render_template("pages/modif_biblio.html", biblio=unique_biblio)
