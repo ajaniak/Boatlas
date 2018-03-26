@@ -3,6 +3,7 @@
 -- Table `gazetteer`.`biblio`
 -- ----------------------------------------------------
 DROP TABLE IF EXISTS `gazetteer`.`biblio` ;
+
 CREATE TABLE IF NOT EXISTS `gazetteer`.`biblio` (
   `biblio_id` INT NOT NULL AUTO_INCREMENT COMMENT '	',
   `biblio_titre` TEXT NOT NULL,
@@ -13,3 +14,12 @@ CREATE TABLE IF NOT EXISTS `gazetteer`.`biblio` (
   PRIMARY KEY (`biblio_id`))
 ENGINE = InnoDB;
 COMMIT;
+
+-- --------------------------
+-- Ajout d'une colonne relation dans la table biblio
+-- --------------------------
+
+ALTER TABLE biblio ADD COLUMN relation_id SMALLINT UNSIGNED;
+
+
+
