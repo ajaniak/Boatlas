@@ -17,12 +17,6 @@ class Authorship(db.Model):
             "on": self.authorship_date
         }
 
-#création d'une table d'association pour les connexions entre les lieux
-link_lieu = db.Table('link_lieu',
-    db.Column('link_id',db.Integer, autoincrement=True, primary_key=True),
-    db.Column('link_parent', db.Integer, db.ForeignKey('place.place_id'),
-    db.Column('link_child',db.Integer, db.ForeignKey('place.place_id'))
-
 # On crée notre modèle
 class Place(db.Model):
     place_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
@@ -31,13 +25,11 @@ class Place(db.Model):
     place_longitude = db.Column(db.Float)
     place_latitude = db.Column(db.Float)
     place_type = db.Column(db.String(45))
+#jointures
     authorships = db.relationship("Authorship", back_populates="place")
     relations = db.relationship("Relation", back_populates="place")
-    liaisons = db.relationship(
-        "Place", secondary=link_lieu,
-        primaryjoin= id ==link_lieu.c.link_parent,
-        secondaryjoin= id ==link_lieu.c.link_child,
-        backref="liens")
+    link_place1 = db.relationship("link_lieu", primaryjoin="Place.place_id==Link_lieu.link_place1_id")
+    link_place2= db.relationship("link_lieu", primaryjoin="Place.place_id==Link_lieu.link_place2_id")
 
     def to_jsonapi_dict(self):
         """ It ressembles a little JSON API format but it is not completely compatible
@@ -260,64 +252,114 @@ class Relation(db.Model):
     biblio = db.relationship("Biblio", back_populates="relations")
     place = db.relationship("Place", back_populates="relations")
 
+# classe pour définir la nature des liens entre les lieux.
+class Link_type(db.Model):
+    __tablename__ = "relation_type"
+    link_type_id = db.Column(db.Integer, unique=True, nullable=False, autoincrement=True, primary_key=True)
+    link_type_name = db.Column(db.String(45), nullable=False)
+    link_type_description = db.Colum(db.String(240), nullable=False)
+# Jointure
+    type_link = db.relationship("Link", back_populates="links")
+
+#création d'une classe pour les connexions entre les lieux
+class link_lieu(db.Model):
+    __tablename__="link"
+    link_id = db.Column(db.Integer, autoincrement=True, primary_key=True, nullable=True)
+    link_place1_id =db.Column(db.Integer, db.ForeignKey('place.place_id'))
+    link_place2_id= db.Column(db.Integer, db.ForeignKey('place.place_id'))
+    link_relation_type_id = db.Column(db.Integer, db.ForeignKey('link_type_id'))
+#jointures
+    links = db.relationship("Link_type", back_populates="type_link")
+    place1 = db.relationship("Place", foreign_keys=[link_place1_id])
+    place2 = db.relationship ("Place", foreign_keys= [link_place2_id])
     # création de la gestions des liens entre les lieux.
     @staticmethod
-    def creer_liaison(nom_lieu_1, nom_lieu_2):
-        erreurs = []
-        if not nom_lieu_1:
-            erreurs.append("Le nom du lieu parent est obligatoire")
-        if not nom_lieu_2:
-            erreurs.append("Il faut indiquer le nom du lieu enfant")
+    def creer_link(link_place1, link_relation_type, link_place2):
+        """ Crée un nouveau lien entre deux lieux.
+        :param link_place1: liste des noms de lieux
+        :param link_place2:  liste des noms de lieux
+        :param link_relation_type : liste des noms de la relation
+        """
+    erreurs = []
+# vérif des champs
+if not ( (len(link_place1) == len (link_place2)) and (len (link_place1) == len(link_relation_type) )   and (len(link_place2) == len (link_relation_type)) ):
+            erreurs.append("Tous les champs doivent être remplis")
 
-        # Si on a au moins une erreur
-        if len(erreurs) > 0:
-            print(erreurs, nom_lieu_1, nom_lieu_2)
-            return False, erreurs
+# Initialisation de la boucle
+            loop = len(link_place1)
+# comparaison des lignes
+            tuples = []
+            reprise = 0
+for row in range (0, loop):
+            tuple = (link_place1[row], link_relation_type[row], link_place2[row])
+for trio in tuples:
+    if tuples == trio:
+                repeat += 1
+                tuples.append(tuple)
+#si erreur
+if reprise > 0:
+            errors.append("certains liens à créer sont identiques")
+# Verif de la sélection du champs type et que les lieux sont différents.
+for row in range (0, loop):
+    if link_relation_type[row] == 'Choisir':
+                errors.append("aucun type de relation n'a été sélectionné, ligne " + str(row +1))
+    if link_place1[row] == link_place2[row]:
+                errors.append("les champs 'Lieu 1' et 'Lieu 2' sont identiques, ligne " + str(row +1))
+#si erreurs.
+    if len(errors) > 0:
+        return False, errors
+# On vérifie les ID sont valides
+for row in range (0, loop):
+            place1 = Place.query.filter(Place.place_id == link_place1[row]).count()
+            place2 = Place.query.filter(Place.place_id == link_place2[row]).count()
+            if place1 == 0:
+                errors.append(link_place1[row] +" n'existe pas, ligne " + str(row +1))
+            if place2 == 0:
+                errors.append(link_place2[row] +" n'existe pas, ligne " + str(row +1))
 
-        lieu_liaison = Place(
-            link_parent=nom_lieu_1,
-            link_child=nom_lieu_2,
-        )
-        print(lieu_liaison)
-        try:
-            # On l'ajoute au transport vers la base de données
-            db.session.add(lieu_liaison)
-            # On envoie le paquet
-            db.session.commit()
+#on requête dans la table Link_type pour aller chercher id.
+            c_liaison = Link_type.query.filter(Link_type.link_type_name == link_relation_type[row]).count()
+# test de la requête.
+if c_liaison == 0:
+                errors.append("erreur de lien, ligne " + str(row +1))
+# si erreurs.
+if len(errors) > 0:
+    return False, errors
 
-            # On renvoie l'utilisateur
-            return True, lieu_liaison
+# On récupère l'id associé au lien.
+for row in range (0, loop):
+            liaison = Relation_type.query.filter(Relation_type.relation_type_name == link_relation_type[row]).all()
+            u_relation = relation[0]
+            link_relation_type[row] = u_relation.relation_type_id
+# On vérifie que le lien n'existe pas déjà
+            uniques = Link.query.filter(
+                db.and_(Link.link_person1_id == link_person1[row], Link.link_person2_id == link_person2[row], Link.link_relation_type_id == link_relation_type[row])
+                ).count()
+            if uniques > 0:
+                errors.append("le lien existe déjà")
+# si erreurs.
+if len(errors) > 0:
+    return False, errors
+# Création d'un nv lien :
+liste_link = []
+for row in range (0, loop):
+# on réinitialise la variable
+            liaison = Link_type.query.filter(Link_type.Link_type_name == link_relation_type[row]).all()
+            creer_link.append(
+                Link(
+link_place1_id=link_place1[row],
+link_relation_type_id=str(link_relation_type[row]),
+link_place2_id=link_place2[row]
+                    )
+                )
+try:
+    for row in range (0, loop):
+#ajout à la DB.
+                db.session.add(creer_link[row])
+                db.session.commit()
+# Renvoie vers l'utilisateur :
+return True, creer_link
 
-        except Exception as erreur:
-            return False, [str(erreur)]
-
-    @staticmethod
-    def modif_liaison(id, nom_lieu_1, nom_lieu_2):
-        erreurs = []
-        if not nom_lieu_1:
-            erreurs.append("Le nom du lieu est obligatoire")
-        if not nom_lieu_2:
-            erreurs.append("Il faut indiquer la latitude")
-
-        # Si on a au moins une erreur
-        if len(erreurs) > 0:
-            print(erreurs, nom_lieu_1, nom_lieu_2)
-            return False, erreurs
-
-        lieu_liaison = link_lieu.query.get(id)
-
-        lieu_liaison.link_parent=nom_lieu_1
-        lieu_liaison.link_child=nom_lieu_2
-
-        try:
-
-            # On l'ajoute au transport vers la base de données
-            db.session.add(lieu_liaison)
-            # On envoie le paquet
-            db.session.commit()
-
-            # On renvoie l'utilisateur
-            return True, lieu_liaison
-
-        except Exception as erreur:
-            return False, [str(erreur)]
+# Si erreurs
+except Exception as error_creation:
+return False, [str(error_creation)]
