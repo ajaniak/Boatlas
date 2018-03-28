@@ -28,8 +28,8 @@ class Place(db.Model):
 #jointures
     authorships = db.relationship("Authorship", back_populates="place")
     relations = db.relationship("Relation", back_populates="place")
-    link_place1 = db.relationship("link_lieu", primaryjoin="Place.place_id==Link_lieu.link_place1_id")
-    link_place2= db.relationship("link_lieu", primaryjoin="Place.place_id==Link_lieu.link_place2_id")
+    link_place1 = db.relationship("link", primaryjoin="Place.place_id==Link.link_place1_id")
+    link_place2= db.relationship("link", primaryjoin="Place.place_id==Link.link_place2_id")
 
     def to_jsonapi_dict(self):
         """ It ressembles a little JSON API format but it is not completely compatible
@@ -262,7 +262,7 @@ class Link_type(db.Model):
     type_link = db.relationship("Link", back_populates="links")
 
 #création d'une classe pour les connexions entre les lieux
-class link_lieu(db.Model):
+class link(db.Model):
     __tablename__="link"
     link_id = db.Column(db.Integer, autoincrement=True, primary_key=True, nullable=True)
     link_place1_id =db.Column(db.Integer, db.ForeignKey('place.place_id'))
@@ -329,11 +329,11 @@ if len(errors) > 0:
 # On récupère l'id associé au lien.
 for row in range (0, loop):
             liaison = Relation_type.query.filter(Relation_type.relation_type_name == link_relation_type[row]).all()
-            u_relation = relation[0]
-            link_relation_type[row] = u_relation.relation_type_id
+            u_liaison = relation[0]
+            link_relation_type[row] = u_liaison.relation_type_id
 # On vérifie que le lien n'existe pas déjà
             uniques = Link.query.filter(
-                db.and_(Link.link_person1_id == link_person1[row], Link.link_person2_id == link_person2[row], Link.link_relation_type_id == link_relation_type[row])
+                db.and_(Link.link_place1_id == link_person1[row], Link.link_place2_id == link_person2[row], Link.link_relation_type_id == link_relation_type[row])
                 ).count()
             if uniques > 0:
                 errors.append("le lien existe déjà")
