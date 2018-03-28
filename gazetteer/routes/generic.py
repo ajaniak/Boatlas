@@ -3,7 +3,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 
 from ..app import app, login
 from ..constantes import LIEUX_PAR_PAGE
-from ..modeles.donnees import Place, Biblio, Relation
+from ..modeles.donnees import Place, Biblio, Relation, Authorship
 from ..modeles.utilisateurs import User
 
 
@@ -26,10 +26,10 @@ def lieu(place_id):
 #Après avoir capturé un objet dans la variable unique_lieu
     reference = unique_lieu.relations
 #Je capture dans une varible la liste des relations
-    lien = Relation.query.get(1)
+    #lien = Relation.query.get(1)
     print(reference)
-    print(lien)
-    return render_template("pages/place.html", nom="Gazetteer", lieu=unique_lieu, reference=reference, lien=lien)
+    #print(lien)
+    return render_template("pages/place.html", nom="Gazetteer", lieu=unique_lieu, reference=reference)
 
 
 @app.route("/recherche")
@@ -241,8 +241,10 @@ def biblio(biblio_id):
     """
     # On récupère le tuple correspondant aux champs de la classe Biblio
     unique_biblio = Biblio.query.get(biblio_id)
-    print(unique_biblio)
-    return render_template("pages/biblio.html", nom="Gazetteer", biblio=unique_biblio)
+    lieux = unique_biblio.relations
+#Je capture dans une varible la liste des relations
+    print(lieux)
+    return render_template("pages/biblio.html", nom="Gazetteer", biblio=unique_biblio, lieux=lieux)
 
 @app.route("/modif_biblio/<int:biblio_id>", methods=["POST", "GET"])
 @login_required
@@ -265,3 +267,23 @@ def modif_biblio(biblio_id):
         flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
         unique_biblio = Biblio.query.get(biblio_id)
         return render_template("pages/modif_biblio.html", biblio=unique_biblio)
+
+@app.route("/index_lieux")
+def index_lieux():
+    """ Route permettant la recherche plein-texte
+    """
+    # On préfèrera l'utilisation de .get() ici
+    #   qui nous permet d'éviter un if long (if "clef" in dictionnaire and dictonnaire["clef"])
+    page = request.args.get("page", 1)
+
+    if isinstance(page, str) and page.isdigit():
+        page = int(page)
+    else:
+        page = 1
+
+    resultats = Place.query.paginate(page=page, per_page=LIEUX_PAR_PAGE)
+
+    return render_template(
+        "pages/index_lieux.html",
+        resultats=resultats
+    )
