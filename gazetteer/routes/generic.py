@@ -275,33 +275,40 @@ def biblio(biblio_id):
     print(unique_biblio)
     return render_template("pages/biblio.html", nom="Gazetteer", biblio=unique_biblio)
 
+@app.route("/creer_link", methods=["GET", "POST"])
+@login_required
+def creer_lien():
+        """ route pour créer une ou plusieurs connexions entre des lieux.
+        """
+        if request.method == "POST":
+            # méthode statique create_link() à créer sous Link
+            statut, donnees = Link.creer_link(
+            link_place1=request.form.getlist("link_1_place[]", None),
+            link_relation_type=request.form.getlist("link_relation_type[]", None),
+            link_place2=request.form.getlist("link_2_place[]", None)
+            )
 
+            if status is True:
+                flash("Enregistrement effectué. Vous avez ajouté une nouvelle relation.", "success")
+                return redirect("/creer_link")
+            else:
+                flash("La création d'une nouvelle relation a échoué")
+                return render_template("pages/creer_link.html")
+
+        else:
+            return render_template("pages/creer_lien.html")
+"""
 @app.route("/liaison/<int:link_id>")
 def lieu_liaison(link_id):
-    """ Route permettant l'affichage des données d'une relation
+Route permettant l'affichage des données d'une relation
 
         :param link_id: Identifiant numérique de la relation
-        """
+    
         # On a bien sûr aussi modifié le template pour refléter le changement
     unique_liaison = link_lieu.query.get(link_id)
     return render_template("pages/liaison.html", nom="Gazetteer", lieu_liaison=unique_liaison)
 
-@app.route("/creer_liaison", methods=["POST", "GET"])
-def creer_liaison():
-    if request.method == "POST":
-        statut, donnees = link_lieu.creer_liaison(
-            nom_lieu_1=request.form.get("nom_lieu_1", None),
-            nom_lieu_2=request.form.get("nom_lieu_2", None),
-        )
 
-        if statut is True:
-            flash("Enregistrement effectué. Vous avez ajouté une nouvelle relation", "success")
-            return redirect("/")
-        else:
-            flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
-            return render_template("pages/creer_liaison.html")
-    else:
-        return render_template("pages/creer_liaison.html")
 
 @app.route("/modif_liaison/<int:link_id>")
 @login_required
@@ -320,4 +327,4 @@ def modif_liaison(link_id):
     else:
         flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
         unique_lieu = Place.query.get(place_id)
-        return render_template("pages/modif_lieu.html", lieu=unique_lieu)
+        return render_template("pages/modif_lieu.html", lieu=unique_lieu)"""
