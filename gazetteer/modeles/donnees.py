@@ -2,7 +2,6 @@ from flask import url_for
 import datetime
 from .. app import db
 
-
 class Authorship(db.Model):
     __tablename__ = "authorship"
     authorship_id = db.Column(db.Integer, nullable=False, autoincrement=True, primary_key=True)
@@ -17,30 +16,23 @@ class Authorship(db.Model):
             "author": self.user.to_jsonapi_dict(),
             "on": self.authorship_date
         }
-followers = db.Table('followers',
-    db.Column('follower_id', db.Integer, db.ForeignKey('place.place_id')),
-    db.Column('followed_id', db.Integer, db.ForeignKey('place.place_id'))
-)
 
 # On crée notre modèle de lieux
 class Place(db.Model):
+    #__tablename__ = "left"
     place_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
     place_nom = db.Column(db.Text)
     place_description = db.Column(db.Text)
     place_longitude = db.Column(db.Float)
     place_latitude = db.Column(db.Float)
     place_type = db.Column(db.String(45))
+#Jointure
     authorships = db.relationship("Authorship", back_populates="place")
+    #biblios = db.relationship("Biblio", primaryjoin="Place.place_id==Relation.relation_biblio_id")
     relations = db.relationship("Relation", back_populates="place")
-    followed = db.relationship(
-    'Place', secondary=followers, primaryjoin=(followers.c.follower_id == place_id),
-    secondaryjoin=(followers.c.followed_id==place_id),
-    backref=db.backref('followers', lazy='dynamic'), lazy='dynamic'
-    )
 
     def to_jsonapi_dict(self):
         """ It ressembles a little JSON API format but it is not completely compatible
-
         :return:
         """
         return {
@@ -126,6 +118,7 @@ class Place(db.Model):
         lieu.place_longitude=longitude
         lieu.place_type=typep
 
+
         try:
 
             # On l'ajoute au transport vers la base de données
@@ -139,34 +132,23 @@ class Place(db.Model):
         except Exception as erreur:
             return False, [str(erreur)]
 
-    @staticmethod
-    def liaison_biblio(place):
-        place = Place.query.get(place_id)
-        print(place.place_nom)
-# Executer l'insertion une seule fois
-        if Biblio.query.count() == 0:
-            place.biblios_titre.append(Biblio(biblio_titre="Garonne"))
-            place.v.append(Variante(variante_nom="Garona"))
-            db.session.add(place)
-            db.session.commit()
-# Cette ligne affiche "Garonne"
-        print(Biblio.query.get(place_id).biblio_titre)
-# Cette ligne affiche ['Garonne', 'Garona']
-        print([b.biblio_titre for b in biblio.query.get(place_id).biblios_titre])
 
 #on crée notre classe de références bibliographiques
 class Biblio(db.Model):
+    #__tablename__ = "right"
     biblio_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
     biblio_titre = db.Column(db.Text, nullable=False)
     biblio_auteur = db.Column(db.Text, nullable=False)
     biblio_date = db.Column(db.Text)
     biblio_lieu = db.Column(db.Text)
     biblio_type = db.Column(db.Text, nullable=False)
+#Jointure
+    #relation_place_id = db.relationship("Place", primaryjoin="Biblio.biblio_id==Relation.relation_place_id")
+    #places = db.Column(db.Integer, db.ForeignKey('relation.relation_id'), nullable=False)
     relations = db.relationship("Relation", back_populates="biblio")
 
     def to_jsonapi_dict(self):
         """ It ressembles a little JSON API format but it is not completely compatible
-
         :return:
         """
         return {
@@ -265,10 +247,20 @@ class Biblio(db.Model):
         except Exception as erreur:
             return False, [str(erreur)]
 
+
+
 class Relation(db.Model):
     __tablename__ = "relation"
     relation_id = db.Column(db.Integer, nullable=False, autoincrement=True, primary_key=True)
     relation_place_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
     relation_biblio_id = db.Column(db.Integer, db.ForeignKey('biblio.biblio_id'))
+#Jointure
+    #biblio = db.relationship("Biblio", foreign_keys=[relation_biblio_id])
     biblio = db.relationship("Biblio", back_populates="relations")
+    #place = db.relationship("Place", foreign_keys=[relation_place_id])
     place = db.relationship("Place", back_populates="relations")
+
+    #@staticmethod
+    #def liaison(biblio_id, place_id):
+        #erreurs = []
+        #lien_id =
