@@ -2,6 +2,20 @@ from flask import url_for
 import datetime
 from .. app import db
 
+class Authorship(db.Model):
+    __tablename__ = "authorship"
+    authorship_id = db.Column(db.Integer, nullable=False, autoincrement=True, primary_key=True)
+    authorship_place_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
+    authorship_user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
+    authorship_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    user = db.relationship("User", back_populates="authorships")
+    place = db.relationship("Place", back_populates="authorships")
+
+    def author_to_json(self):
+        return {
+            "author": self.user.to_jsonapi_dict(),
+            "on": self.authorship_date
+        }
 
 # On crée notre modèle de lieux
 class Place(db.Model):
@@ -13,7 +27,7 @@ class Place(db.Model):
     place_latitude = db.Column(db.Float)
     place_type = db.Column(db.String(45))
 #Jointure
-    #authorships = db.relationship("Authorship", back_populates="place")
+    authorships = db.relationship("Authorship", back_populates="place")
     #biblios = db.relationship("Biblio", primaryjoin="Place.place_id==Relation.relation_biblio_id")
     relations = db.relationship("Relation", back_populates="place")
 
@@ -60,7 +74,6 @@ class Place(db.Model):
             return False, erreurs
 
         lieu = Place(
-
             place_nom=nom,
             place_latitude=latitude,
             place_longitude=longitude,
@@ -246,3 +259,8 @@ class Relation(db.Model):
     biblio = db.relationship("Biblio", back_populates="relations")
     #place = db.relationship("Place", foreign_keys=[relation_place_id])
     place = db.relationship("Place", back_populates="relations")
+
+    #@staticmethod
+    #def liaison(biblio_id, place_id):
+        #erreurs = []
+        #lien_id =
