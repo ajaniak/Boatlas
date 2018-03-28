@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <h1>Les références bibliographiques</h1>
+  <body>
+      {% for biblio in biblios %}
+        <h2>{{biblio.biblio_titre}}</h2>
+        <dl>
+            <dt>Titre</dt><dd>{{biblio.biblio_titre}}</dd>
+            <dt>Auteur</dt><dd>{{biblio.biblio_auteur}}</dd>
+            <dt>Date</dt><dd>{{biblio.biblio_date}}</dd>
+            <dt>Lieu</dt><dd>{{biblio.biblio_lieu}}</dd>
+            <dt>Type</dt><dd>{{biblio.biblio_type}}</dd>
+        </dl>
+    {% endfor %}
+
+  </body>
+</html>

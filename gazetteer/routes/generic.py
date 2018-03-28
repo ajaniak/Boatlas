@@ -3,7 +3,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 
 from ..app import app, login
 from ..constantes import LIEUX_PAR_PAGE
-from ..modeles.donnees import Place, Biblio
+from ..modeles.donnees import Place, Biblio, Relation
 from ..modeles.utilisateurs import User
 
 
@@ -19,12 +19,17 @@ def accueil():
 @app.route("/place/<int:place_id>")
 def lieu(place_id):
     """ Route permettant l'affichage des données d'un lieu
-
     :param place_id: Identifiant numérique du lieu
     """
     # On a bien sûr aussi modifié le template pour refléter le changement
     unique_lieu = Place.query.get(place_id)
-    return render_template("pages/place.html", nom="Gazetteer", lieu=unique_lieu)
+#Après avoir capturé un objet dans la variable unique_lieu
+    reference = unique_lieu.relations
+#Je capture dans une varible la liste des relations
+    lien = Relation.query.get(1)
+    print(reference)
+    print(lien)
+    return render_template("pages/place.html", nom="Gazetteer", lieu=unique_lieu, reference=reference, lien=lien)
 
 
 @app.route("/recherche")
@@ -175,7 +180,8 @@ def depot():
             latitude=request.form.get("lat", None),
             longitude=request.form.get("longt", None),
             description=request.form.get("desc", None),
-            typep=request.form.get("typep", None)
+            typep=request.form.get("typep", None),
+            biblios=request.form.get("biblios", None)
         )
         if status is True:
             flash("Enregistrement effectué. Vous avez ajouté un nouveau lieu", "success")
@@ -231,7 +237,6 @@ def creer_biblio():
 @app.route("/biblio/<int:biblio_id>")
 def biblio(biblio_id):
     """ Route permettant l'affichage des données d'un lieu
-
     :param biblio_id: Identifiant numérique de la référence bibliographique
     """
     # On récupère le tuple correspondant aux champs de la classe Biblio

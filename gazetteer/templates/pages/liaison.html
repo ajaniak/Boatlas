@@ -1,0 +1,21 @@
+{% extends "conteneur.html" %}
+
+{% block titre %}| Inscription{%endblock%}
+
+{% block corps %}
+
+<h1>Nouvelle référence bibliographique</h1>
+<p>Complétez le formulaire et cliquez sur "Ajouter".</p>
+<form class="form" method="POST" action="{{url_for("nature_relation")}}">
+  <div class="form-group row">
+    <label for="relation-type" class="col-sm-2 col-form-label">Nature de la relation entre le lieu et la référence</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="nature" name="nature" placeholder="Nature de la référence">
+    </div>
+  </div>
+  
+  <div>
+    <button type="submit" class="btn btn-primary">Ajouter</button>
+  </div>
+</form>
+{% endblock %}
