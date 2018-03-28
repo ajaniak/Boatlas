@@ -19,7 +19,4 @@ COMMIT;
 -- Ajout d'une colonne relation dans la table biblio
 -- --------------------------
 
-ALTER TABLE biblio ADD COLUMN relation_id SMALLINT UNSIGNED;
-
-
-
+ALTER TABLE `gazetteer`.`biblio` ADD COLUMN relation_id SMALLINT UNSIGNED;
