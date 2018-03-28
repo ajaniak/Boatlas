@@ -7,9 +7,9 @@ CREATE TABLE IF NOT EXISTS `gazetteer`.`link_type` (
   PRIMARY KEY (`link_type_id`))
 ENGINE = InnoDB;
 
-DROP TABLE IF EXISTS `gazetteer`.`link_lieu` ;
+DROP TABLE IF EXISTS `gazetteer`.`link` ;
 
-CREATE TABLE IF NOT EXISTS `gazetteer`.`link_lieu` (
+CREATE TABLE IF NOT EXISTS `gazetteer`.`link` (
   `link_id` SMALLINT NOT NULL AUTO_INCREMENT,
   `link_place1_id` SMALLINT NOT NULL,
   `link_relation_type_id` SMALLINT NOT NULL,
