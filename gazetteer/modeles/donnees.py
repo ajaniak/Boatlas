@@ -252,35 +252,19 @@ class Relation(db.Model):
     biblio = db.relationship("Biblio", back_populates="relations")
     place = db.relationship("Place", back_populates="relations")
 
-# classe pour définir la nature des liens entre les lieux.
-class Link_type(db.Model):
-    __tablename__ = "relation_type"
-    link_type_id = db.Column(db.Integer, unique=True, nullable=False, autoincrement=True, primary_key=True)
-    link_type_name = db.Column(db.String(45), nullable=False)
-    link_type_description = db.Colum(db.String(240), nullable=False)
-# Jointure
-    type_link = db.relationship("Link", back_populates="links")
-
 #création d'une classe pour les connexions entre les lieux
 class link(db.Model):
     __tablename__="link"
-    link_id = db.Column(db.Integer, autoincrement=True, primary_key=True, nullable=True)
+    link_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     link_place1_id =db.Column(db.Integer, db.ForeignKey('place.place_id'))
     link_place2_id= db.Column(db.Integer, db.ForeignKey('place.place_id'))
-    link_relation_type_id = db.Column(db.Integer, db.ForeignKey('link_type_id'))
+    link_relation_type = db.Colum(db.String(240), nullable=False)
 #jointures
-    links = db.relationship("Link_type", back_populates="type_link")
     place1 = db.relationship("Place", foreign_keys=[link_place1_id])
     place2 = db.relationship ("Place", foreign_keys= [link_place2_id])
     # création de la gestions des liens entre les lieux.
     @staticmethod
     def creer_link(link_place1, link_relation_type, link_place2):
-        """ Crée un nouveau lien entre deux lieux.
-        :param link_place1: liste des noms de lieux
-        :param link_place2:  liste des noms de lieux
-        :param link_relation_type : liste des noms de la relation
-        """
-    erreurs = []
 # vérif des champs
 if not ( (len(link_place1) == len (link_place2)) and (len (link_place1) == len(link_relation_type) )   and (len(link_place2) == len (link_relation_type)) ):
             erreurs.append("Tous les champs doivent être remplis")
@@ -317,29 +301,6 @@ for row in range (0, loop):
             if place2 == 0:
                 errors.append(link_place2[row] +" n'existe pas, ligne " + str(row +1))
 
-#on requête dans la table Link_type pour aller chercher id.
-            c_liaison = Link_type.query.filter(Link_type.link_type_name == link_relation_type[row]).count()
-# test de la requête.
-if c_liaison == 0:
-                errors.append("erreur de lien, ligne " + str(row +1))
-# si erreurs.
-if len(errors) > 0:
-    return False, errors
-
-# On récupère l'id associé au lien.
-for row in range (0, loop):
-            liaison = Relation_type.query.filter(Relation_type.relation_type_name == link_relation_type[row]).all()
-            u_liaison = relation[0]
-            link_relation_type[row] = u_liaison.relation_type_id
-# On vérifie que le lien n'existe pas déjà
-            uniques = Link.query.filter(
-                db.and_(Link.link_place1_id == link_person1[row], Link.link_place2_id == link_person2[row], Link.link_relation_type_id == link_relation_type[row])
-                ).count()
-            if uniques > 0:
-                errors.append("le lien existe déjà")
-# si erreurs.
-if len(errors) > 0:
-    return False, errors
 # Création d'un nv lien :
 liste_link = []
 for row in range (0, loop):
