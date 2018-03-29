@@ -288,8 +288,24 @@ def index_lieux():
         resultats=resultats
     )
 
-@app.route("/creer_liaison/<int:place_id>", methods=["POST", "GET"])
-def creer_liaison(place_id):
+@app.route("/creer_liaison", methods=["POST", "GET"])
+def creer_liaison():
+    if request.method == "POST":
+        statut, donnees = Relation.creer_liaison(
+            biblio_id=request.form.get("biblio_id", None),
+            place_id=request.form.get("place_id", None)
+        )
+        if statut is True:
+            flash("Enregistrement effectué. Vous avez ajouté une nouvelle relation", "success")
+            return redirect("/")
+        else:
+            flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
+            return render_template("pages/liaison.html")
+    else:
+        return render_template("pages/liaison.html")
+        
+@app.route("/creer_lien/<int:place_id>", methods=["POST", "GET"])
+def creer_lien(place_id):
     if request.method == "POST":
         statut, donnees = Relation.creer_liaison(
             biblio_titre=request.form.get("titre", None),
