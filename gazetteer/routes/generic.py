@@ -181,7 +181,7 @@ def depot():
             longitude=request.form.get("longt", None),
             description=request.form.get("desc", None),
             typep=request.form.get("typep", None),
-            biblios=request.form.get("biblios", None)
+
         )
         if status is True:
             flash("Enregistrement effectué. Vous avez ajouté un nouveau lieu", "success")
@@ -201,7 +201,7 @@ def modif_lieu(place_id):
         latitude=request.args.get("latitude", None),
         longitude=request.args.get("longitude", None),
         description=request.args.get("description", None),
-        typep=request.args.get("typep", None),
+        typep=request.args.get("typep", None)
     )
 
     if status is True :
@@ -287,3 +287,37 @@ def index_lieux():
         "pages/index_lieux.html",
         resultats=resultats
     )
+
+@app.route("/creer_liaison", methods=["POST", "GET"])
+def creer_liaison():
+    if request.method == "POST":
+        statut, donnees = Relation.creer_liaison(
+            biblio_id=request.form.get("biblio_id", None),
+            place_id=request.form.get("place_id", None)
+        )
+        if statut is True:
+            flash("Enregistrement effectué. Vous avez ajouté une nouvelle relation", "success")
+            return redirect("/")
+        else:
+            flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
+            return render_template("pages/liaison.html")
+    else:
+        return render_template("pages/liaison.html")
+
+@app.route("/liaison/<int:biblio_id>/<int:place_id>")
+def liaison(biblio_id, place_id):
+    """ Route permettant de lier une bibliographie à un lieu
+    :param place_id: Identifiant numérique du lieu
+    :param biblio_id: Identifiant numérique de la référence bibliographique
+    """
+    #endroit_1 = Place.liaison(place_id=place_id,
+    #biblio_id=relations.biblio.biblio_id)
+    #x = Place.query.get(place_id)
+    #x = (x, (Biblio.liaison(biblio_id=biblio_id)))
+    bibliographie = Relation.liaison(biblio_id=biblio_id,
+    place_id=place_id)
+
+    print(bibliographie)
+
+
+    return render_template("pages/liaison.html", nom="Gazetteer", bibliographie=bibliographie)
