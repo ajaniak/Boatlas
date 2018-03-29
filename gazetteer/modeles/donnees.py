@@ -294,7 +294,6 @@ class Relation(db.Model):
 
             return True, endroit_relation, reference_relation
 
-
     @staticmethod
     def creer_liaison(biblio_id, place_id):
         """ Crée une nouvelle référence bibliographique et renvoie les informations entrées par l'utilisateur
@@ -334,6 +333,52 @@ class Relation(db.Model):
 
         except Exception as erreur:
             return False, [str(erreur)]
+
+    #@staticmethod
+    #def creer_lien(place_id):
+        """ Crée une nouvelle référence bibliographique et renvoie les informations entrées par l'utilisateur
+        :param titre: Titre de la référence
+        :param auteur: Auteur de la référence
+        :param date: Date de publication de la référence
+        :param lieu: Lieu de publication de la référence
+        :param type: Type de publication
+        """
+        #erreurs = []
+        #if not biblio_titre:
+        #    erreurs.append("Le titre de la référence est obligatoire")
+        #if not place_nom:
+        #    erreurs.append("Il faut indiquer le nom du lieu que vous voulez relier")
+
+
+        # Si on a au moins une erreur
+        #if len(erreurs) > 0:
+        #    print(erreurs, biblio_titre, place_nom)
+        #    return False, erreurs
+
+        #for biblio_titre:
+        #    bibliographie = Biblio.query.filter(biblio_titre == Biblio.biblio_titre.like("%{}%".format(biblio_titre))
+
+        #biblio_id = Relation.biblio.biblio_titre query.get(relation_biblio_id).filter(biblio_titre==relation_biblio_id.biblio_titre)
+        #place_id=Relation.query.get(relation_place_id).filter(place_nom==relation_place_id.place_nom)
+
+        #liaison = Relation(
+        #    relation_biblio_id=biblio_id,
+        #    relation_place_id=place_id,
+
+            # changer le nom "type"
+        #)
+        #print (liaison)
+
+        #try:
+            # On l'ajoute au transport vers la base de données
+        #    db.session.add(liaison)
+            # On envoie la référence
+        #    db.session.commit()
+
+        #    return True, liaison
+
+        #except Exception as erreur:
+        #    return False, [str(erreur)]
 
 
             #if not (element.relations.relation_id == reference.relations.relation_id)

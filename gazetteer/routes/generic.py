@@ -288,12 +288,12 @@ def index_lieux():
         resultats=resultats
     )
 
-@app.route("/creer_liaison", methods=["POST", "GET"])
-def creer_liaison():
+@app.route("/creer_liaison/<int:place_id>", methods=["POST", "GET"])
+def creer_liaison(place_id):
     if request.method == "POST":
         statut, donnees = Relation.creer_liaison(
-            biblio_id=request.form.get("biblio_id", None),
-            place_id=request.form.get("place_id", None)
+            biblio_titre=request.form.get("titre", None),
+            place_nom=request.form.get("nom", None)
         )
         if statut is True:
             flash("Enregistrement effectué. Vous avez ajouté une nouvelle relation", "success")
