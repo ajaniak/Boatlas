@@ -3,11 +3,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 
 from ..app import app, login
 from ..constantes import LIEUX_PAR_PAGE
-<<<<<<< HEAD
-from ..modeles.donnees import Place, Biblio, link
-=======
-from ..modeles.donnees import Place, Biblio, Relation, Authorship
->>>>>>> upstream/master
+from ..modeles.donnees import Place, Biblio, Relation, Authorship, link
 from ..modeles.utilisateurs import User
 
 
