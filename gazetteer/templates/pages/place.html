@@ -29,6 +29,7 @@
     {% if current_user.is_authenticated %}
     <p><a class="nav-link" href="{{url_for('modif_lieu', place_id=lieu.place_id)}}">Editer le lieu</a></p>
     <p><a class="nav-link" href="{{url_for("depot")}}">Ajouter un nouveau lieu</a></p>
+    <p><a class="nav-link" href="{{url_for('index_biblio', place_id=lieu.place_id)}}">Ajouter une nouvelle référence</a></p>
     <!--- <p><a class="nav-link" href="{{url_for("creer_biblio")}}">Editer la bibliographie</a></p>-->
 
 
