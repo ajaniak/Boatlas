@@ -26,19 +26,12 @@ class Place(db.Model):
     place_longitude = db.Column(db.Float)
     place_latitude = db.Column(db.Float)
     place_type = db.Column(db.String(45))
-<<<<<<< HEAD
 #jointures
-=======
-#Jointure
->>>>>>> upstream/master
     authorships = db.relationship("Authorship", back_populates="place")
     #biblios = db.relationship("Biblio", primaryjoin="Place.place_id==Relation.relation_biblio_id")
     relations = db.relationship("Relation", back_populates="place")
-<<<<<<< HEAD
     link_place1 = db.relationship("link", primaryjoin="Place.place_id==link.link_place1_id")
     link_place2= db.relationship("link", primaryjoin="Place.place_id==link.link_place2_id")
-=======
->>>>>>> upstream/master
 
     def to_jsonapi_dict(self):
         """ It ressembles a little JSON API format but it is not completely compatible
