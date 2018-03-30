@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-ALTER TABLE `gazetteer`.`place` ADD COLUMN relation_id SMALLINT UNSIGNED;
-=======
 -- -----------------------------------------------------
 -- Table `gazetteer`.`relation`
 -- -----------------------------------------------------
@@ -24,4 +21,3 @@ CREATE TABLE IF NOT EXISTS `gazetteer`.`relation` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
->>>>>>> upstream/master
