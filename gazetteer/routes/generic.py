@@ -3,7 +3,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 
 from ..app import app, login
 from ..constantes import LIEUX_PAR_PAGE
-from ..modeles.donnees import Place, Biblio
+from ..modeles.donnees import Place, Biblio, link
 from ..modeles.utilisateurs import User
 
 
@@ -209,7 +209,6 @@ def modif_lieu(place_id):
         return render_template("pages/modif_lieu.html", lieu=unique_lieu)
 
 
-@app.route("/creer_biblio")
 @login_required
 @app.route("/creer_biblio", methods=["POST", "GET"])
 def creer_biblio():
@@ -242,8 +241,8 @@ def biblio(biblio_id):
     print(unique_biblio)
     return render_template("pages/biblio.html", nom="Gazetteer", biblio=unique_biblio)
 
-@app.route("/modif_biblio/<int:biblio_id>", methods=["POST", "GET"])
 @login_required
+@app.route("/modif_biblio/<int:biblio_id>", methods=["POST", "GET"])
 def modif_biblio(biblio_id):
     status, donnees = Biblio.modif_biblio(
         id=biblio_id,
@@ -264,52 +263,42 @@ def modif_biblio(biblio_id):
         unique_biblio = Biblio.query.get(biblio_id)
         return render_template("pages/modif_biblio.html", biblio=unique_biblio)
 
-@app.route("/biblio/<int:biblio_id>")
-def biblio(biblio_id):
-    """ Route permettant l'affichage des données d'un lieu
-
-    :param biblio_id: Identifiant numérique de la référence bibliographique
-    """
-    # On récupère le tuple correspondant aux champs de la classe Biblio
-    unique_biblio = Biblio.query.get(biblio_id)
-    print(unique_biblio)
-    return render_template("pages/biblio.html", nom="Gazetteer", biblio=unique_biblio)
-
-@app.route("/creer_link", methods=["GET", "POST"])
 @login_required
-def creer_lien():
+@app.route("/creer_liaison", methods=["GET", "POST"])
+def creer_liaison():
         """ route pour créer une ou plusieurs connexions entre des lieux.
         """
         if request.method == "POST":
-            # méthode statique create_link() à créer sous Link
-            statut, donnees = Link.creer_link(
-            link_place1=request.form.getlist("link_1_place[]", None),
-            link_relation_type=request.form.getlist("link_relation_type[]", None),
-            link_place2=request.form.getlist("link_2_place[]", None)
+            # méthode statique créer_liaison() à créer sous Link
+            statut, donnees = link.creer_liaison(
+            link_place1=request.form.get("link_1_place[]", None),
+            link_relation_type=request.form.get("link_relation_type[]", None),
+            link_place2=request.form.get("link_2_place[]", None)
             )
 
             if status is True:
                 flash("Enregistrement effectué. Vous avez ajouté une nouvelle relation.", "success")
-                return redirect("/creer_link")
+                return redirect("/creer_liaison")
             else:
                 flash("La création d'une nouvelle relation a échoué")
-                return render_template("pages/creer_link.html")
+                return render_template("pages/creer_liaison.html")
 
         else:
-            return render_template("pages/creer_lien.html")
-"""
+            return render_template("pages/creer_liaison.html")
+
 @app.route("/liaison/<int:link_id>")
 def lieu_liaison(link_id):
+    """
 Route permettant l'affichage des données d'une relation
 
-        :param link_id: Identifiant numérique de la relation
-    
+        :param link_id: Identifiant numérique de la relation"""
+
         # On a bien sûr aussi modifié le template pour refléter le changement
-    unique_liaison = link_lieu.query.get(link_id)
+    unique_liaison = link.query.get(link_id)
     return render_template("pages/liaison.html", nom="Gazetteer", lieu_liaison=unique_liaison)
 
 
-
+"""
 @app.route("/modif_liaison/<int:link_id>")
 @login_required
 def modif_liaison(link_id):
