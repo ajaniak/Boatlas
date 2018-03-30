@@ -303,7 +303,76 @@ def creer_liaison():
             return render_template("pages/liaison.html")
     else:
         return render_template("pages/liaison.html")
-        
+
+@app.route("/creer_liaison_correcte", methods=["POST", "GET"])
+def creer_liaison_correcte():
+
+    lieu = Place.query.get(place_id)
+    titres = lieu.relations
+    if request.method == "POST":
+        statut, donnees = Relation.creer_liaison_correcte(
+            place_id=place_id,
+            biblio_id=biblio_id,
+        #    biblio_titre=request.form.get("biblio_titre", None),
+        )
+        if statut is True:
+            flash("Enregistrement effectué. Vous avez ajouté une nouvelle relation", "success")
+            return redirect("/")
+        else:
+            flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
+            return render_template("pages/index_biblio.html")
+    else:
+        return render_template("pages/index_biblio.html")
+
+@app.route("/index_biblio/<int:place_id>")
+def index_biblio(place_id):
+    """ Route permettant la recherche plein-texte
+    """
+    # On préfèrera l'utilisation de .get() ici
+    #   qui nous permet d'éviter un if long (if "clef" in dictionnaire and dictonnaire["clef"])
+    unique_lieu = Place.query.get(place_id)
+    page = request.args.get("page", 1)
+
+    if isinstance(page, str) and page.isdigit():
+        page = int(page)
+    else:
+        page = 1
+
+    resultats = Biblio.query.paginate(page=page, per_page=LIEUX_PAR_PAGE)
+
+    return render_template(
+        "pages/index_biblio.html", lieu=unique_lieu,
+        resultats=resultats
+    )
+
+
+"""
+#place_id == Relation.query.get(relation_place_id)
+#reference = Place.query.get(relations).all() : impossible de faire comme ça
+#puisqu'a priori, le lieu n'a pas de relation
+#titres = Biblio.query.get(biblio_titre).all()
+#biblio_id == Relation.relation_biblio_id
+
+status, donnees = Relation.creer_liaison_correcte(
+    place_id=place_id,
+    biblio_id=biblio_id,
+    #biblio_titre=request.args.get("titre", None),
+)
+
+if status is True :
+    #flash("Merci pour votre contribution !", "success")
+#Ai-je besoin de récupérer l'ID du lieu  ? Oui, si je considère qu'il s'agit d'une modification du lieu
+#que de modifier sa référence. En ce cas, deux types de modifications :
+#-la modification du lieu
+#-la modification de ses relations
+    unique_lieu = Place.query.get(place_id)
+    return redirect("/index_biblio.html", lieu=unique_lieu) #vers le lieu qu'il vient de créer.
+
+else:
+    flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
+    unique_lieu = Place.query.get(place_id)
+    return render_template("pages/creer_liaison_correcte.html", lieu=unique_lieu)
+
 @app.route("/creer_lien/<int:place_id>", methods=["POST", "GET"])
 def creer_lien(place_id):
     if request.method == "POST":
@@ -322,10 +391,10 @@ def creer_lien(place_id):
 
 @app.route("/liaison/<int:biblio_id>/<int:place_id>")
 def liaison(biblio_id, place_id):
-    """ Route permettant de lier une bibliographie à un lieu
+    """""" Route permettant de lier une bibliographie à un lieu
     :param place_id: Identifiant numérique du lieu
     :param biblio_id: Identifiant numérique de la référence bibliographique
-    """
+    """"""
     #endroit_1 = Place.liaison(place_id=place_id,
     #biblio_id=relations.biblio.biblio_id)
     #x = Place.query.get(place_id)
@@ -336,4 +405,4 @@ def liaison(biblio_id, place_id):
     print(bibliographie)
 
 
-    return render_template("pages/liaison.html", nom="Gazetteer", bibliographie=bibliographie)
+    return render_template("pages/liaison.html", nom="Gazetteer", bibliographie=bibliographie)"""
