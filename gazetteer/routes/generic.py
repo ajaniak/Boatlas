@@ -277,10 +277,10 @@ def creer_liaison():
         """
         if request.method == "POST":
             # méthode statique créer_liaison() à créer sous Link
-            statut, donnees = link.creer_liaison(
-            link_place1=request.form.get("link_1_place[]", None),
-            link_relation_type=request.form.get("link_relation_type[]", None),
-            link_place2=request.form.get("link_2_place[]", None)
+            status, donnees = link.creer_liaison(
+            lieu1=request.form.get("link_1_place[]", None),
+            relation=request.form.get("link_relation_type[]", None),
+            lieu2=request.form.get("link_2_place[]", None)
             )
 
             if status is True:
