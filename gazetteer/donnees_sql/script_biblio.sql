@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `gazetteer`.`biblio` (
   `biblio_date` TEXT NULL,
   `biblio_lieu` TEXT NULL,
   `biblio_type` TEXT NOT NULL,
-  PRIMARY KEY (`biblio_id`))
+  PRIMARY KEY (`biblio_id`)relation)
 ENGINE = InnoDB;
 COMMIT;
 
@@ -19,4 +19,11 @@ COMMIT;
 -- Ajout d'une colonne relation dans la table biblio
 -- --------------------------
 
+<<<<<<< HEAD
 ALTER TABLE `gazetteer`.`biblio` ADD COLUMN relation_id SMALLINT UNSIGNED;
+=======
+
+
+
+
+>>>>>>> upstream/master

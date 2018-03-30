@@ -19,21 +19,29 @@ class Authorship(db.Model):
 
 # On crée notre modèle
 class Place(db.Model):
+    #__tablename__ = "left"
     place_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
     place_nom = db.Column(db.Text)
     place_description = db.Column(db.Text)
     place_longitude = db.Column(db.Float)
     place_latitude = db.Column(db.Float)
     place_type = db.Column(db.String(45))
+<<<<<<< HEAD
 #jointures
+=======
+#Jointure
+>>>>>>> upstream/master
     authorships = db.relationship("Authorship", back_populates="place")
+    #biblios = db.relationship("Biblio", primaryjoin="Place.place_id==Relation.relation_biblio_id")
     relations = db.relationship("Relation", back_populates="place")
+<<<<<<< HEAD
     link_place1 = db.relationship("link", primaryjoin="Place.place_id==link.link_place1_id")
     link_place2= db.relationship("link", primaryjoin="Place.place_id==link.link_place2_id")
+=======
+>>>>>>> upstream/master
 
     def to_jsonapi_dict(self):
         """ It ressembles a little JSON API format but it is not completely compatible
-
         :return:
         """
         return {
@@ -119,6 +127,7 @@ class Place(db.Model):
         lieu.place_longitude=longitude
         lieu.place_type=typep
 
+
         try:
 
             # On l'ajoute au transport vers la base de données
@@ -135,17 +144,20 @@ class Place(db.Model):
 
             #on crée notre classe de références bibliographiques
 class Biblio(db.Model):
+    #__tablename__ = "right"
     biblio_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
     biblio_titre = db.Column(db.Text, nullable=False)
     biblio_auteur = db.Column(db.Text, nullable=False)
     biblio_date = db.Column(db.Text)
     biblio_lieu = db.Column(db.Text)
     biblio_type = db.Column(db.Text, nullable=False)
+#Jointure
+    #relation_place_id = db.relationship("Place", primaryjoin="Biblio.biblio_id==Relation.relation_place_id")
+    #places = db.Column(db.Integer, db.ForeignKey('relation.relation_id'), nullable=False)
     relations = db.relationship("Relation", back_populates="biblio")
 
     def to_jsonapi_dict(self):
         """ It ressembles a little JSON API format but it is not completely compatible
-
         :return:
         """
         return {
@@ -244,13 +256,19 @@ class Biblio(db.Model):
         except Exception as erreur:
             return False, [str(erreur)]
 
+
+
 class Relation(db.Model):
     __tablename__ = "relation"
     relation_id = db.Column(db.Integer, nullable=False, autoincrement=True, primary_key=True)
     relation_place_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
     relation_biblio_id = db.Column(db.Integer, db.ForeignKey('biblio.biblio_id'))
+#Jointure
+    #biblio = db.relationship("Biblio", foreign_keys=[relation_biblio_id])
     biblio = db.relationship("Biblio", back_populates="relations")
+    #place = db.relationship("Place", foreign_keys=[relation_place_id])
     place = db.relationship("Place", back_populates="relations")
+
 
 #création d'une classe pour les connexions entre les lieux
 class link(db.Model):
