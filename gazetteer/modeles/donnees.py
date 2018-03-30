@@ -320,7 +320,7 @@ class link(db.Model):
             if lieu1[row] == lieu2[row]:
                 errors.append("les champs 'Lieu 1' et 'Lieu 2' sont identiques, ligne " + str(row +1))
 #si erreurs.
-        if len(errors) > 0:
+        if len(erreurs) > 0:
             return False, errors
 
 # On vérifie les ID sont valides
@@ -337,9 +337,9 @@ class link(db.Model):
 # on réinitialise la variable
         liste_link.append(
                 link(
-                link_place1_id=lieu1[row],
-                link_relation_type_id=str(relation[row]),
-                link_place2_id=lieu2[row]
+                link_place1_id=lieu1,
+                link_relation_type=relation,
+                link_place2_id=lieu2
                     )
                 )
         try:
