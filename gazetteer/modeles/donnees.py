@@ -274,6 +274,7 @@ class Relation(db.Model):
         if reference_relation == endroit_relation:
             return True, reference_relation, endroit_relation
 
+#Attention ce code est un test
     @staticmethod
     def liaison(biblio_id, place_id):
         reference_1 = Biblio.query.get(biblio_id)
@@ -330,6 +331,43 @@ class Relation(db.Model):
             db.session.commit()
 
             return True, liaison
+
+        except Exception as erreur:
+            return False, [str(erreur)]
+
+    @staticmethod
+    def creer_liaison_correcte(place_id, biblio_id):
+        """ Crée une nouvelle relation entre un lieu et une ou plusieurs références bibliographiques
+         et renvoie les informations entrées par l'utilisateur
+        :param titre: Titre de la référence
+        :param place_id: ID du lieu
+        """
+        #erreurs = []
+        #if not biblio_titre:
+        #    erreurs.append("Le biblio_id est obligatoire")
+
+        #commentaire: Si on a au moins une erreur
+        #if len(erreurs) > 0:
+        #    print(erreurs, place_id, biblio_titre)
+        #    return False, erreurs
+
+        titres = Biblio.query.get(biblio_titre).all()
+        liaison_propre = Relation(
+            #relation_biblio_id=biblio_id,
+            relation_place_id=place_id,
+            relation_biblio_id=biblio_id,
+
+            # changer le nom "type"
+        )
+        print (liaison_propre)
+
+        try:
+            # On l'ajoute au transport vers la base de données
+            db.session.add(liaison_propre)
+            # On envoie la référence
+            db.session.commit()
+
+            return True, liaison_propre
 
         except Exception as erreur:
             return False, [str(erreur)]
