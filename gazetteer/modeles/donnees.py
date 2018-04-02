@@ -261,48 +261,11 @@ class Relation(db.Model):
     #place = db.relationship("Place", foreign_keys=[relation_place_id])
     place = db.relationship("Place", back_populates="relations")
 
-    @staticmethod
-    def liees(biblio_id, place_id):
-        reference = biblio_id
-        endroit = place_id
-        reference = reference.relations
-        endroit = endroit.relations
-        for element in endroit:
-            endroit_relation = element.relations.relation_id
-        for element in reference:
-            reference_relation = element.relations.relation_id
-        if reference_relation == endroit_relation:
-            return True, reference_relation, endroit_relation
-
-#Attention ce code est un test
-    @staticmethod
-    def liaison(biblio_id, place_id):
-        reference_1 = Biblio.query.get(biblio_id)
-        endroit_1 = Place.query.get(place_id)
-        reference = reference_1.relations
-        endroit = endroit_1.relations
-        for element in endroit:
-            endroit_relation = element.relations.relation_id
-            print(endroit_relation)
-            #Un ou deux = ?
-            if endroit_relation == element.relations.relation_id.count() == 0:
-                endroit.append(biblio.reference_1)
-            # if element.relations.relation_id == None
-        for element in reference:
-            reference_relation = element.relations.relation_id
-            if reference_relation == element.relations.relation_id.count() == 0:
-                reference.append(place.endroit_1)
-
-            return True, endroit_relation, reference_relation
 
     @staticmethod
-    def creer_liaison(biblio_id, place_id):
+    def reference_3(biblio_id, place_id):
         """ Crée une nouvelle référence bibliographique et renvoie les informations entrées par l'utilisateur
-        :param titre: Titre de la référence
-        :param auteur: Auteur de la référence
-        :param date: Date de publication de la référence
-        :param lieu: Lieu de publication de la référence
-        :param type: Type de publication
+
         """
         erreurs = []
         if not biblio_id:
@@ -335,98 +298,5 @@ class Relation(db.Model):
         except Exception as erreur:
             return False, [str(erreur)]
 
-    @staticmethod
-    def creer_liaison_correcte(place_id, biblio_id):
-        """ Crée une nouvelle relation entre un lieu et une ou plusieurs références bibliographiques
-         et renvoie les informations entrées par l'utilisateur
-        :param titre: Titre de la référence
-        :param place_id: ID du lieu
-        """
-        #erreurs = []
-        #if not biblio_titre:
-        #    erreurs.append("Le biblio_id est obligatoire")
 
-        #commentaire: Si on a au moins une erreur
-        #if len(erreurs) > 0:
-        #    print(erreurs, place_id, biblio_titre)
-        #    return False, erreurs
-
-        titres = Biblio.query.get(biblio_titre).all()
-        liaison_propre = Relation(
-            #relation_biblio_id=biblio_id,
-            relation_place_id=place_id,
-            relation_biblio_id=biblio_id,
-
-            # changer le nom "type"
-        )
-        print (liaison_propre)
-
-        try:
-            # On l'ajoute au transport vers la base de données
-            db.session.add(liaison_propre)
-            # On envoie la référence
-            db.session.commit()
-
-            return True, liaison_propre
-
-        except Exception as erreur:
-            return False, [str(erreur)]
-
-    #@staticmethod
-    #def creer_lien(place_id):
-        """ Crée une nouvelle référence bibliographique et renvoie les informations entrées par l'utilisateur
-        :param titre: Titre de la référence
-        :param auteur: Auteur de la référence
-        :param date: Date de publication de la référence
-        :param lieu: Lieu de publication de la référence
-        :param type: Type de publication
-        """
-        #erreurs = []
-        #if not biblio_titre:
-        #    erreurs.append("Le titre de la référence est obligatoire")
-        #if not place_nom:
-        #    erreurs.append("Il faut indiquer le nom du lieu que vous voulez relier")
-
-
-        # Si on a au moins une erreur
-        #if len(erreurs) > 0:
-        #    print(erreurs, biblio_titre, place_nom)
-        #    return False, erreurs
-
-        #for biblio_titre:
-        #    bibliographie = Biblio.query.filter(biblio_titre == Biblio.biblio_titre.like("%{}%".format(biblio_titre))
-
-        #biblio_id = Relation.biblio.biblio_titre query.get(relation_biblio_id).filter(biblio_titre==relation_biblio_id.biblio_titre)
-        #place_id=Relation.query.get(relation_place_id).filter(place_nom==relation_place_id.place_nom)
-
-        #liaison = Relation(
-        #    relation_biblio_id=biblio_id,
-        #    relation_place_id=place_id,
-
-            # changer le nom "type"
-        #)
-        #print (liaison)
-
-        #try:
-            # On l'ajoute au transport vers la base de données
-        #    db.session.add(liaison)
-            # On envoie la référence
-        #    db.session.commit()
-
-        #    return True, liaison
-
-        #except Exception as erreur:
-        #    return False, [str(erreur)]
-
-
-            #if not (element.relations.relation_id == reference.relations.relation_id)
-            #liaison = reference.append(reference.relations.place.place_id)
-            #db.session.add(liaison)
-            #db.session.commit()
-            #relation_id == element.place.place_id and relation_id == reference)
-
-
-    #@staticmethod
-    #def liaison(biblio_id, place_id):
-        #erreurs = []
-        #lien_id =
+    
