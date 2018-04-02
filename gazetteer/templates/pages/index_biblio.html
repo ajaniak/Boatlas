@@ -1,47 +1,25 @@
 {% extends "conteneur.html" %}
 
-{% block titre %}| Index de biblios : Page {{resultats.page}}{%endblock%}
+{% block titre %}| Index de biblios : Page {{references.page}} {%endblock%}
 
 {% block corps %}
 
     <h1>Index de biblios</h1>
-    {% if resultats %}
 
-            <div class="row">
+  <div class="row">
 <form class="form" method="POST" action="{{url_for('index_biblio', place_id=lieu.place_id)}}" >
-  {% for biblio in resultats.items %}
+  {%for biblio in resultats.items %}
+<div class="checkbox col-sm-2">
+  <label><input type="checkbox" name="biblio_id" id="biblio_id" value="{{biblio.biblio_id}}">
+    {{biblio.biblio_titre}}</label>
+</div>
+{%endfor%}
 
-  <div class="checkbox col-sm-2">
-  <label><input type="checkbox" name="{{biblio.biblio_id}}">{{biblio.biblio_titre}}</label>
-</div>
-<div>
-  <button type="submit" class="btn btn-success">Contribuer</button>
-</div>
-    {% endfor %}
+    <div>
+      <button type="submit" class="btn btn-primary" >Contribuer</button>
     </div>
-  </ul>
-<nav aria-label="research-pagination">
-<ul class="pagination">
-  {%- for page in resultats.iter_pages() %}
-      {% if page %}
-        {% if page != resultats.page %}
-          <li class="page-item">
-              <a class="page-link" href="{{ url_for("index_biblio", place_id=lieu.place_id, page=page) }}">{{page}}</a>
-          </li>
-        {% else %}
-          <li class="page-item active disabled">
-            <a class="page-link">{{page}} <span class="sr-only">(actuelle)</span></a>
-          </li>
-        {% endif %}
+    </div>
 
-      {% else %}
-          <li class="page-item disabled">
-            <a class="page-link">...</a>
-          </li>
-      {% endif %}
 
-  {%- endfor %}
-</ul>
-</nav>
-    {% endif %}
+
 {% endblock %}
