@@ -14,12 +14,3 @@ CREATE TABLE IF NOT EXISTS `gazetteer`.`biblio` (
   PRIMARY KEY (`biblio_id`))
 ENGINE = InnoDB;
 COMMIT;
-
--- --------------------------
--- Ajout d'une colonne relation dans la table biblio
--- --------------------------
-
-
-
-
-
