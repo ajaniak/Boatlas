@@ -1,0 +1,24 @@
+!-- Ancien code pour afficher un index biblio et cocher les références intéressantes pour faire la liaison
+vers place
+
+{% extends "conteneur.html" %}
+
+{% block titre %}| Index de bibliographies {%endblock%}
+
+{% block corps %}
+
+    <h1>Index de bibliographies</h1>
+    {% if resultats %}
+
+            <div class="row">
+
+{% for element in titres %}
+<div class="checkbox col-sm-2">
+  <label><input type="checkbox" name="{{biblio_titre}}">{{biblio.biblio_titre}}</label>
+</div>
+  <button type="submit" class="btn btn-primary">Ajouter</button>
+    {% endfor %}
+    </div>
+    {%endif%}
+
+    {%endblock%} -->
