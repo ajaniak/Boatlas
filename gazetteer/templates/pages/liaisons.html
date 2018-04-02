@@ -1,0 +1,24 @@
+{% extends "conteneur.html" %}
+
+{% block titre %}
+    {%if lieu_liaison %}| lieu_liaison : {{lieu_liaison.link_id}} {% endif %}
+{% endblock %}
+
+{% block corps %}
+    {% if lieu_liaison %}
+        <h1>{{lieu_liaison.link_id}}</h1>
+        <dl>
+            <dt>Nom du lieu 1</dt><dd>{{lieu_liaison.link_parent}}</dd>
+            <dt>Nom du lieu 2</dt><dd>{{lieu_liaison.link_child}}</dd>
+        </dl>
+
+
+    {% else %}
+        <p>La base de données est en cours de constitution</p>
+    {% endif %}
+
+    <p><a href="{{url_for('accueil')}}">Retour à l'accueil</a></p>
+    {% if current_user.is_authenticated %}
+        <a class="nav-link" href="{{url_for('modif_liaison', link_id=lieu_liaison.link_id)}}">Editer</a>
+        {%endif %}
+{% endblock %}

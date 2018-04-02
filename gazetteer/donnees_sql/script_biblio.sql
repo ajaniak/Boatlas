@@ -18,8 +18,3 @@ COMMIT;
 -- --------------------------
 -- Ajout d'une colonne relation dans la table biblio
 -- --------------------------
-
-
-
-
-

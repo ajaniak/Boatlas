@@ -3,7 +3,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 
 from ..app import app, login
 from ..constantes import LIEUX_PAR_PAGE
-from ..modeles.donnees import Place, Biblio, Relation, Authorship
+from ..modeles.donnees import Place, Biblio, Relation, Authorship, link
 from ..modeles.utilisateurs import User
 
 
@@ -214,6 +214,8 @@ def modif_lieu(place_id):
         unique_lieu = Place.query.get(place_id)
         return render_template("pages/modif_lieu.html", lieu=unique_lieu)
 
+
+@login_required
 @app.route("/creer_biblio", methods=["POST", "GET"])
 def creer_biblio():
     if request.method == "POST":
@@ -246,8 +248,8 @@ def biblio(biblio_id):
     print(lieux)
     return render_template("pages/biblio.html", nom="Gazetteer", biblio=unique_biblio, lieux=lieux)
 
-@app.route("/modif_biblio/<int:biblio_id>", methods=["POST", "GET"])
 @login_required
+@app.route("/modif_biblio/<int:biblio_id>", methods=["POST", "GET"])
 def modif_biblio(biblio_id):
     status, donnees = Biblio.modif_biblio(
         id=biblio_id,
@@ -268,22 +270,57 @@ def modif_biblio(biblio_id):
         unique_biblio = Biblio.query.get(biblio_id)
         return render_template("pages/modif_biblio.html", biblio=unique_biblio)
 
-@app.route("/index_lieux")
-def index_lieux():
-    """ Route permettant la recherche plein-texte
+@login_required
+@app.route("/creer_liaison", methods=["GET", "POST"])
+def creer_liaison():
+        """ route pour créer une ou plusieurs connexions entre des lieux.
+        """
+        if request.method == "POST":
+            # méthode statique créer_liaison() à créer sous Link
+            status, donnees = link.creer_liaison(
+            lieu1=request.form.get("link_1_place[]", None),
+            relation=request.form.get("link_relation_type[]", None),
+            lieu2=request.form.get("link_2_place[]", None)
+            )
+
+            if status is True:
+                flash("Enregistrement effectué. Vous avez ajouté une nouvelle relation.", "success")
+                return redirect("/creer_liaison")
+            else:
+                flash("La création d'une nouvelle relation a échoué")
+                return render_template("pages/creer_liaison.html")
+
+        else:
+            return render_template("pages/creer_liaison.html")
+
+@app.route("/liaison/<int:link_id>")
+def lieu_liaison(link_id):
     """
-    # On préfèrera l'utilisation de .get() ici
-    #   qui nous permet d'éviter un if long (if "clef" in dictionnaire and dictonnaire["clef"])
-    page = request.args.get("page", 1)
+Route permettant l'affichage des données d'une relation
 
-    if isinstance(page, str) and page.isdigit():
-        page = int(page)
-    else:
-        page = 1
+        :param link_id: Identifiant numérique de la relation"""
 
-    resultats = Place.query.paginate(page=page, per_page=LIEUX_PAR_PAGE)
+        # On a bien sûr aussi modifié le template pour refléter le changement
+    unique_liaison = link.query.get(link_id)
+    return render_template("pages/liaison.html", nom="Gazetteer", lieu_liaison=unique_liaison)
 
-    return render_template(
-        "pages/index_lieux.html",
-        resultats=resultats
+
+"""
+@app.route("/modif_liaison/<int:link_id>")
+@login_required
+def modif_liaison(link_id):
+    status, donnees = link_lieu.modif_liaison(
+        id=link_id,
+        nom_lieu_1=request.args.get("nom_lieu_1", None),
+        nom_lieu_2=request.args.get("nom_lieu_2", None),
     )
+
+    if status is True :
+        flash("Merci pour votre contribution !", "success")
+        unique_lieu = Place.query.get(place_id)
+        return redirect("/") #vers le lieu qu'il vient de créer.
+
+    else:
+        flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
+        unique_lieu = Place.query.get(place_id)
+        return render_template("pages/modif_lieu.html", lieu=unique_lieu)"""
