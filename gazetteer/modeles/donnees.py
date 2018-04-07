@@ -55,9 +55,15 @@ class Place(db.Model):
                  "editions": [
                      author.author_to_json()
                      for author in self.authorships
-                 ]
+                 ],
+                 "references": [
+                 relation.to_jsonapi_dict()
+                          for relation in self.relations
+                      ]
+                 }
+
             }
-        }
+
 
 
     @staticmethod
@@ -145,12 +151,10 @@ class Biblio(db.Model):
     biblio_lieu = db.Column(db.Text)
     biblio_type = db.Column(db.Text, nullable=False)
 #Jointure
-    #relation_place_id = db.relationship("Place", primaryjoin="Biblio.biblio_id==Relation.relation_place_id")
-    #places = db.Column(db.Integer, db.ForeignKey('relation.relation_id'), nullable=False)
     relations = db.relationship("Relation", back_populates="biblio")
 
     def to_jsonapi_dict(self):
-        """ It ressembles a little JSON API format but it is not completely compatible
+        """ Semblant d'API en JSON mais défauts de compatibilité
         :return:
         """
         return {
@@ -161,18 +165,30 @@ class Biblio(db.Model):
                 "auteur": self.biblio_auteur,
                 "date": self.biblio_date,
                 "lieu": self.biblio_lieu,
-                "category": self.place_type
+                "category": self.place_type,
+                "relationships": self.relations,
             },
             "links": {
                 "self": url_for("biblio", biblio_id=self.biblio_id, _external=True),
                 "json": url_for("api_biblios_single", biblio_id=self.biblio_id, _external=True)
             },
 
+            "relationships": {
+                 "lieux" : [
+                          relation.to_json_dict()
+                          for relation in self.relations
+                      ]
+                 }
+
         }
+
+            #manque retour de lieu vers biblio
+
 
     @staticmethod
     def creer_biblio(titre, auteur, date, lieu, typep):
-        """ Crée une nouvelle référence bibliographique et renvoie les informations entrées par l'utilisateur
+        """ Crée une nouvelle référence bibliographique et
+        renvoie les informations entrées par l'utilisateur
         :param titre: Titre de la référence
         :param auteur: Auteur de la référence
         :param date: Date de publication de la référence
@@ -251,24 +267,44 @@ class Biblio(db.Model):
 
 
 
-
 class Relation(db.Model):
     __tablename__ = "relation"
     relation_id = db.Column(db.Integer, nullable=False, autoincrement=True, primary_key=True)
     relation_place_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
     relation_biblio_id = db.Column(db.Integer, db.ForeignKey('biblio.biblio_id'))
 #Jointure
-    #biblio = db.relationship("Biblio", foreign_keys=[relation_biblio_id])
     biblio = db.relationship("Biblio", back_populates="relations")
-    #place = db.relationship("Place", foreign_keys=[relation_place_id])
     place = db.relationship("Place", back_populates="relations")
 
+    def to_jsonapi_dict(self):
+        """ It ressembles a little JSON API format but it is not completely compatible
+        :return:
+        """
+        return {
+            "type": "relation",
+            "id": self.relation_id,
+            "attributes": {
+                "lieu": self.relation_place_id,
+                "reference": self.relation_biblio_id,
+                "biblio": self.biblio,
+                "place": self.place,
+            },
+            "links": {
+                "self": url_for("relation", relation_id=self.relation_id, _external=True),
+                "json": url_for("api_relations_single", relation_id=self.relation_id, _external=True)
+            },
+            "relationships":{
+            "lieux":self.place.to_jsonapi_dict(),
+            "references":self.biblio.to_jsonapi_dict(),
+            }
 
+        }
 
     @staticmethod
-    def reference_3(biblio_id, place_id):
-        """ Crée une nouvelle référence bibliographique et renvoie les informations entrées par l'utilisateur
-
+    def associer_reference(biblio_id, place_id):
+        """ Crée une nouvelle relation entre un lieu et
+        une référence. La fonction renvoie les informations
+        entrées par l'utilisateur
         """
         erreurs = []
         if not biblio_id:
