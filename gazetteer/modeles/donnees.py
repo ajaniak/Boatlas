@@ -316,7 +316,7 @@ class link(db.Model):
             #envoie de la liaison.
             db.session.commit()
 
-            return True, links
+            return True, link
 
         except Exception as erreur:
             return False, [str(erreur)]
