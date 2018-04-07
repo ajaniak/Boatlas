@@ -13,7 +13,8 @@ def accueil():
     """
     # On a bien sûr aussi modifié le template pour refléter le changement
     lieux = Place.query.order_by(Place.place_id.desc()).limit(5).all()
-    return render_template("pages/accueil.html", nom="Gazetteer", lieux=lieux)
+    references = Biblio.query.order_by(Biblio.biblio_id.desc()).limit(5).all()
+    return render_template("pages/accueil.html", nom="Gazetteer", lieux=lieux, references=references)
 
 
 @app.route("/place/<int:place_id>")
@@ -53,14 +54,19 @@ def recherche():
     # On fait de même pour le titre de la page
     titre = "Recherche"
     if motclef:
-        resultats = Place.query.filter(
+        lieux = Place.query.filter(
             Place.place_nom.like("%{}%".format(motclef))
+        ).paginate(page=page, per_page=LIEUX_PAR_PAGE)
+        titre = "Résultat pour la recherche `" + motclef + "`"
+        references = Biblio.query.filter(
+            Biblio.biblio_titre.like("%{}%".format(motclef))
         ).paginate(page=page, per_page=LIEUX_PAR_PAGE)
         titre = "Résultat pour la recherche `" + motclef + "`"
 
     return render_template(
         "pages/recherche.html",
-        resultats=resultats,
+        lieux=lieux,
+        references=references,
         titre=titre,
         keyword=motclef
     )
@@ -315,10 +321,10 @@ def modif_liaison(link_id):
         nom_lieu_2=request.args.get("nom_lieu_2", None),
     )
 
-@app.route("/reference_3", methods=["POST", "GET"])
-def reference_3():
+"""@app.route("/associer_reference", methods=["POST", "GET"])
+def reference_1():
     if request.method == "POST":
-        statut, donnees = Relation.reference_3(
+        statut, donnees = Relation.associer_reference(
             biblio_id=request.form.get("biblio_id", None),
             place_id=request.form.get("place_id", None)
         )
@@ -331,8 +337,8 @@ def reference_3():
     else:
         return render_template("pages/reference.html")
 
-@app.route("/reference_4", methods=["POST", "GET"])
-def reference_4():
+@app.route("/associer_reference", methods=["POST", "GET"])
+def reference():
 
     lieu = Place.query.get(place_id)
     titres = lieu.relations
@@ -340,7 +346,6 @@ def reference_4():
         statut, donnees = Relation.reference_4(
             place_id=place_id,
             biblio_id=biblio_id,
-        #    biblio_titre=request.form.get("biblio_titre", None),
         )
         if statut is True:
             flash("Enregistrement effectué. Vous avez ajouté une nouvelle relation", "success")
@@ -349,10 +354,10 @@ def reference_4():
             flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
             return render_template("pages/index_biblio.html")
     else:
-        return render_template("pages/index_biblio.html")
+        return render_template("pages/index_biblio.html")"""
 
 
-@app.route("/index_biblio/<int:place_id>", methods=["POST", "GET"])
+@app.route("/associer_reference/<int:place_id>", methods=["POST", "GET"])
 def index_biblio(place_id):
     """ Route permettant la recherche plein-texte
     """
@@ -360,10 +365,10 @@ def index_biblio(place_id):
     #   qui nous permet d'éviter un if long (if "clef" in dictionnaire and dictonnaire["clef"])
     unique_lieu = Place.query.get(place_id)
     #A tester sans la ligne ci-dessous
-    references = Biblio.query.paginate().query.get(id)
+    #references = Biblio.query.paginate().query.get(id)
     resultats = Biblio.query.paginate()
     if request.method == "POST":
-        statut, donnees = Relation.reference_3(
+        statut, donnees = Relation.associer_reference(
         place_id=place_id,
         biblio_id=request.form.get("biblio_id", None)
         )
@@ -374,7 +379,29 @@ def index_biblio(place_id):
         else:
             flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
             return render_template("pages/index_biblio.html", lieu=unique_lieu,
-        references=references, resultats=resultats)
+        resultats=resultats)
     else:
         return render_template("pages/index_biblio.html", lieu=unique_lieu,
-    references=references, resultats=resultats)
+    resultats=resultats)
+
+@app.route("/index_lieux/<int:biblio_id>", methods=["POST", "GET"])
+def index_lieux(biblio_id):
+    """ Route permettant la recherche plein-texte """
+    unique_biblio = Biblio.query.get(biblio_id)
+    lieux = Place.query.paginate()
+    if request.method == "POST":
+        statut, donnees = Relation.associer_reference(
+        biblio_id=biblio_id,
+        place_id=request.form.get("place_id", None)
+        )
+
+        if statut is True:
+            flash("Enregistrement effectué. Vous avez ajouté une nouvelle relation", "success")
+            return redirect("/")
+        else:
+            flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
+            return render_template("pages/index_lieux.html", biblio=unique_biblio,
+        lieux=lieux)
+    else:
+        return render_template("pages/index_lieux.html", biblio=unique_biblio,
+        lieux=lieux)
