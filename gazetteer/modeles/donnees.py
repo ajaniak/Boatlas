@@ -277,11 +277,12 @@ class link(db.Model):
 
     # création de la gestions des liens entre les lieux.
     @staticmethod
-    def creer_liaison(lieu1, relation, lieu2):
+    def creer_liaison(lieu1, relation, lieu2, description):
         """ Crée une nouvelle connexion entre deux lieux.
         :param lieu1: Lieu 1 de la relation
         :param lieu2: lieu 2 de la relation
         :param relation: type de la relation
+        :param description: description de la relation
 
         """
 # vérif des champs
@@ -292,63 +293,31 @@ class link(db.Model):
             erreurs.append("Il faut une nature pour caractériser la relation entre deux lieux")
         if not lieu2:
             erreurs.append("Il faut un lieu 2 pour créer une relation entre deux lieux")
-
+        if lieu1 == lieu2:
+            erreurs.append("Une relation ne peut se faire qu'entre deux lieux différents. ")
+        if not relation =="historique" or relation=="administrative" or relation=="topographique":
+            erreurs.append("La nature de la relation doit être administrative, topographique ou historique. ")
         # Si on a au moins une erreur
         if len(erreurs) > 0:
-            print(erreurs, titre, auteur, date, lieu, typep)
             return False, erreurs
 
-# Initialisation de la boucle
-        loop = len(lieu1)
-# comparaison des lignes
-        tuples = []
-        reprise = 0
-        for row in range (0, loop):
-                tuple = (lieu1[row], relation[row], lieu2[row])
-        for trio in tuples:
-            if tuples == trio:
-                repeat += 1
-                tuples.append(tuple)
-#si erreur
-        if reprise > 0:
-            errors.append("Certains liens à créer sont identiques")
+        link= link(
+                    link_place1_id=lieu1,
+                    link_relation_type=relation,
+                    link_place2_id=lieu2,
+                    link_relation_description=description
+                        )
 
-# Verif de la sélection du champs type et que les lieux sont différents.
-        for row in range (0, loop):
-            if relation[row] == 'Choisir':
-                errors.append("aucun type de relation n'a été sélectionné, ligne " + str(row +1))
-            if lieu1[row] == lieu2[row]:
-                errors.append("les champs 'Lieu 1' et 'Lieu 2' sont identiques, ligne " + str(row +1))
-#si erreurs.
-        if len(erreurs) > 0:
-            return False, errors
+        print(link)
 
-# On vérifie les ID sont valides
-        for row in range (0, loop):
-            lieu1 = Place.query.filter(Place.place_id == lieu1[row]).count()
-            lieu2 = Place.query.filter(Place.place_id == lieu2[row]).count()
-            if lieu1 == 0:
-                errors.append(link_place1[row] +" n'existe pas, ligne " + str(row +1))
-            if lieu2 == 0:
-                errors.append(link_place2[row] +" n'existe pas, ligne " + str(row +1))
-
-# Création d'un nv lien :
-        liste_link = []
-# on réinitialise la variable
-        liste_link.append(
-                link(
-                link_place1_id=lieu1,
-                link_relation_type=relation,
-                link_place2_id=lieu2
-                    )
-                )
         try:
-#ajout à la DB.
-            db.session.add(liste_link)
+            #envoie vers la db
+            db.session.add(link)
+            #envoie de la liaison.
             db.session.commit()
-# Renvoie vers l'utilisateur :
-            return True, liste_link
 
-# Si erreurs
-        except Exception as error_creation:
-            return False, [str(error_creation)]
+            return True, links
+
+        except Exception as erreur:
+            return False, [str(erreur)]
+# comparaison des lieu1 et lieu2
