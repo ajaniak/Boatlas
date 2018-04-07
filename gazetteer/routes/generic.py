@@ -280,7 +280,8 @@ def creer_liaison():
             status, donnees = link.creer_liaison(
             lieu1=request.form.get("link_1_place[]", None),
             relation=request.form.get("link_relation_type[]", None),
-            lieu2=request.form.get("link_2_place[]", None)
+            lieu2=request.form.get("link_2_place[]", None),
+            description=request.form.get("link_relation_description[]", None)
             )
 
             if status is True:
@@ -294,7 +295,7 @@ def creer_liaison():
             return render_template("pages/creer_liaison.html")
 
 @app.route("/liaison/<int:link_id>")
-def lieu_liaison(link_id):
+def liaison(link_id):
     """
 Route permettant l'affichage des données d'une relation
 
@@ -302,6 +303,10 @@ Route permettant l'affichage des données d'une relation
 
         # On a bien sûr aussi modifié le template pour refléter le changement
     unique_liaison = link.query.get(link_id)
+    #on fait appel grâce à la jointure aux lieux qui sont reliés les uns avec les autres. 
+    connexion_depart= unique_liaison.place1
+    connexion_arrivee=unique_liaison.place2
+
     return render_template("pages/liaison.html", nom="Gazetteer", lieu_liaison=unique_liaison)
 
 
