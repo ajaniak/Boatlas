@@ -6,13 +6,22 @@
 <h1>Bienvenue !</h1>
     {% if lieux %}
     <p>{{lieux|length}} derniers lieux enregistrés :</p>
-        <ul>
+        <ul class="float-left">
             {% for lieu in lieux %}
                 <li><a href="{{url_for('lieu', place_id=lieu.place_id)}}">{{lieu.place_nom}}</a></li>
             {% endfor %}
         </ul>
-      
+
+    {% if references %}
+    <p class="float-right">{{references|length}} dernières références enregistrées :</p>
+    
+        <ul class="float-right">
+            {% for reference in references %}
+                <li><a href="{{url_for('biblio', biblio_id=reference.biblio_id)}}">{{reference.biblio_titre}}</a></li>
+            {% endfor %}
+        </ul>
+        {%endif%}
     {% else %}
-        <p>La base de données est en cours de constitution</p>
-    {% endif %}
+    <p>La base de données est en cours de constitution</p>
+    {%endif%}
 {% endblock %}
