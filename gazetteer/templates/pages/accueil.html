@@ -3,24 +3,30 @@
     {% include "partials/recherche.html" %}
 {%endblock%}
 {% block corps %}
+
+
 <h1>Bienvenue !</h1>
-    {% if lieux %}
-    <p>{{lieux|length}} derniers lieux enregistrés :</p>
-        <ul class="float-left">
+<div class="row">
+    <div class="col">{% if lieux %}
+    <p>Voici les {{lieux|length}} derniers lieux enregistrés :</p>
+        <ul>
             {% for lieu in lieux %}
                 <li><a href="{{url_for('lieu', place_id=lieu.place_id)}}">{{lieu.place_nom}}</a></li>
             {% endfor %}
-        </ul>
+        </ul>{%endif%}
+      <a href="{{url_for('browse')}}">Voir plus de lieux</a></div>
 
-    {% if references %}
-    <p class="float-right">{{references|length}} dernières références enregistrées :</p>
-    
-        <ul class="float-right">
+    <div class="col" >{% if references %}
+    <p>Voici les {{references|length}} dernières références enregistrées :</p>
+
+        <ul>
             {% for reference in references %}
                 <li><a href="{{url_for('biblio', biblio_id=reference.biblio_id)}}">{{reference.biblio_titre}}</a></li>
             {% endfor %}
         </ul>
-        {%endif%}
+        <a href="{{url_for('moteur_biblio')}}">Voir plus de références bibliographiques</a>
+      </div>
+</div>
     {% else %}
     <p>La base de données est en cours de constitution</p>
     {%endif%}

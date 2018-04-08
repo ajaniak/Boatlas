@@ -19,22 +19,22 @@ class Authorship(db.Model):
 
 # On crée notre modèle
 class Place(db.Model):
-    #__tablename__ = "left"
     place_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
     place_nom = db.Column(db.Text)
     place_description = db.Column(db.Text)
     place_longitude = db.Column(db.Float)
     place_latitude = db.Column(db.Float)
     place_type = db.Column(db.String(45))
-#jointures
+#jointure biblio & utilisateur
     authorships = db.relationship("Authorship", back_populates="place")
-    #biblios = db.relationship("Biblio", primaryjoin="Place.place_id==Relation.relation_biblio_id")
     relations = db.relationship("Relation", back_populates="place")
+#jointure récursive many-to-many
     link_place1 = db.relationship("link", primaryjoin="Place.place_id==link.link_place1_id")
     link_place2= db.relationship("link", primaryjoin="Place.place_id==link.link_place2_id")
 
     def to_jsonapi_dict(self):
-        """ It ressembles a little JSON API format but it is not completely compatible
+        """ It ressembles a little JSON API format
+        but it is not completely compatible
         :return:
         """
         return {
@@ -63,7 +63,6 @@ class Place(db.Model):
                  }
 
             }
-
 
 
     @staticmethod

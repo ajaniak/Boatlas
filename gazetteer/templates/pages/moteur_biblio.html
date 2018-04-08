@@ -8,7 +8,7 @@
     {% if resultats %}
         <p>Il y a {{resultats.total}} références bibliographiques qui répondent à votre requête :</p>
         <ul>
-            {% for lieu in resultats.items %}
+            {% for biblio in resultats.items %}
                 <li><a href="{{url_for('biblio', biblio_id=biblio.biblio_id)}}">{{biblio.biblio_titre}}</a></li>
             {% endfor %}
         </ul>
