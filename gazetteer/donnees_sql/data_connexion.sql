@@ -1,0 +1,1 @@
+INSERT INTO `gazetteer`.`link` (`link_id`,`link_place1_id`, `link_place2_id`, `link_relation_type`, `link_relation_description`) VALUES ( 1, 1, 2, `topographique`, `Connexion entre les lieux/fausse donnée`);
