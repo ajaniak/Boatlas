@@ -288,7 +288,7 @@ def creer_liaison():
                 flash("Enregistrement effectué. Vous avez ajouté une nouvelle relation.", "success")
                 return redirect("/creer_liaison")
             else:
-                flash("La création d'une nouvelle relation a échoué")
+                flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
                 return render_template("pages/creer_liaison.html")
 
         else:
@@ -303,7 +303,7 @@ Route permettant l'affichage des données d'une relation
 
         # On a bien sûr aussi modifié le template pour refléter le changement
     unique_liaison = link.query.get(link_id)
-    #on fait appel grâce à la jointure aux lieux qui sont reliés les uns avec les autres. 
+    #on fait appel grâce à la jointure aux lieux qui sont reliés les uns avec les autres.
     connexion_depart= unique_liaison.place1
     connexion_arrivee=unique_liaison.place2
 
