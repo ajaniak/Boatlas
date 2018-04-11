@@ -30,8 +30,9 @@ class Place(db.Model):
     authorships = db.relationship("Authorship", back_populates="place")
     #biblios = db.relationship("Biblio", primaryjoin="Place.place_id==Relation.relation_biblio_id")
     relations = db.relationship("Relation", back_populates="place")
-    link_place1 = db.relationship("link", primaryjoin="Place.place_id==link.link_place1_id")
-    link_place2= db.relationship("link", primaryjoin="Place.place_id==link.link_place2_id")
+#    link_place1 = db.relationship("link", primaryjoin="Place.place_id==link.link_place1_id")
+#    link_place2= db.relationship("link", primaryjoin="Place.place_id==link.link_place2_id")
+    liens=db.relationship("link", back_populates="place")
 
     def to_jsonapi_dict(self):
         """ It ressembles a little JSON API format but it is not completely compatible
@@ -272,9 +273,11 @@ class link(db.Model):
     link_relation_type = db.Column(db.String(45), nullable=False)
     link_relation_description = db.Column(db.String(240))
 #jointures
-    place1 = db.relationship("Place", foreign_keys=[link_place1_id])
-    place2 = db.relationship ("Place", foreign_keys= [link_place2_id])
-
+#    place1 = db.relationship("Place", foreign_keys=[link_place1_id])
+#    place2 = db.relationship ("Place", foreign_keys= [link_place2_id])
+    place=db.relationship("Place", back_populates="link") # si seulement ce fragment de code crée: sqlalchemy.exc.AmbiguousForeignKeysError: Could not determine join condition between parent/child tables on relationship Place.liens-
+    #, primaryjoin=link_place1_id==Place.place_id)
+    place=db.relationship("Place", back_populates="link") #, primaryjoin=link_place2_id==Place.place_id) ce fragment de code crée : One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper|Place|place'
     # création de la gestions des liens entre les lieux.
     @staticmethod
     def creer_liaison(lieu1, relation, lieu2, description):
@@ -289,19 +292,20 @@ class link(db.Model):
         erreurs = []
         if not lieu1:
             erreurs.append("Il faut un lieu 1 pour créer une relation entre deux lieux")
-        if not relation:
-            erreurs.append("Il faut une nature pour caractériser la relation entre deux lieux")
+        #if not relation:
+        #    erreurs.append("Il faut une nature pour caractériser la relation entre deux lieux")
         if not lieu2:
             erreurs.append("Il faut un lieu 2 pour créer une relation entre deux lieux")
         if lieu1 == lieu2:
             erreurs.append("Une relation ne peut se faire qu'entre deux lieux différents. ")
-        if not relation =="historique" or relation=="administrative" or relation=="topographique":
+# retrait de cette ligne qui crée un bug.
+        #if not relation =="historique" or relation=="administrative" or relation=="topographique":
             erreurs.append("La nature de la relation doit être administrative, topographique ou historique. ")
         # Si on a au moins une erreur
         if len(erreurs) > 0:
             return False, erreurs
 
-        link= link(
+        lien= link(
                     link_place1_id=lieu1,
                     link_relation_type=relation,
                     link_place2_id=lieu2,
@@ -316,7 +320,7 @@ class link(db.Model):
             #envoie de la liaison.
             db.session.commit()
 
-            return True, link
+            return True, lien
 
         except Exception as erreur:
             return False, [str(erreur)]
