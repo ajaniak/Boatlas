@@ -7,19 +7,28 @@
    {% include "partials/recherche.html" %}
 
     <h1>{{titre}}</h1>
-    {% if resultats %}
-        <p>Il y a {{resultats.total}} lieux qui répondent à votre requête :</p>
+    {% if lieux %}
+    
+        <p>Il y a {{lieux.total}} lieu(x) qui répond(ent) à votre requête :</p>
         <ul>
-            {% for lieu in resultats.items %}
+            {% for lieu in lieux.items %}
                 <li><a href="{{url_for('lieu', place_id=lieu.place_id)}}">{{lieu.place_nom}}</a></li>
             {% endfor %}
         </ul>
+
+        {% if references %}
+            <p>Il y a {{references.total}} référence(s) qui répond(ent) à votre requête :</p>
+            <ul>
+                {% for reference in references.items %}
+                    <li><a href="{{url_for('biblio', biblio_id=reference.biblio_id)}}">{{reference.biblio_titre}}</a></li>
+                {% endfor %}
+            </ul>
     <nav aria-label="research-pagination">
       <ul class="pagination">
-        {%- for page in resultats.iter_pages() %}
+        {%- for page in lieux.iter_pages() %}
             {% if page %}
 
-              {% if page != resultats.page %}
+              {% if page != lieux.page %}
                 <li class="page-item">
                     <a class="page-link" href="{{ url_for("recherche", keyword=keyword, page=page) }}">{{page}}</a>
                 </li>
@@ -38,5 +47,6 @@
         {%- endfor %}
       </ul>
     </nav>
+    {%endif%}
     {% endif %}
 {% endblock %}

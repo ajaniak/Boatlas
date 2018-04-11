@@ -1,25 +1,29 @@
 {% extends "conteneur.html" %}
-
-{% block titre %}| Index de lieux : Page {{resultats.page}}{%endblock%}
+<!--Manque un endblocl-->
+{% block titre %}| Index des lieux : Page {{lieux.page}} {%endblock%}
 
 {% block corps %}
 
-    <h1>Index de lieux</h1>
-    {% if resultats %}
+    <h1>Index des lieux</h1>
 
-            <div class="row">
-{% for lieu in resultats.items %}
+  <div class="row">
+<form class="form" method="POST" action="{{url_for('index_lieux', biblio_id=biblio.biblio_id)}}">
+  {%for lieu in lieux.items %}
 <div class="checkbox col-sm-2">
-  <label><input type="checkbox" name="{{lieu.place_id}}">{{lieu.place_nom}}</label>
+  <label><input type="checkbox" name="place_id" id="place_id" value="{{lieu.place_id}}">
+    {{lieu.place_nom}}</label>
 </div>
-    {% endfor %}
+{%endfor%}
+
+    <div>
+      <button type="submit" class="btn btn-primary" >Contribuer</button>
     </div>
-  </ul>
+    </div>
 <nav aria-label="research-pagination">
 <ul class="pagination">
-  {%- for page in resultats.iter_pages() %}
+  {%- for page in lieux.iter_pages() %}
       {% if page %}
-        {% if page != resultats.page %}
+        {% if page != lieux.page %}
           <li class="page-item">
               <a class="page-link" href="{{ url_for("index_lieux", page=page) }}">{{page}}</a>
           </li>
@@ -34,9 +38,9 @@
             <a class="page-link">...</a>
           </li>
       {% endif %}
-
-  {%- endfor %}
+{%- endfor %}
 </ul>
 </nav>
-    {% endif %}
-{% endblock %}
+  
+
+    {% endblock %}
