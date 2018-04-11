@@ -13,7 +13,8 @@ def accueil():
     """
     # On a bien sûr aussi modifié le template pour refléter le changement
     lieux = Place.query.order_by(Place.place_id.desc()).limit(5).all()
-    return render_template("pages/accueil.html", nom="Gazetteer", lieux=lieux)
+    references = Biblio.query.order_by(Biblio.biblio_id.desc()).limit(5).all()
+    return render_template("pages/accueil.html", nom="Gazetteer", lieux=lieux, references=references)
 
 
 @app.route("/place/<int:place_id>")
@@ -53,14 +54,19 @@ def recherche():
     # On fait de même pour le titre de la page
     titre = "Recherche"
     if motclef:
-        resultats = Place.query.filter(
+        lieux = Place.query.filter(
             Place.place_nom.like("%{}%".format(motclef))
+        ).paginate(page=page, per_page=LIEUX_PAR_PAGE)
+        titre = "Résultat pour la recherche `" + motclef + "`"
+        references = Biblio.query.filter(
+            Biblio.biblio_titre.like("%{}%".format(motclef))
         ).paginate(page=page, per_page=LIEUX_PAR_PAGE)
         titre = "Résultat pour la recherche `" + motclef + "`"
 
     return render_template(
         "pages/recherche.html",
-        resultats=resultats,
+        lieux=lieux,
+        references=references,
         titre=titre,
         keyword=motclef
     )
@@ -181,7 +187,7 @@ def depot():
             longitude=request.form.get("longt", None),
             description=request.form.get("desc", None),
             typep=request.form.get("typep", None),
-            biblios=request.form.get("biblios", None)
+
         )
         if status is True:
             flash("Enregistrement effectué. Vous avez ajouté un nouveau lieu", "success")
@@ -201,7 +207,7 @@ def modif_lieu(place_id):
         latitude=request.args.get("latitude", None),
         longitude=request.args.get("longitude", None),
         description=request.args.get("description", None),
-        typep=request.args.get("typep", None),
+        typep=request.args.get("typep", None)
     )
 
     if status is True :
@@ -305,7 +311,7 @@ Route permettant l'affichage des données d'une relation
     return render_template("pages/liaison.html", nom="Gazetteer", lieu_liaison=unique_liaison)
 
 
-"""
+
 @app.route("/modif_liaison/<int:link_id>")
 @login_required
 def modif_liaison(link_id):
@@ -315,12 +321,87 @@ def modif_liaison(link_id):
         nom_lieu_2=request.args.get("nom_lieu_2", None),
     )
 
-    if status is True :
-        flash("Merci pour votre contribution !", "success")
-        unique_lieu = Place.query.get(place_id)
-        return redirect("/") #vers le lieu qu'il vient de créer.
-
+"""@app.route("/associer_reference", methods=["POST", "GET"])
+def reference_1():
+    if request.method == "POST":
+        statut, donnees = Relation.associer_reference(
+            biblio_id=request.form.get("biblio_id", None),
+            place_id=request.form.get("place_id", None)
+        )
+        if statut is True:
+            flash("Enregistrement effectué. Vous avez ajouté une nouvelle relation", "success")
+            return redirect("/")
+        else:
+            flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
+            return render_template("pages/reference.html")
     else:
-        flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
-        unique_lieu = Place.query.get(place_id)
-        return render_template("pages/modif_lieu.html", lieu=unique_lieu)"""
+        return render_template("pages/reference.html")
+
+@app.route("/associer_reference", methods=["POST", "GET"])
+def reference():
+
+    lieu = Place.query.get(place_id)
+    titres = lieu.relations
+    if request.method == "POST":
+        statut, donnees = Relation.reference_4(
+            place_id=place_id,
+            biblio_id=biblio_id,
+        )
+        if statut is True:
+            flash("Enregistrement effectué. Vous avez ajouté une nouvelle relation", "success")
+            return redirect("/")
+        else:
+            flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
+            return render_template("pages/index_biblio.html")
+    else:
+        return render_template("pages/index_biblio.html")"""
+
+
+@app.route("/associer_reference/<int:place_id>", methods=["POST", "GET"])
+def index_biblio(place_id):
+    """ Route permettant la recherche plein-texte
+    """
+    # On préfèrera l'utilisation de .get() ici
+    #   qui nous permet d'éviter un if long (if "clef" in dictionnaire and dictonnaire["clef"])
+    unique_lieu = Place.query.get(place_id)
+    #A tester sans la ligne ci-dessous
+    #references = Biblio.query.paginate().query.get(id)
+    resultats = Biblio.query.paginate()
+    if request.method == "POST":
+        statut, donnees = Relation.associer_reference(
+        place_id=place_id,
+        biblio_id=request.form.get("biblio_id", None)
+        )
+
+        if statut is True:
+            flash("Enregistrement effectué. Vous avez ajouté une nouvelle relation", "success")
+            return redirect("/")
+        else:
+            flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
+            return render_template("pages/index_biblio.html", lieu=unique_lieu,
+        resultats=resultats)
+    else:
+        return render_template("pages/index_biblio.html", lieu=unique_lieu,
+    resultats=resultats)
+
+@app.route("/index_lieux/<int:biblio_id>", methods=["POST", "GET"])
+def index_lieux(biblio_id):
+    """ Route permettant la recherche plein-texte """
+    unique_biblio = Biblio.query.get(biblio_id)
+    lieux = Place.query.paginate()
+    if request.method == "POST":
+        statut, donnees = Relation.associer_reference(
+        biblio_id=biblio_id,
+        place_id=request.form.get("place_id", None)
+        )
+
+        if statut is True:
+            flash("Enregistrement effectué. Vous avez ajouté une nouvelle relation", "success")
+            return redirect("/")
+        else:
+            flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
+            return render_template("pages/index_lieux.html", biblio=unique_biblio,
+        lieux=lieux)
+    else:
+        return render_template("pages/index_lieux.html", biblio=unique_biblio,
+        lieux=lieux)

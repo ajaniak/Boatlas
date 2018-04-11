@@ -11,10 +11,6 @@ CREATE TABLE IF NOT EXISTS `gazetteer`.`biblio` (
   `biblio_date` TEXT NULL,
   `biblio_lieu` TEXT NULL,
   `biblio_type` TEXT NOT NULL,
-  PRIMARY KEY (`biblio_id`)relation)
+  PRIMARY KEY (`biblio_id`))
 ENGINE = InnoDB;
 COMMIT;
-
--- --------------------------
--- Ajout d'une colonne relation dans la table biblio
--- --------------------------
