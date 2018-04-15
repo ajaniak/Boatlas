@@ -37,7 +37,7 @@ class Place(db.Model):
         but it is not completely compatible
         :return:
         """
-        return {
+        endroit = {
             "type": "place",
             "id": self.place_id,
             "attributes": {
@@ -45,24 +45,29 @@ class Place(db.Model):
                 "description": self.place_description,
                 "longitude": self.place_longitude,
                 "latitude": self.place_latitude,
-                "category": self.place_type
+                "category": self.place_type,
+
             },
             "links": {
                 "self": url_for("lieu", place_id=self.place_id, _external=True),
-                "json": url_for("api_places_single", place_id=self.place_id, _external=True)
-            },
-            "relationships": {
-                 "editions": [
-                     author.author_to_json()
-                     for author in self.authorships
-                 ],
-                 "references": [
-                 relation.to_jsonapi_dict()
-                          for relation in self.relations
-                      ]
+                "json": url_for("api_places_single", place_id=self.place_id, _external=True),
+                },
+
+            "relations": {
+            "editions":[
+            author.author_to_json()
+            for author in self.authorships
+            ],
+            #biblio fait référence à ce sur quoi l'on boucle
+                "references":[biblio.association_to_json()
+                 for biblio in self.relations]
+
                  }
 
-            }
+             }
+        return endroit
+
+
 
 
     @staticmethod
@@ -164,20 +169,20 @@ class Biblio(db.Model):
                 "auteur": self.biblio_auteur,
                 "date": self.biblio_date,
                 "lieu": self.biblio_lieu,
-                "category": self.place_type,
-                "relationships": self.relations,
+                "category": self.biblio_type,
+
             },
             "links": {
                 "self": url_for("biblio", biblio_id=self.biblio_id, _external=True),
                 "json": url_for("api_biblios_single", biblio_id=self.biblio_id, _external=True)
-            },
+            }
 
-            "relationships": {
-                 "lieux" : [
-                          relation.to_json_dict()
-                          for relation in self.relations
-                      ]
-                 }
+        # "relationships": {
+                # "lieux" : [
+                #          lieu.association_to_json()
+                #          for lieu in self.relations
+                #      ]
+                 #}"""
 
         }
 
@@ -265,7 +270,7 @@ class Biblio(db.Model):
             return False, [str(erreur)]
 
 
-
+#classe Relation
 class Relation(db.Model):
     __tablename__ = "relation"
     relation_id = db.Column(db.Integer, nullable=False, autoincrement=True, primary_key=True)
@@ -275,29 +280,12 @@ class Relation(db.Model):
     biblio = db.relationship("Biblio", back_populates="relations")
     place = db.relationship("Place", back_populates="relations")
 
-    def to_jsonapi_dict(self):
-        """ It ressembles a little JSON API format but it is not completely compatible
-        :return:
-        """
+    def association_to_json(self):
         return {
-            "type": "relation",
-            "id": self.relation_id,
-            "attributes": {
-                "lieu": self.relation_place_id,
-                "reference": self.relation_biblio_id,
-                "biblio": self.biblio,
-                "place": self.place,
-            },
-            "links": {
-                "self": url_for("relation", relation_id=self.relation_id, _external=True),
-                "json": url_for("api_relations_single", relation_id=self.relation_id, _external=True)
-            },
-            "relationships":{
-            "lieux":self.place.to_jsonapi_dict(),
-            "references":self.biblio.to_jsonapi_dict(),
-            }
-
+            "biblio": self.biblio.to_jsonapi_dict()
+            #"lieu": self.place.to_jsonapi_dict()
         }
+
 
     @staticmethod
     def associer_reference(biblio_id, place_id):
