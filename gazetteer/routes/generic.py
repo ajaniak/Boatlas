@@ -331,7 +331,6 @@ Route permettant l'affichage des données d'une relation
     return render_template("pages/liaison.html", nom="Gazetteer", lieu_liaison=unique_liaison)
 
 
-
 @app.route("/modif_liaison/<int:link_id>")
 @login_required
 def modif_liaison(link_id):
@@ -340,6 +339,7 @@ def modif_liaison(link_id):
         nom_lieu_1=request.args.get("nom_lieu_1", None),
         nom_lieu_2=request.args.get("nom_lieu_2", None),
     )
+
 
 @app.route("/associer_reference/<int:place_id>", methods=["POST", "GET"])
 def index_biblio(place_id):
@@ -387,3 +387,12 @@ def index_lieux(biblio_id):
     else:
         return render_template("pages/index_lieux.html", biblio=unique_biblio,
         lieux=lieux)
+
+@app.route("/supprimer_association/<int:place_id>")
+def supprimer_association(place_id):
+    """Route pour supprimer la relation
+    entre une référence et un lieu
+    :param place_id: identifiant numérique du lieu"""
+    status = Place.supprimer_association(place_id)
+    flash("Suppression réussie!", "success")
+    return redirect("/index_lieux")
