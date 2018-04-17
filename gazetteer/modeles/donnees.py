@@ -67,6 +67,27 @@ class Place(db.Model):
              }
         return endroit
 
+    def to_jsonapi_dict_1(self):
+        """ It ressembles a little JSON API format
+        but it is not completely compatible
+        :return:
+        """
+        return {
+                "type": "place",
+                "id": self.place_id,
+                "attributes": {
+                    "name": self.place_nom,
+                    "description": self.place_description,
+                    "longitude": self.place_longitude,
+                    "latitude": self.place_latitude,
+                    "category": self.place_type,
+
+                },
+                "links": {
+                    "self": url_for("lieu", place_id=self.place_id, _external=True),
+                    "json": url_for("api_places_single", place_id=self.place_id, _external=True),
+                    }}
+
 
 
 
@@ -144,8 +165,29 @@ class Place(db.Model):
         except Exception as erreur:
             return False, [str(erreur)]
 
+    @staticmethod
+    def supprimer_association(place_id):
+        """
+        Fonction supprimant la relation entre
+        le lieu et la reference bibliographique
+        :param place_id: identifiant du lieu
+        :returns: booleen
+        """
 
-            #on crée notre classe de références bibliographiques
+        lieu = Place.query.get(place_id)
+        associations = lieu.relations
+        unique_lieu = associations.relation_place_id
+        unique_relation = associations.relation_id
+        unique_reference = associations.relation_biblio_id
+        for lieu in unique_lieu:
+            db.session.delete(lieu)
+            db.session.commit()
+        for reference in unique_reference:
+            db.session.delete(reference)
+            db.session.commit()
+
+
+#on crée notre classe de références bibliographiques
 class Biblio(db.Model):
     #__tablename__ = "right"
     biblio_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
@@ -156,6 +198,7 @@ class Biblio(db.Model):
     biblio_type = db.Column(db.Text, nullable=False)
 #Jointure
     relations = db.relationship("Relation", back_populates="biblio")
+
 
     def to_jsonapi_dict(self):
         """ Semblant d'API en JSON mais défauts de compatibilité
@@ -175,18 +218,35 @@ class Biblio(db.Model):
             "links": {
                 "self": url_for("biblio", biblio_id=self.biblio_id, _external=True),
                 "json": url_for("api_biblios_single", biblio_id=self.biblio_id, _external=True)
-            }
+            },
 
-        # "relationships": {
-                # "lieux" : [
-                #          lieu.association_to_json()
-                #          for lieu in self.relations
-                #      ]
-                 #}"""
+            "relationships": {
+                     "endroits" : [
+                              endroit.relation_to_json()
+                              for endroit in self.relations
+                          ]
+                     }}
 
-        }
+    def to_jsonapi_dict_1(self):
+        """ Semblant d'API en JSON mais défauts de compatibilité
+        :return:
+        """
+        return {
+            "type": "biblio",
+            "id": self.biblio_id,
+            "attributes": {
+                "titre": self.biblio_titre,
+                "auteur": self.biblio_auteur,
+                "date": self.biblio_date,
+                "lieu": self.biblio_lieu,
+                "category": self.biblio_type,
 
-            #manque retour de lieu vers biblio
+            },
+            "links": {
+                "self": url_for("biblio", biblio_id=self.biblio_id, _external=True),
+                "json": url_for("api_biblios_single", biblio_id=self.biblio_id, _external=True)
+            }}
+
 
 
     @staticmethod
@@ -279,13 +339,12 @@ class Relation(db.Model):
 #Jointure
     biblio = db.relationship("Biblio", back_populates="relations")
     place = db.relationship("Place", back_populates="relations")
-
+#Gros problème de récursivité
     def association_to_json(self):
         return {
-            "biblio": self.biblio.to_jsonapi_dict()
-            #"lieu": self.place.to_jsonapi_dict()
+            "biblio": self.biblio.to_jsonapi_dict_1(),
+            "endroit": self.place.to_jsonapi_dict_1()
         }
-
 
     @staticmethod
     def associer_reference(biblio_id, place_id):
@@ -323,8 +382,6 @@ class Relation(db.Model):
 
         except Exception as erreur:
             return False, [str(erreur)]
-
-
 
 
 #création d'une classe pour les connexions entre les lieux
