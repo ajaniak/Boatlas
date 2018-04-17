@@ -30,11 +30,12 @@ def api_places_single(place_id):
 
 @app.route(API_ROUTE+"/biblios/<biblio_id>")
 def api_biblios_single(biblio_id):
-    try:
-        query = Biblio.query.get(biblio_id)
-        return jsonify(query.to_jsonapi_dict())
-    except:
-        return Json_404()
+    biblio = Biblio.query.get(biblio_id)
+    if not biblio:
+        return Json_404
+    else:
+        return jsonify(biblio.to_jsonapi_dict())
+
 
 @app.route(API_ROUTE+"/relations/<relation_id>")
 def api_relations_single(relation_id):
