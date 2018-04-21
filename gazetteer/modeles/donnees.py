@@ -121,7 +121,7 @@ class Place(db.Model):
 
         except Exception as erreur:
             return False, [str(erreur)]
-            
+
     @staticmethod
     def create_link(id,lieu_1, lieu_2):
         erreurs=[]
@@ -163,8 +163,10 @@ class Place(db.Model):
     @staticmethod
     def caracterized_link(id, type, description):
         erreurs=[]
-        if not type:
-            erreurs.append("Le type est obligatoire: topographique, admistrative, historique")
+        #contrôler du typage réalisé par l'internaute. 
+        if not type== "topographique" or type=="administrative" or type=="historique":
+            erreurs.append("Le type est obligatoire: topographique, administrative, historique")
+
 
         # Si on a au moins une erreur
         if len(erreurs) > 0:
@@ -176,6 +178,7 @@ class Place(db.Model):
         link_relation_type = type,
         link_relation_description = description,
         )
+
         print (caracteristics)
         try:
             # On l'ajoute au transport vers la base de données
@@ -192,7 +195,7 @@ class Place(db.Model):
     @staticmethod
     def modif_caracterized_link(id, type, description):
         erreurs = []
-        if not type:
+        if not type== "topographique" or type=="administrative" or type=="historique":
             erreurs.append("Le type est obligatoire: administrative, topographique ou historique")
 
         # Si on a au moins une erreur
