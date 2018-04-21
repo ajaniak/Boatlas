@@ -3,7 +3,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 
 from ..app import app, login
 from ..constantes import LIEUX_PAR_PAGE
-from ..modeles.donnees import Place, Biblio, Relation, Authorship, link
+from ..modeles.donnees import Place, Biblio, Relation, Authorship, Link, links
 from ..modeles.utilisateurs import User
 
 
@@ -277,54 +277,42 @@ def modif_biblio(biblio_id):
         return render_template("pages/modif_biblio.html", biblio=unique_biblio)
 
 @login_required
-@app.route("/creer_liaison", methods=["GET", "POST"])
-def creer_liaison():
-        """ route pour créer une ou plusieurs connexions entre des lieux.
-        """
-        if request.method == "POST":
-            # méthode statique créer_liaison() à créer sous Link
-            status, donnees = link.creer_liaison(
-            lieu1=request.form.get("link_1_place[]", None),
-            relation=request.form.get("link_relation_type[]", None),
-            lieu2=request.form.get("link_2_place[]", None),
-            description=request.form.get("link_relation_description[]", None)
-            )
-
-            if status is True:
-                flash("Enregistrement effectué. Vous avez ajouté une nouvelle relation.", "success")
-                return redirect("/creer_liaison")
-            else:
-                flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
-                return render_template("pages/creer_liaison.html")
-
+@app.route("/create_link",methods=["POST", "GET"])
+def create_link():
+    if request.method == "POST":
+        statut, donnees = links.create_link(
+            lieu_1=request.form.get("ID du lieu 1", None),
+            lieu_2=request.form.get("ID du lieu 1", None),
+        )
+        if statut is True:
+            flash("Enregistrement effectué. Vous avez ajouté une nouvelle connexion", "success")
+            return redirect("/")
         else:
-            return render_template("pages/creer_liaison.html")
+            flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
+            return render_template("pages/create_link.html")
+    else:
+        return render_template("pages/create_link.html")
 
-@app.route("/liaison/<int:link_id>")
-def liaison(link_id):
-    """
-Route permettant l'affichage des données d'une relation
-
-        :param link_id: Identifiant numérique de la relation"""
-
-        # On a bien sûr aussi modifié le template pour refléter le changement
-    unique_liaison = link.query.get(link_id)
-    #on fait appel grâce à la jointure aux lieux qui sont reliés les uns avec les autres.
-    connexion_depart= unique_liaison.place1
-    connexion_arrivee=unique_liaison.place2
-
-    return render_template("pages/liaison.html", nom="Gazetteer", lieu_liaison=unique_liaison)
-
-
-
-@app.route("/modif_liaison/<int:link_id>")
 @login_required
-def modif_liaison(link_id):
-    status, donnees = link_lieu.modif_liaison(
+@app.route("/modif_link/<int:link_id>", method=["POST", "GET"])
+def modif_link(link_id):
+    status, donnees = links.modif_link(
         id=link_id,
-        nom_lieu_1=request.args.get("nom_lieu_1", None),
-        nom_lieu_2=request.args.get("nom_lieu_2", None),
+        lieu_1=request.args.get("ID du lieu 1", None),
+        lieu_2=request.args.get("ID du lieu 2", None),
     )
+
+    if status is True :
+        flash("Merci pour votre contribution !", "success")
+        unique_link = links.query.get(link_id)
+        return redirect("/") #vers le lieu qu'il vient de créer.
+
+    else:
+        flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
+        unique_link = links.query.get(link_id)
+        return render_template("pages/modif_link.html", connection=unique_link)
+
+#je dois encore faire la route pour la page link/link_id
 
 """@app.route("/associer_reference", methods=["POST", "GET"])
 def reference_1():
@@ -410,3 +398,5 @@ def index_lieux(biblio_id):
     else:
         return render_template("pages/index_lieux.html", biblio=unique_biblio,
         lieux=lieux)
+
+@app.route('/link_lieu/<int:place_id>')
