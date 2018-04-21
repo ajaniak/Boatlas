@@ -86,20 +86,138 @@ class Place(db.Model):
 
             }
 
-    @staticmethod
-    def creer_liaison(self, lieu):
-        if not self.is_linked(lieu):
-            self.linked.append(lieu)
 
     @staticmethod
-    def supprimer_liaison(self, lieu):
-        if self.is_linked(lieu):
-            self.linked.remove(lieu)
+    def modif_link(id,lieu_1, lieu_2):
+        erreurs = []
+        if not lieu_1:
+            erreurs.append("Le lieu 1 est nécessaire")
+        if not lieu_2:
+            erreurs.append("Le lieu 2 est nécessaire")
+
+        # Si les deux lieux sont identiques:
+        if lieu_1 == lieu_2:
+            erreurs.append("Les deux lieux sont identiques")
+        # Si on a au moins une erreur
+        if len(erreurs) > 0:
+            print(erreurs, titre, auteur, date, lieu, typep)
+            return False, erreurs
+
+        connection = links.query.get(id)
+
+        links.link_id=id
+        links.link_place1_id=type
+        links.link_place2_id=description
+
+        try:
+
+            # On l'ajoute au transport vers la base de données
+            db.session.add(connection)
+            # On envoie le paquet
+            db.session.commit()
+
+            # On renvoie l'utilisateur
+            return True, connection
+
+        except Exception as erreur:
+            return False, [str(erreur)]
+            
+    @staticmethod
+    def create_link(id,lieu_1, lieu_2):
+        erreurs=[]
+        if not lieu_1:
+            erreurs.append("Le lieu 1 est nécessaire")
+        if not lieu_2:
+            erreurs.append("Le lieu 2 est nécessaire")
+
+        #ajouter une fonction car les deux lieux ne peuvent être identiquesself.
+        if lieu_1 == lieu_2:
+            erreurs.append("Le lieu 1 et le lieu 2 ne peuvent pas être identiques")
+
+        #il faudrait vérifier qu'aucune connexion n'a été faite entre ces deux lieux...
+
+        # si on a une erreur
+        if len(erreurs)>o:
+            print(erreurs,lieu_1, lieu_2)
+            return False, erreurs
+
+        connection = links (
+        link_id=id
+        link_place1_id=lieu_1,
+        link_place2_id=lieu_2,
+        )
+
+        print(connection)
+        try:
+            # On l'ajoute au transport vers la base de données
+            db.session.add(connection)
+            # On envoie le paquet
+            db.session.commit()
+
+            # On renvoie l'utilisateur
+            return True, connection
+
+        except Exception as erreur:
+            return False, [str(erreur)]
 
     @staticmethod
-    def is_linked(self, lieu):
-        return self.linked.filter(links.c.link_place2_id == place.place_id).count () > 0
+    def caracterized_link(id, type, description):
+        erreurs=[]
+        if not type:
+            erreurs.append("Le type est obligatoire: topographique, admistrative, historique")
 
+        # Si on a au moins une erreur
+        if len(erreurs) > 0:
+            print(erreurs, nom, latitude, description, longitude)
+            return False, erreurs
+
+        caracteristics=Link(
+        link_id = id,
+        link_relation_type = type,
+        link_relation_description = description,
+        )
+        print (caracteristics)
+        try:
+            # On l'ajoute au transport vers la base de données
+            db.session.add(caracteristics)
+            # On envoie le paquet
+            db.session.commit()
+
+            # On renvoie l'utilisateur
+            return True, caracteristics
+
+        except Exception as erreur:
+            return False, [str(erreur)]
+
+    @staticmethod
+    def modif_caracterized_link(id, type, description):
+        erreurs = []
+        if not type:
+            erreurs.append("Le type est obligatoire: administrative, topographique ou historique")
+
+        # Si on a au moins une erreur
+        if len(erreurs) > 0:
+            print(erreurs, titre, auteur, date, lieu, typep)
+            return False, erreurs
+
+        caracteristics = Link.query.get(id)
+
+        link.link_id=id
+        link.link_relation_type=type
+        link.link_relation_description=description
+
+        try:
+
+            # On l'ajoute au transport vers la base de données
+            db.session.add(caracteristics)
+            # On envoie le paquet
+            db.session.commit()
+
+            # On renvoie l'utilisateur
+            return True, caracteristics
+
+        except Exception as erreur:
+            return False, [str(erreur)]
 
     @staticmethod
     def creer_lieu(nom, latitude, longitude, description, typep):
