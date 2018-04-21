@@ -23,6 +23,7 @@ links=db.Table('links',
     db.Column('link_place1_id', db.Integer, db.ForeignKey('place.place_id')),
     db.Column('link_place2_id', db.Integer, db.ForeignKey('place.place_id')),
     )
+    
 # On crée une class link pour gérer la nature des relations.
 class Link(db.Model):
     link_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
@@ -32,6 +33,19 @@ class Link(db.Model):
         'Link', secondary=links,
         backref=db.backref('link', lazy='dynamic'))
 
+def to_jsonapi_dict(self):
+    """ It ressembles a little JSON API format but it is not completely compatible
+    :return:
+    """
+    return {
+        "type": "place",
+        "id": self.link_id,
+        "attributes": {
+            "type": self.link_relation_type,
+            "description": self.link_relation_description
+             }
+
+        }
 # On crée notre modèle
 class Place(db.Model):
     #__tablename__ = "left"
@@ -163,7 +177,7 @@ class Place(db.Model):
     @staticmethod
     def caracterized_link(id, type, description):
         erreurs=[]
-        #contrôler du typage réalisé par l'internaute. 
+        #contrôler du typage réalisé par l'internaute.
         if not type== "topographique" or type=="administrative" or type=="historique":
             erreurs.append("Le type est obligatoire: topographique, administrative, historique")
 
