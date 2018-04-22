@@ -26,16 +26,16 @@ def lieu(place_id):
     unique_lieu = Place.query.get(place_id)
 #Après avoir capturé un objet dans la variable unique_lieu
     reference = unique_lieu.relations
+    liaison = unique_lieu.link_place2
 #Je capture dans une varible la liste des relations
-    #lien = Relation.query.get(1)
-    print(reference)
-    #print(lien)
-    return render_template("pages/place.html", nom="Gazetteer", lieu=unique_lieu, reference=reference)
+
+    return render_template("pages/place.html", nom="Gazetteer", lieu=unique_lieu, reference=reference, liaison=liaison)
 
 
 @app.route("/recherche")
 def recherche():
     """ Route permettant la recherche plein-texte
+    dans les lieux comme dans la bibliographie
     """
     # On préfèrera l'utilisation de .get() ici
     #   qui nous permet d'éviter un if long (if "clef" in dictionnaire and dictonnaire["clef"])
@@ -160,6 +160,8 @@ login.login_view = 'connexion'
 
 @app.route("/deconnexion", methods=["POST", "GET"])
 def deconnexion():
+    """
+    Route gérant les déconnexions utilisateur"""
     if current_user.is_authenticated is True:
         logout_user()
     flash("Vous êtes déconnecté-e", "info")
@@ -167,6 +169,7 @@ def deconnexion():
 
 @app.route("/depot", methods=["POST", "GET"])
 @login_required
+"""Route gérant la création de lieux"""
 def depot():
     if request.method == "POST":
         status, donnees = Place.creer_lieu(
@@ -189,6 +192,10 @@ def depot():
 @app.route("/modif_lieu/<int:place_id>")
 @login_required
 def modif_lieu(place_id):
+    """
+    Route gérant la modification de lieu
+    :param place_id: identifiant du lieu
+    """
     status, donnees = Place.modif_lieu(
         id=place_id,
         nom=request.args.get("nom", None),
@@ -212,6 +219,9 @@ def modif_lieu(place_id):
 @login_required
 @app.route("/creer_biblio", methods=["POST", "GET"])
 def creer_biblio():
+    """
+    Route gérant la création de références bibliographiques
+    """
     if request.method == "POST":
         statut, donnees = Biblio.creer_biblio(
             titre=request.form.get("titre", None),
@@ -232,7 +242,7 @@ def creer_biblio():
 
 @app.route("/biblio/<int:biblio_id>")
 def biblio(biblio_id):
-    """ Route permettant l'affichage des données d'un lieu
+    """ Route permettant l'affichage des données d'une référence bibliographique
     :param biblio_id: Identifiant numérique de la référence bibliographique
     """
     # On récupère le tuple correspondant aux champs de la classe Biblio
@@ -245,6 +255,9 @@ def biblio(biblio_id):
 @login_required
 @app.route("/modif_biblio/<int:biblio_id>", methods=["POST", "GET"])
 def modif_biblio(biblio_id):
+    """
+    Route permettant la modification des données d'une référence bibliographique
+    """
     status, donnees = Biblio.modif_biblio(
         id=biblio_id,
         titre=request.args.get("titre", None),
@@ -267,14 +280,15 @@ def modif_biblio(biblio_id):
 @login_required
 @app.route("/creer_liaison", methods=["GET", "POST"])
 def creer_liaison():
-        """ route pour créer une ou plusieurs connexions entre des lieux.
+        """ Route pour créer une ou plusieurs connexions entre des lieux.
         """
         if request.method == "POST":
             # méthode statique créer_liaison() à créer sous Link
-            status, donnees = link.creer_liaison(
-            lieu1=request.form.get("link_1_place[]", None),
-            relation=request.form.get("link_relation_type[]", None),
-            lieu2=request.form.get("link_2_place[]", None)
+            status, donnees = link.creer_liaison_1(
+            link_place1_id=request.form.get("lieu1", None),
+            link_relation_type=request.form.get("type_liaison", None),
+            link_place2_id=request.form.get("lieu2", None),
+            link_relation_description=request.form.get("description", None)
             )
 
             if status is True:
@@ -287,14 +301,15 @@ def creer_liaison():
         else:
             return render_template("pages/creer_liaison.html")
 
+
+
 @app.route("/liaison/<int:link_id>")
 def lieu_liaison(link_id):
     """
-Route permettant l'affichage des données d'une relation
-
-        :param link_id: Identifiant numérique de la relation"""
-
-        # On a bien sûr aussi modifié le template pour refléter le changement
+    Route permettant l'affichage des données d'une relation
+    :param link_id: Identifiant numérique de la relation
+    """
+# On a bien sûr aussi modifié le template pour refléter le changement
     unique_liaison = link.query.get(link_id)
     return render_template("pages/liaison.html", nom="Gazetteer", lieu_liaison=unique_liaison)
 
@@ -310,7 +325,10 @@ def modif_liaison(link_id):
 
 @app.route("/associer_reference/<int:place_id>", methods=["POST", "GET"])
 def index_biblio(place_id):
-    """ Route permettant la recherche plein-texte
+    """ Route permettant d'afficher toutes les références bibliographiques
+    en vue de créer une relation
+    :param place_id: identifiant numérique du lieu qu'on veut rattacher
+    à une référence bibliographique
     """
     # On préfèrera l'utilisation de .get() ici
     #   qui nous permet d'éviter un if long (if "clef" in dictionnaire and dictonnaire["clef"])
@@ -335,7 +353,11 @@ def index_biblio(place_id):
 
 @app.route("/index_lieux/<int:biblio_id>", methods=["POST", "GET"])
 def index_lieux(biblio_id):
-    """ Route permettant la recherche plein-texte """
+    """ Route permettant d'afficher toutes les lieux
+    en vue de créer une relation avec la référence bibliographique affichée
+    :param biblio_id: identifiant numérique du lieu qu'on veut rattacher
+    à une référence bibliographique
+    """
     unique_biblio = Biblio.query.get(biblio_id)
     lieux = Place.query.paginate()
     if request.method == "POST":

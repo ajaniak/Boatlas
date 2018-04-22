@@ -31,6 +31,7 @@ class Place(db.Model):
 #jointure récursive many-to-many
     link_place1 = db.relationship("link", primaryjoin="Place.place_id==link.link_place1_id")
     link_place2= db.relationship("link", primaryjoin="Place.place_id==link.link_place2_id")
+    
 
     def to_jsonapi_dict(self):
         """ It ressembles a little JSON API format
@@ -393,6 +394,42 @@ class link(db.Model):
 #jointures
     place1 = db.relationship("Place", foreign_keys=[link_place1_id])
     place2 = db.relationship ("Place", foreign_keys= [link_place2_id])
+
+
+    @staticmethod
+    def creer_liaison_1(link_place1_id, link_place2_id, link_relation_type, link_relation_description):
+        erreurs = []
+        if not link_place1_id:
+            erreurs.append("Le nom du lieu est obligatoire")
+        if not link_place2_id:
+            erreurs.append("Il faut indiquer la latitude")
+        if not link_relation_type:
+            erreurs.append("Il faut indiquer la longitude")
+
+        # Si on a au moins une erreur
+        if len(erreurs) > 0:
+            print(erreurs, link_place1_id, link_place2_id, link_relation_type)
+            return False, erreurs
+
+        liaison = link(
+            link_place1_id=link_place1_id,
+            link_place2_id=link_place2_id,
+            link_relation_type=link_relation_type,
+            link_relation_description=link_relation_description
+            # changer le nom "type"
+        )
+        print(liaison)
+        try:
+            # On l'ajoute au transport vers la base de données
+            db.session.add(liaison)
+            # On envoie le paquet
+            db.session.commit()
+
+            # On renvoie l'utilisateur
+            return True, liaison
+
+        except Exception as erreur:
+            return False, [str(erreur)]
 
     # création de la gestions des liens entre les lieux.
     @staticmethod
