@@ -286,6 +286,8 @@ def create_link():
         statut, donnees = links.create_link(
             lieu_1=request.form.get("ID du lieu 1", None),
             lieu_2=request.form.get("ID du lieu 1", None),
+            type=request.form.get("nature: topographique ou administrative ou historique", None),
+            description=request.form.get("deescription", None),
         )
         if statut is True:
             flash("Enregistrement effectué. Vous avez ajouté une nouvelle connexion", "success")
@@ -297,25 +299,34 @@ def create_link():
         return render_template("pages/create_link.html")
 
 @login_required
-@app.route("/modif_link/<int:link_id>", method=["POST", "GET"])
+@app.route("/modif_link/<int:link_id>", methods=["POST", "GET"])
 def modif_link(link_id):
     """ Route permettant l' affichage du formulaire de modification de la connexion entre deux.
     :param link_id: Identifiant numérique de la référence connexion
     """
+    """état fonctionnel pour seulement la connexion sans la caractérisation
     status, donnees = links.modif_link(
         id=link_id,
         lieu_1=request.args.get("ID du lieu 1", None),
         lieu_2=request.args.get("ID du lieu 2", None),
+    )"""
+#db.and pour essayer de mettre dans la même route les fonctions de caractéristations et de connexions entre les lieux
+    status, donnees = link.query.join(link, (links.c.link_id == links.link_id)).modif_link(
+    id = link_id,
+    lieu_1=request.args.get("ID du lieu 1", None),
+    lieu_2=request.args.get("ID du lieu 2", None),
+    type=request.args.get("nature: topographique ou administrative ou historique", None),
+    description=request.args.get("description", None),
     )
 
     if status is True :
         flash("Merci pour votre contribution !", "success")
-        unique_link = links.query.get(link_id)
-        return redirect("/") #vers le lieu qu'il vient de créer.
+        unique_link = link.query.join(link, (links.c.link_id == links.link_id)).get(id)
+        return redirect("/") #vers la connexion qu'il vient de créer.
 
     else:
         flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
-        unique_link = links.query.get(link_id)
+        unique_link = link.query.join(link, (links.c.link_id == links.link_id)).get(id)
         return render_template("pages/modif_link.html", connection=unique_link)
 
 #je dois encore faire la route pour la page link/link_id
@@ -325,12 +336,11 @@ def link(link_id):
     :param link_id: Identifiant numérique de la référence bibliographique
     """
     # On récupère le tuple correspondant aux champs de la classe Biblio
-    unique_link = links.query.get(link_id)
+    unique_link = link.query.join(link, (links.c.link_id == links.link_id)).get(id)
     lieux = unique_link.Link
     print(lieux)
     return render_template("pages/link.html", nom="Gazetteer", biblio=unique_link, lieux=lieux)
 
-#Section pour les routes des caractéristiques:
 
 
 """@app.route("/associer_reference", methods=["POST", "GET"])
@@ -417,5 +427,3 @@ def index_lieux(biblio_id):
     else:
         return render_template("pages/index_lieux.html", biblio=unique_biblio,
         lieux=lieux)
-
-@app.route('/link_lieu/<int:place_id>')
