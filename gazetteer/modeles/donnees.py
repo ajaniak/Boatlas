@@ -23,7 +23,7 @@ links=db.Table('links',
     db.Column('link_place1_id', db.Integer, db.ForeignKey('place.place_id')),
     db.Column('link_place2_id', db.Integer, db.ForeignKey('place.place_id')),
     )
-    
+
 # On crée une class link pour gérer la nature des relations.
 class Link(db.Model):
     link_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
@@ -102,7 +102,7 @@ class Place(db.Model):
 
 
     @staticmethod
-    def modif_link(id,lieu_1, lieu_2):
+    def modif_link(id,lieu_1, lieu_2, type, description):
         erreurs = []
         if not lieu_1:
             erreurs.append("Le lieu 1 est nécessaire")
@@ -112,14 +112,20 @@ class Place(db.Model):
         # Si les deux lieux sont identiques:
         if lieu_1 == lieu_2:
             erreurs.append("Les deux lieux sont identiques")
+
+        if not type== "topographique" or type=="administrative" or type=="historique":
+            erreurs.append("Le type est obligatoire: administrative, topographique ou historique")
+
         # Si on a au moins une erreur
         if len(erreurs) > 0:
             print(erreurs, titre, auteur, date, lieu, typep)
             return False, erreurs
 
-        connection = links.query.get(id)
+        connection = link.query.join(link, (links.c.link_id == links.link_id)).get(id)
 
-        links.link_id=id
+        link.link_id=id
+        link.link_relation_type=type
+        link.link_relation_description=description
         links.link_place1_id=type
         links.link_place2_id=description
 
@@ -137,7 +143,7 @@ class Place(db.Model):
             return False, [str(erreur)]
 
     @staticmethod
-    def create_link(id,lieu_1, lieu_2):
+    def create_link(id,lieu_1, lieu_2, type, description):
         erreurs=[]
         if not lieu_1:
             erreurs.append("Le lieu 1 est nécessaire")
@@ -148,17 +154,23 @@ class Place(db.Model):
         if lieu_1 == lieu_2:
             erreurs.append("Le lieu 1 et le lieu 2 ne peuvent pas être identiques")
 
+        #contrôler du typage réalisé par l'internaute.
+        if not type== "topographique" or type=="administrative" or type=="historique":
+            erreurs.append("Le type est obligatoire: topographique, administrative, historique")
+
         #il faudrait vérifier qu'aucune connexion n'a été faite entre ces deux lieux...
 
         # si on a une erreur
         if len(erreurs)>o:
-            print(erreurs,lieu_1, lieu_2)
+            print(erreurs,lieu_1, lieu_2, type, description)
             return False, erreurs
 
-        connection = links (
-        link_id=id
+        connection = link.query.join(link, (links.c.link_id == links.link_id)) (
+        link_id=id,
         link_place1_id=lieu_1,
         link_place2_id=lieu_2,
+        link_relation_type = type,
+        link_relation_description = description,
         )
 
         print(connection)
@@ -174,67 +186,6 @@ class Place(db.Model):
         except Exception as erreur:
             return False, [str(erreur)]
 
-    @staticmethod
-    def caracterized_link(id, type, description):
-        erreurs=[]
-        #contrôler du typage réalisé par l'internaute.
-        if not type== "topographique" or type=="administrative" or type=="historique":
-            erreurs.append("Le type est obligatoire: topographique, administrative, historique")
-
-
-        # Si on a au moins une erreur
-        if len(erreurs) > 0:
-            print(erreurs, nom, latitude, description, longitude)
-            return False, erreurs
-
-        caracteristics=Link(
-        link_id = id,
-        link_relation_type = type,
-        link_relation_description = description,
-        )
-
-        print (caracteristics)
-        try:
-            # On l'ajoute au transport vers la base de données
-            db.session.add(caracteristics)
-            # On envoie le paquet
-            db.session.commit()
-
-            # On renvoie l'utilisateur
-            return True, caracteristics
-
-        except Exception as erreur:
-            return False, [str(erreur)]
-
-    @staticmethod
-    def modif_caracterized_link(id, type, description):
-        erreurs = []
-        if not type== "topographique" or type=="administrative" or type=="historique":
-            erreurs.append("Le type est obligatoire: administrative, topographique ou historique")
-
-        # Si on a au moins une erreur
-        if len(erreurs) > 0:
-            print(erreurs, titre, auteur, date, lieu, typep)
-            return False, erreurs
-
-        caracteristics = Link.query.get(id)
-
-        link.link_id=id
-        link.link_relation_type=type
-        link.link_relation_description=description
-
-        try:
-
-            # On l'ajoute au transport vers la base de données
-            db.session.add(caracteristics)
-            # On envoie le paquet
-            db.session.commit()
-
-            # On renvoie l'utilisateur
-            return True, caracteristics
-
-        except Exception as erreur:
-            return False, [str(erreur)]
 
     @staticmethod
     def creer_lieu(nom, latitude, longitude, description, typep):
