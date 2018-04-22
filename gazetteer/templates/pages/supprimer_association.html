@@ -1,33 +1,25 @@
 {% extends "conteneur.html" %}
 
-{% block titre %}
-    {%if lieu %}| Lieu : {{lieu.place_nom}} {% endif %}
-{% endblock %}
 
 {% block corps %}
-    {% if lieu %}
+<form class="col-3 mr-2 " method="POST" action="{{url_for('supprimer_association', relation_id=relation.relation_id)}}">
+<dl>
 
-<!-- J'itère sur ma liste de références et s'il y a des relations, il faut les afficher-->
-            {% for element in associations%}
-              <dt>Référence bibliographique</a></dt><dd id="{{element.relation_biblio_id}}">{{element.biblio.biblio_titre}}</dd>
-              {%endfor%}
-              <div class="col-md container mt-3">
-              				<div class="row"><!-- supprimer relation_id et non place_id après avoir récupéré relation_place_id et relation_biblio_id-->
-              				<form class="col-3 mr-2 " method="POST" action="{{url_for('suppression_association', relation_id=element.relation_id) }}">
-              				<button type="submit" class="btn btn-success btn-sm">Confirmer</button>
-              				</form>
-              				<form class="col-3 ml-2" method="GET" action="{{ url_for('place', place_id=lieu) }}">
-              				<button type="submit" class="btn btn-danger btn-sm">Annuler</button>
-              			</form>
+            <dt>Lieu</dt><dd id="lieu" name="lieu" value="{{relation.relation_place_id}}">{{relation.place.place_nom}}</dd>
+            <dt>Référence bibliographique associée</dt><dd id="reference" name="reference" value="{{relation.relation_biblio_id}}">{{relation.biblio.biblio_titre}}</dd>
+
+<div class="col-md container mt-3">
+      <div class="row"><!-- supprimer relation_id et non place_id après avoir récupéré relation_place_id et relation_biblio_id-->
+
+        <button type="submit" class="btn btn-success btn-sm">Confirmer</button>
+
+      </form>
+
+
               		</div>
         </dl>
 
-    {% else %}
-        <p>La base de données est en cours de constitution</p>
-    {% endif %}
 
     <p><a href="{{url_for('accueil')}}">Retour à l'accueil</a></p>
 
-  
-{%endif %}
 {% endblock %}

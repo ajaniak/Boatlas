@@ -37,7 +37,7 @@ class Place(db.Model):
         but it is not completely compatible
         :return:
         """
-        endroit = {
+        return {
             "type": "place",
             "id": self.place_id,
             "attributes": {
@@ -59,15 +59,14 @@ class Place(db.Model):
             for author in self.authorships
             ],
             #biblio fait référence à ce sur quoi l'on boucle
-                "references":[biblio.association_to_json()
-                 for biblio in self.relations]
+                "references":[reference.association_to_json()
+                 for reference in self.relations]
 
                  }
 
              }
-        return endroit
 
-    def to_jsonapi_dict_1(self):
+    def dictionnaire_2(self):
         """ It ressembles a little JSON API format
         but it is not completely compatible
         :return:
@@ -153,7 +152,6 @@ class Place(db.Model):
 
 
         try:
-
             # On l'ajoute au transport vers la base de données
             db.session.add(lieu)
             # On envoie le paquet
@@ -164,27 +162,6 @@ class Place(db.Model):
 
         except Exception as erreur:
             return False, [str(erreur)]
-
-    @staticmethod
-    def supprimer_association(place_id):
-        """
-        Fonction supprimant la relation entre
-        le lieu et la reference bibliographique
-        :param place_id: identifiant du lieu
-        :returns: booleen
-        """
-
-        lieu = Place.query.get(place_id)
-        associations = lieu.relations
-        unique_lieu = associations.relation_place_id
-        unique_relation = associations.relation_id
-        unique_reference = associations.relation_biblio_id
-        for lieu in unique_lieu:
-            db.session.delete(lieu)
-            db.session.commit()
-        for reference in unique_reference:
-            db.session.delete(reference)
-            db.session.commit()
 
 
 #on crée notre classe de références bibliographiques
@@ -199,12 +176,11 @@ class Biblio(db.Model):
 #Jointure
     relations = db.relationship("Relation", back_populates="biblio")
 
-
     def to_jsonapi_dict(self):
         """ Semblant d'API en JSON mais défauts de compatibilité
         :return:
         """
-        return {
+        biblio = {
             "type": "biblio",
             "id": self.biblio_id,
             "attributes": {
@@ -226,26 +202,28 @@ class Biblio(db.Model):
                               for endroit in self.relations
                           ]
                      }}
+        return biblio
 
-    def to_jsonapi_dict_1(self):
+    def dictionnaire_2(self):
         """ Semblant d'API en JSON mais défauts de compatibilité
         :return:
         """
-        return {
-            "type": "biblio",
-            "id": self.biblio_id,
+        reference = {
+            #"id": self.biblio_id,
             "attributes": {
                 "titre": self.biblio_titre,
                 "auteur": self.biblio_auteur,
                 "date": self.biblio_date,
-                "lieu": self.biblio_lieu,
                 "category": self.biblio_type,
+            #    "type": "biblio",
 
             },
             "links": {
-                "self": url_for("biblio", biblio_id=self.biblio_id, _external=True),
+            #    "self": url_for("biblio", biblio_id=self.biblio_id, _external=True),
                 "json": url_for("api_biblios_single", biblio_id=self.biblio_id, _external=True)
             }}
+        return reference
+
 
 
 
@@ -339,11 +317,11 @@ class Relation(db.Model):
 #Jointure
     biblio = db.relationship("Biblio", back_populates="relations")
     place = db.relationship("Place", back_populates="relations")
-#Gros problème de récursivité
+#Problème de mini-boucle
     def association_to_json(self):
         return {
-            "biblio": self.biblio.to_jsonapi_dict_1(),
-            "endroit": self.place.to_jsonapi_dict_1()
+            "reference": self.biblio.dictionnaire_2(),
+            "endroit": self.place.dictionnaire_2()
         }
 
     @staticmethod
@@ -357,7 +335,6 @@ class Relation(db.Model):
             erreurs.append("Le biblio_id est obligatoire")
         if not place_id:
             erreurs.append("Il faut indiquer le place_id")
-
 
         # Si on a au moins une erreur
         if len(erreurs) > 0:
@@ -379,6 +356,27 @@ class Relation(db.Model):
             db.session.commit()
 
             return True, liaison
+
+        except Exception as erreur:
+            return False, [str(erreur)]
+
+    @staticmethod
+    def supprimer_association(relation_place_id, relation_biblio_id, relation_id):
+        """
+        Fonction supprimant la relation entre
+        le lieu et la reference bibliographique
+        :param place_id: identifiant du lieu
+        :returns: booleen
+        """
+
+        relation_id = Relation.query.get(relation_id)
+        relation_biblio_id=relation_biblio_id,
+        relation_place_id=relation_place_id
+
+        try:
+            db.session.delete(relation_id)
+            db.session.commit()
+            return True, lieu
 
         except Exception as erreur:
             return False, [str(erreur)]

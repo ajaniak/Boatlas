@@ -15,6 +15,7 @@
 <!-- J'itère sur ma liste de références et s'il y a des relations, il faut les afficher-->
             {% for element in reference%}
               <dt><a href="{{url_for('biblio', biblio_id=element.biblio.biblio_id)}}">Référence bibliographique</a></dt><dd>{{element.biblio.biblio_titre}}</dd>
+              <p><a class="nav-link" href="{{url_for("supprimer_association", relation_id=element.relation_id)}}">Supprimer l'association</a></p>
               {%endfor%}
 
         </dl>
@@ -29,7 +30,7 @@
     <p><a class="nav-link" href="{{url_for('modif_lieu', place_id=lieu.place_id)}}">Editer le lieu</a></p>
     <p><a class="nav-link" href="{{url_for("depot")}}">Ajouter un nouveau lieu</a></p>
     <p><a class="nav-link" href="{{url_for('index_biblio', place_id=lieu.place_id)}}">Ajouter une nouvelle référence</a></p>
-    <!--- <p><a class="nav-link" href="{{url_for("creer_biblio")}}">Editer la bibliographie</a></p>-->
+
     <!-- Je renvoie vers ma route qui renvoie vers un formulaire où biblio_id = la liste définie d'après ma classe -->
 {%endif %}
 {% endblock %}

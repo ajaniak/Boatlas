@@ -37,15 +37,6 @@ def api_biblios_single(biblio_id):
         return jsonify(biblio.to_jsonapi_dict())
 
 
-@app.route(API_ROUTE+"/relations/<relation_id>")
-def api_relations_single(relation_id):
-    try:
-        query = Relation.query.get(relation_id)
-        return jsonify(query.to_jsonapi_dict())
-    except:
-        return Json_404()
-
-
 
 @app.route(API_ROUTE+"/places")
 def api_places_browse():

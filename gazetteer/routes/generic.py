@@ -331,7 +331,7 @@ Route permettant l'affichage des données d'une relation
     return render_template("pages/liaison.html", nom="Gazetteer", lieu_liaison=unique_liaison)
 
 
-@app.route("/modif_liaison/<int:link_id>")
+@app.route("/modif_liaison/<int:link_id>", methods=["POST", "GET"])
 @login_required
 def modif_liaison(link_id):
     status, donnees = link_lieu.modif_liaison(
@@ -339,7 +339,6 @@ def modif_liaison(link_id):
         nom_lieu_1=request.args.get("nom_lieu_1", None),
         nom_lieu_2=request.args.get("nom_lieu_2", None),
     )
-
 
 @app.route("/associer_reference/<int:place_id>", methods=["POST", "GET"])
 def index_biblio(place_id):
@@ -388,11 +387,27 @@ def index_lieux(biblio_id):
         return render_template("pages/index_lieux.html", biblio=unique_biblio,
         lieux=lieux)
 
-@app.route("/supprimer_association/<int:place_id>")
-def supprimer_association(place_id):
+@app.route("/supprimer_association/<int:relation_id>", methods=["POST", "GET"])
+def supprimer_association(relation_id):
     """Route pour supprimer la relation
     entre une référence et un lieu
-    :param place_id: identifiant numérique du lieu"""
-    status = Place.supprimer_association(place_id)
-    flash("Suppression réussie!", "success")
-    return redirect("/index_lieux")
+    :param relation_id: identifiant numérique du lieu
+    """
+    relation = Relation.query.get(relation_id)
+    #associations = endroit.relations
+    if request.method == "POST":
+        status, donnees = Relation.supprimer_association(
+        relation_id = relation_id,
+        relation_biblio_id = request.form.get("reference", None),
+        relation_place_id = request.form.get("lieu", None)
+        )
+        if status is True:
+            flash("Suppression réussie!", "success")
+            return redirect("/")
+        else:
+            flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
+            return render_template("pages/supprimer_association.html", relation=relation)
+    else:
+        return render_template("pages/supprimer_association.html", relation=relation)
+    flash("")
+    return redirect("/supprimer_association.html", relation=relation)
