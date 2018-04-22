@@ -71,38 +71,6 @@ def recherche():
         keyword=motclef
     )
 
-@app.route("/recherche_biblio")
-def recherche_biblio():
-    """ Route permettant la recherche plein-texte
-    """
-    # On préfèrera l'utilisation de .get() ici
-    #   qui nous permet d'éviter un if long (if "clef" in dictionnaire and dictonnaire["clef"])
-    motclef = request.args.get("keyword", None)
-    page = request.args.get("page", 1)
-
-    if isinstance(page, str) and page.isdigit():
-        page = int(page)
-    else:
-        page = 1
-
-    # On crée une liste vide de résultat (qui restera vide par défaut
-    #   si on n'a pas de mot clé)
-    resultats = []
-
-    # On fait de même pour le titre de la page
-    titre = "Recherche_biblio"
-    if motclef:
-        resultats = Biblio.query.filter(
-            Biblio.biblio_titre.like("%{}%".format(motclef))
-        ).paginate(page=page, per_page=LIEUX_PAR_PAGE)
-        titre = "Résultat pour la recherche `" + motclef + "`"
-
-    return render_template(
-        "pages/recherche_biblio.html",
-        resultats=resultats,
-        titre=titre,
-        keyword=motclef
-    )
 
 @app.route("/browse")
 def browse():
@@ -121,6 +89,26 @@ def browse():
 
     return render_template(
         "pages/browse.html",
+        resultats=resultats
+    )
+
+@app.route("/moteur_biblio")
+def moteur_biblio():
+    """ Route permettant la recherche plein-texte
+    """
+    # On préfèrera l'utilisation de .get() ici
+    #   qui nous permet d'éviter un if long (if "clef" in dictionnaire and dictonnaire["clef"])
+    page = request.args.get("page", 1)
+
+    if isinstance(page, str) and page.isdigit():
+        page = int(page)
+    else:
+        page = 1
+
+    resultats = Biblio.query.paginate(page=page, per_page=LIEUX_PAR_PAGE)
+
+    return render_template(
+        "pages/moteur_biblio.html",
         resultats=resultats
     )
 
@@ -311,8 +299,7 @@ Route permettant l'affichage des données d'une relation
     return render_template("pages/liaison.html", nom="Gazetteer", lieu_liaison=unique_liaison)
 
 
-
-@app.route("/modif_liaison/<int:link_id>")
+@app.route("/modif_liaison/<int:link_id>", methods=["POST", "GET"])
 @login_required
 def modif_liaison(link_id):
     status, donnees = link_lieu.modif_liaison(
@@ -321,42 +308,6 @@ def modif_liaison(link_id):
         nom_lieu_2=request.args.get("nom_lieu_2", None),
     )
 
-"""@app.route("/associer_reference", methods=["POST", "GET"])
-def reference_1():
-    if request.method == "POST":
-        statut, donnees = Relation.associer_reference(
-            biblio_id=request.form.get("biblio_id", None),
-            place_id=request.form.get("place_id", None)
-        )
-        if statut is True:
-            flash("Enregistrement effectué. Vous avez ajouté une nouvelle relation", "success")
-            return redirect("/")
-        else:
-            flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
-            return render_template("pages/reference.html")
-    else:
-        return render_template("pages/reference.html")
-
-@app.route("/associer_reference", methods=["POST", "GET"])
-def reference():
-
-    lieu = Place.query.get(place_id)
-    titres = lieu.relations
-    if request.method == "POST":
-        statut, donnees = Relation.reference_4(
-            place_id=place_id,
-            biblio_id=biblio_id,
-        )
-        if statut is True:
-            flash("Enregistrement effectué. Vous avez ajouté une nouvelle relation", "success")
-            return redirect("/")
-        else:
-            flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
-            return render_template("pages/index_biblio.html")
-    else:
-        return render_template("pages/index_biblio.html")"""
-
-
 @app.route("/associer_reference/<int:place_id>", methods=["POST", "GET"])
 def index_biblio(place_id):
     """ Route permettant la recherche plein-texte
@@ -364,8 +315,6 @@ def index_biblio(place_id):
     # On préfèrera l'utilisation de .get() ici
     #   qui nous permet d'éviter un if long (if "clef" in dictionnaire and dictonnaire["clef"])
     unique_lieu = Place.query.get(place_id)
-    #A tester sans la ligne ci-dessous
-    #references = Biblio.query.paginate().query.get(id)
     resultats = Biblio.query.paginate()
     if request.method == "POST":
         statut, donnees = Relation.associer_reference(
@@ -405,3 +354,28 @@ def index_lieux(biblio_id):
     else:
         return render_template("pages/index_lieux.html", biblio=unique_biblio,
         lieux=lieux)
+
+@app.route("/supprimer_association/<int:relation_id>", methods=["POST", "GET"])
+def supprimer_association(relation_id):
+    """Route pour supprimer la relation
+    entre une référence et un lieu
+    :param relation_id: identifiant numérique du lieu
+    """
+    relation = Relation.query.get(relation_id)
+    #associations = endroit.relations
+    if request.method == "POST":
+        status, donnees = Relation.supprimer_association(
+        relation_id = relation_id,
+        relation_biblio_id = request.form.get("reference", None),
+        relation_place_id = request.form.get("lieu", None)
+        )
+        if status is True:
+            flash("Suppression réussie!", "success")
+            return redirect("/")
+        else:
+            flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
+            return render_template("pages/supprimer_association.html", relation=relation)
+    else:
+        return render_template("pages/supprimer_association.html", relation=relation)
+    flash("")
+    return redirect("/supprimer_association.html", relation=relation)

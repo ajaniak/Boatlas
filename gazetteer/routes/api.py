@@ -1,10 +1,17 @@
-from flask import render_template, request, url_for, jsonify
+from flask import render_template, request, url_for, jsonify, json
 from urllib.parse import urlencode
 
 from ..app import app
 from ..constantes import LIEUX_PAR_PAGE, API_ROUTE
-from ..modeles.donnees import Place
+from ..modeles.donnees import Place, Biblio, Relation, Authorship
+from ..modeles.utilisateurs import User
 
+#Classe pour encoder les sets en listes (pour la TypeError "JSON is not serializable")
+class SetEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, set):
+            return list(obj)
+        return json.JSONEncoder.default(self, obj)
 
 def Json_404():
     response = jsonify({"erreur": "Unable to perform the query"})
@@ -12,13 +19,23 @@ def Json_404():
     return response
 
 
-@app.route(API_ROUTE+"/places/<place_id>")
+@app.route(API_ROUTE+"/places/<int:place_id>")
 def api_places_single(place_id):
-    try:
-        query = Place.query.get(place_id)
-        return jsonify(query.to_jsonapi_dict())
-    except:
-        return Json_404()
+    lieu = Place.query.get(place_id)
+    if not lieu:
+        return Json_404
+    else:
+        return jsonify(lieu.to_jsonapi_dict())
+
+
+@app.route(API_ROUTE+"/biblios/<biblio_id>")
+def api_biblios_single(biblio_id):
+    biblio = Biblio.query.get(biblio_id)
+    if not biblio:
+        return Json_404
+    else:
+        return jsonify(biblio.to_jsonapi_dict())
+
 
 
 @app.route(API_ROUTE+"/places")
