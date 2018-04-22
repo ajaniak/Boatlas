@@ -279,6 +279,9 @@ def modif_biblio(biblio_id):
 @login_required
 @app.route("/create_link",methods=["POST", "GET"])
 def create_link():
+    """ Route permettant l' affichage du formulaire de la création de la connexion entre deux.
+    :param link_id: Identifiant numérique de la référence connexion
+    """
     if request.method == "POST":
         statut, donnees = links.create_link(
             lieu_1=request.form.get("ID du lieu 1", None),
@@ -296,6 +299,9 @@ def create_link():
 @login_required
 @app.route("/modif_link/<int:link_id>", method=["POST", "GET"])
 def modif_link(link_id):
+    """ Route permettant l' affichage du formulaire de modification de la connexion entre deux.
+    :param link_id: Identifiant numérique de la référence connexion
+    """
     status, donnees = links.modif_link(
         id=link_id,
         lieu_1=request.args.get("ID du lieu 1", None),
@@ -313,6 +319,19 @@ def modif_link(link_id):
         return render_template("pages/modif_link.html", connection=unique_link)
 
 #je dois encore faire la route pour la page link/link_id
+@app.route("/link/<int:link_id>")
+def link(link_id):
+    """ Route permettant l'affichage des données d'une connexion
+    :param link_id: Identifiant numérique de la référence bibliographique
+    """
+    # On récupère le tuple correspondant aux champs de la classe Biblio
+    unique_link = links.query.get(link_id)
+    lieux = unique_link.Link
+    print(lieux)
+    return render_template("pages/link.html", nom="Gazetteer", biblio=unique_link, lieux=lieux)
+
+#Section pour les routes des caractéristiques:
+
 
 """@app.route("/associer_reference", methods=["POST", "GET"])
 def reference_1():
