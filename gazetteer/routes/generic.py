@@ -35,7 +35,6 @@ def lieu(place_id):
 @app.route("/recherche")
 def recherche():
     """ Route permettant la recherche plein-texte
-    dans les lieux comme dans la bibliographie
     """
     # On préfèrera l'utilisation de .get() ici
     #   qui nous permet d'éviter un if long (if "clef" in dictionnaire and dictonnaire["clef"])
@@ -91,7 +90,7 @@ def browse():
         "pages/browse.html",
         resultats=resultats
     )
-
+    
 @app.route("/moteur_biblio")
 def moteur_biblio():
     """ Route permettant la recherche plein-texte
@@ -167,10 +166,10 @@ def deconnexion():
     flash("Vous êtes déconnecté-e", "info")
     return redirect("/")
 
-@app.route("/depot", methods=["POST", "GET"])
 @login_required
-"""Route gérant la création de lieux"""
+@app.route("/depot", methods=["POST", "GET"])
 def depot():
+    """Route gérant la création de lieux"""
     if request.method == "POST":
         status, donnees = Place.creer_lieu(
             nom=request.form.get("nom", None),
@@ -391,9 +390,14 @@ def supprimer_association(relation_id):
         relation_biblio_id = request.form.get("reference", None),
         relation_place_id = request.form.get("lieu", None)
         )
-        if status is True:
+#Problème de chargement de la session
+        error = "sqlalchemy.orm.exc.DetachedInstanceError"
+        if error:
             flash("Suppression réussie!", "success")
             return redirect("/")
+        if status is True:
+            flash("Suppression réussie!", "success")
+            return redirect("/", )
         else:
             flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
             return render_template("pages/supprimer_association.html", relation=relation)
