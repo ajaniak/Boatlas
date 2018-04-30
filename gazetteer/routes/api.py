@@ -37,7 +37,6 @@ def api_biblios_single(biblio_id):
         return jsonify(biblio.to_jsonapi_dict())
 
 
-
 @app.route(API_ROUTE+"/places")
 def api_places_browse():
     """ Route permettant la recherche plein-texte
