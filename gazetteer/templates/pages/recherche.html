@@ -7,8 +7,11 @@
    {% include "partials/recherche.html" %}
 
     <h1>{{titre}}</h1>
+    {% if message_erreur%}
+    <p id="error">"Vous n'avez entré aucun motclef !"</p>
+  {%endif%}
     {% if lieux %}
-    
+
         <p>Il y a {{lieux.total}} lieu(x) qui répond(ent) à votre requête :</p>
         <ul>
             {% for lieu in lieux.items %}

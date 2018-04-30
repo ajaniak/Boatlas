@@ -7,18 +7,21 @@
     <h1>Index de biblios</h1>
 
   <div class="row">
+    <div class="col">
 <form class="form" method="POST" action="{{url_for('index_biblio', place_id=lieu.place_id)}}" >
   {%for biblio in resultats.items %}
 <div class="checkbox col-sm-2">
-  <label><input type="checkbox" name="biblio_id" id="biblio_id" value="{{biblio.biblio_id}}">
-    {{biblio.biblio_titre}}</label>
+  <hr><label><input type="checkbox" name="biblio_id" id="biblio_id" value="{{biblio.biblio_id}}">
+    {{biblio.biblio_titre}}</label></hr>
 </div>
+
 {%endfor%}
 
     <div>
       <button type="submit" class="btn btn-primary" >Contribuer</button>
     </div>
     </div>
+  </div>
 
 
 
