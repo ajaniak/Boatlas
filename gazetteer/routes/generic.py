@@ -61,6 +61,9 @@ def recherche():
             Biblio.biblio_titre.like("%{}%".format(motclef))
         ).paginate(page=page, per_page=LIEUX_PAR_PAGE)
         titre = "Résultat pour la recherche `" + motclef + "`"
+    else:
+        message_erreur = "Vous n'avez entré aucun mot clef"
+        return render_template("pages/recherche.html", titre=titre, keyword=motclef, message_erreur=message_erreur)
 
     return render_template(
         "pages/recherche.html",
@@ -90,7 +93,7 @@ def browse():
         "pages/browse.html",
         resultats=resultats
     )
-    
+
 @app.route("/moteur_biblio")
 def moteur_biblio():
     """ Route permettant la recherche plein-texte
