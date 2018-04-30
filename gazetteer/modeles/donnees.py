@@ -19,6 +19,7 @@ class Authorship(db.Model):
 
 # On crée notre modèle
 class Place(db.Model):
+    """Définit une classe lieu sur le modèle SQL"""
     place_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
     place_nom = db.Column(db.Text)
     place_description = db.Column(db.Text)
@@ -31,12 +32,12 @@ class Place(db.Model):
 #jointure récursive many-to-many
     link_place1 = db.relationship("link", primaryjoin="Place.place_id==link.link_place1_id")
     link_place2= db.relationship("link", primaryjoin="Place.place_id==link.link_place2_id")
-    
+
 
     def to_jsonapi_dict(self):
         """ It ressembles a little JSON API format
         but it is not completely compatible
-        :return:
+        :return: dictionnaire avec infos de la table SQL
         """
         return {
             "type": "place",
@@ -68,9 +69,10 @@ class Place(db.Model):
              }
 
     def dictionnaire_2(self):
-        """ It ressembles a little JSON API format
-        but it is not completely compatible
-        :return:
+        """ Permet d'éviter une boucle infinie lors
+        de l'établissement des relations
+        Problème cependant car la boucle fonctionne une fois de trop
+        :return: dictionnaire avec infos de la table SQL
         """
         return {
                 "type": "place",
@@ -93,6 +95,13 @@ class Place(db.Model):
 
     @staticmethod
     def creer_lieu(nom, latitude, longitude, description, typep):
+        """Création d'un lieu:
+        :param nom: nom du lieu
+        :param latitude: latitude du lieu
+        :param longitude: longitude du lieu
+        :param description: description succinte du lieu
+        :param typep: détermine la nature du lieu
+        returns: liste"""
         erreurs = []
         if not nom:
             erreurs.append("Le nom du lieu est obligatoire")
@@ -130,6 +139,13 @@ class Place(db.Model):
 
     @staticmethod
     def modif_lieu(id, nom, latitude, longitude, description, typep):
+        """Modification d'un lieu:
+        :param nom: nom du lieu
+        :param latitude: latitude du lieu
+        :param longitude: longitude du lieu
+        :param description: description succinte du lieu
+        :param typep: détermine la nature du lieu
+        returns: liste"""
         erreurs = []
         if not nom:
             erreurs.append("Le nom du lieu est obligatoire")
@@ -167,7 +183,7 @@ class Place(db.Model):
 
 #on crée notre classe de références bibliographiques
 class Biblio(db.Model):
-    #__tablename__ = "right"
+    """Création d'une classe biblio sur le modèle SQL"""
     biblio_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
     biblio_titre = db.Column(db.Text, nullable=False)
     biblio_auteur = db.Column(db.Text, nullable=False)
@@ -179,7 +195,7 @@ class Biblio(db.Model):
 
     def to_jsonapi_dict(self):
         """ Semblant d'API en JSON mais défauts de compatibilité
-        :return:
+        :return: dictionnaire biblio avec infos contenues dans la table SQL
         """
         biblio = {
             "type": "biblio",
@@ -199,7 +215,7 @@ class Biblio(db.Model):
 
             "relationships": {
                      "endroits" : [
-                              endroit.relation_to_json()
+                              endroit.association_to_json()
                               for endroit in self.relations
                           ]
                      }}
@@ -207,9 +223,9 @@ class Biblio(db.Model):
 
     def dictionnaire_2(self):
         """ Semblant d'API en JSON mais défauts de compatibilité
-        :return:
+        :return: dictionnaire reference
         """
-        reference = {
+        reference ={
             #"id": self.biblio_id,
             "attributes": {
                 "titre": self.biblio_titre,
@@ -226,8 +242,6 @@ class Biblio(db.Model):
         return reference
 
 
-
-
     @staticmethod
     def creer_biblio(titre, auteur, date, lieu, typep):
         """ Crée une nouvelle référence bibliographique et
@@ -237,6 +251,7 @@ class Biblio(db.Model):
         :param date: Date de publication de la référence
         :param lieu: Lieu de publication de la référence
         :param type: Type de publication
+        returns: list
         """
         erreurs = []
         if not titre:
@@ -274,6 +289,15 @@ class Biblio(db.Model):
 
     @staticmethod
     def modif_biblio(id, titre, auteur, date, lieu, typep):
+        """ Modifie une référence bibliographique et
+        renvoie les informations entrées par l'utilisateur
+        :param titre: Titre de la référence
+        :param auteur: Auteur de la référence
+        :param date: Date de publication de la référence
+        :param lieu: Lieu de publication de la référence
+        :param type: Type de publication
+        returns: list
+        """
         erreurs = []
         if not titre:
             erreurs.append("Le titre est obligatoire")
@@ -311,6 +335,8 @@ class Biblio(db.Model):
 
 #classe Relation
 class Relation(db.Model):
+    """Création d'une table d'associations entre table Biblio
+    et la table Place"""
     __tablename__ = "relation"
     relation_id = db.Column(db.Integer, nullable=False, autoincrement=True, primary_key=True)
     relation_place_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
@@ -330,6 +356,9 @@ class Relation(db.Model):
         """ Crée une nouvelle relation entre un lieu et
         une référence. La fonction renvoie les informations
         entrées par l'utilisateur
+        :param biblio_id: identifiant de la référence bibliographique
+        :param place_id: identifiant du lieu
+        returns: list
         """
         erreurs = []
         if not biblio_id:
@@ -366,7 +395,9 @@ class Relation(db.Model):
         """
         Fonction supprimant la relation entre
         le lieu et la reference bibliographique
-        :param place_id: identifiant du lieu
+        :param relation_place_id: identifiant du lieu conservé dans la table d'association
+        :param relation_biblio_id: identifiant de la référence conservé dans la table d'association
+        :param relation_id: identifiant de la relation
         :returns: booleen
         """
 
