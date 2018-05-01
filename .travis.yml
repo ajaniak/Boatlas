@@ -6,4 +6,5 @@ install:
 #  - pip install coveralls
 # command to run tests
 script:
-  - python -m unittest discover tests
+  - python tests.py
+  - python -m smtpd -n -c DebuggingServer localhost:25
