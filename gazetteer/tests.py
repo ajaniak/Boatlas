@@ -1,7 +1,7 @@
-import unittest
-from app import app, db
-from modeles.donnees import Place, Biblio, Relation
-from app.modeles.utilisateurs import User
+from gazetteer.app import db, config_app, login
+from gazetteer.modeles.utilisateurs import User
+from gazetteer.modeles.donnees import Place, Authorship, Biblio, Authorship
+from unittest import TestCase
 
 class UserModelCase(unittest.TestCase):
     def setUp(self):
@@ -38,74 +38,53 @@ class PlaceModelCase(unittest.TestCase):
         l = Place(place_nom='Marseille', place_latitude='43.300000', place_longitude='5.400000')
         self.assertEqual(l=l)
 
-"""
+
 class BiblioModelCase(unittest.TestCase):
     def setUp(self):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
         db.create_all()
 
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+
+    def creation(self):
+        l = Place(biblio_titre='Versailles, un palais pour la sculpture', biblio_auteur='Alexandre Maral', biblio_date='2013')
+        self.assertEqual(l=l)
 
     def test_association_ref(self, biblio_id):
-        lieu = Place(place_nom='Athènes', place_latitude='37.983810', place_longitude='23.727539', place_type='capitale')
-        reference = Biblio(biblio_titre='Les Perses', biblio_auteur='Eschyle', biblio_type='tragédie grecque')
-        db.session.add(lieu)
-        db.session.add(reference)
+        lieu1 = Place(place_nom='Athènes', place_latitude='37.983810', place_longitude='23.727539', place_type='capitale')
+        livre1 = Biblio(biblio_titre='Les Perses', biblio_auteur='Eschyle', biblio_type='tragédie grecque')
+        db.session.add(lieu1)
+        db.session.add(livre1)
         db.session.commit()
-        self.assertEqual(lieu.relations.all(), [])
-        self.assertEqual(biblio.relations.all(), [])
+        self.assertEqual(lieu1.relations.all(), [])
+        self.assertEqual(livre1.relations.all(), [])
 
-        lieu.associer_reference(biblio)
+        lieu1.associer_reference(livre1)
         db.session.commit()
-#Ligne ci-dessous non écrite dans donnees.py
-        #self.assertTrue(u1.is_following(u2))
-        self.assertEqual(u1.followed.count(), 1)
-        self.assertEqual(u1.followed.first().username, 'susan')
-        self.assertEqual(u2.followers.count(), 1)
-        self.assertEqual(u2.followers.first().username, 'john')
+        self.assertTrue(lieu1.associer_reference(u2))
 
-        u1.unfollow(u2)
+        lieu1.supprimer_association(livre1)
         db.session.commit()
-        self.assertFalse(u1.is_following(u2))
-        self.assertEqual(u1.followed.count(), 0)
-        self.assertEqual(u2.followers.count(), 0)
+        self.assertFalse(lieu1.associer_reference(u2))
 
-    def test_follow_posts(self):
-        # create four users
-        u1 = User(username='john', email='john@example.com')
-        u2 = User(username='susan', email='susan@example.com')
-        u3 = User(username='mary', email='mary@example.com')
-        u4 = User(username='david', email='david@example.com')
-        db.session.add_all([u1, u2, u3, u4])
+class RelationModelCase(unittest.TestCase):
+    def setUp(self):
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
+        db.create_all()
 
-        # create four posts
-        now = datetime.utcnow()
-        p1 = Post(body="post from john", author=u1,
-                  timestamp=now + timedelta(seconds=1))
-        p2 = Post(body="post from susan", author=u2,
-                  timestamp=now + timedelta(seconds=4))
-        p3 = Post(body="post from mary", author=u3,
-                  timestamp=now + timedelta(seconds=3))
-        p4 = Post(body="post from david", author=u4,
-                  timestamp=now + timedelta(seconds=2))
-        db.session.add_all([p1, p2, p3, p4])
-        db.session.commit()
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
 
-        # setup the followers
-        u1.follow(u2)  # john follows susan
-        u1.follow(u4)  # john follows david
-        u2.follow(u3)  # susan follows mary
-        u3.follow(u4)  # mary follows david
-        db.session.commit()
+    """def creation(self):
+        #demander à Ella quelles données ont été liées entre elles pour l'écriture du test!
+        l = Place(relation_id=, relation_place_id=, relation_biblio_id=)
+        self.assertEqual(l=l)"""
 
-        # check the followed posts of each user
-        f1 = u1.followed_posts().all()
-        f2 = u2.followed_posts().all()
-        f3 = u3.followed_posts().all()
-        f4 = u4.followed_posts().all()
-        self.assertEqual(f1, [p2, p4, p1])
-        self.assertEqual(f2, [p2, p3])
-        self.assertEqual(f3, [p3, p4])
-        self.assertEqual(f4, [p4])
+
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)"""
