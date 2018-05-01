@@ -43,3 +43,13 @@ def config_app(config_name="test"):
 SQLALCHEMY_RECORD_QUERIES = True
 #configuration de la limite au dela de laquelle la durée de query est trop longue, en seconde:
 DATABASE_QUERY_TIMEOUT = 1
+
+#configuration d'un rapport d'erreurs via mail:
+# mail server settings
+MAIL_SERVER = 'localhost'
+MAIL_PORT = 25
+MAIL_USERNAME = 'ajaniak' , 'e.dureault'
+MAIL_PASSWORD = None #se renseigner sur la manière de gérer le mot de passe. 
+
+# administrator list
+ADMINS = ['axelle.janiak@chartes.psl.eu', 'ella.duréault@chartes.psl.eu']
