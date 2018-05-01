@@ -2,6 +2,9 @@ from gazetteer.app import db, config_app, login
 from gazetteer.modeles.utilisateurs import User
 from gazetteer.modeles.donnees import Place, Authorship, Biblio, Authorship
 from unittest import TestCase
+from coverage import coverage
+cov = coverage(branch=True, omit=['flask/*', 'tests.py'])
+cov.start()
 
 class UserModelCase(unittest.TestCase):
     def setUp(self):
@@ -134,8 +137,20 @@ class TestApi(Base):
         # On vérifie que le lien est correct
         seconde_requete = self.client.get(json_parse["links"]["self"])
         self.assertEqual(seconde_requete.status_code, 200)
-        
 
 
 if __name__ == '__main__':
-    unittest.main(verbosity=2)"""
+    unittest.main(verbosity=2)
+
+if __name__ == '__main__':
+    try:
+        unittest.main()
+    except:
+        pass
+    cov.stop()
+    cov.save()
+    print("\n\nCoverage Report:\n")
+    cov.report()
+    print("HTML version: " + os.path.join(basedir, "tmp/coverage/index.html"))
+    cov.html_report(directory='tmp/coverage')
+    cov.erase()
