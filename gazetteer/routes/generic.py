@@ -276,6 +276,19 @@ def modif_biblio(biblio_id):
         unique_biblio = Biblio.query.get(biblio_id)
         return render_template("pages/modif_biblio.html", biblio=unique_biblio)
 
+#je dois encore faire la route pour la page link/link_id
+@app.route("/link/<int:link_id>")
+def link(link_id):
+    """ Route permettant l'affichage des données d'une connexion
+    :param link_id: Identifiant numérique de la référence bibliographique
+    """
+    # On récupère le tuple correspondant aux champs de la classe Biblio
+    unique_link = link.query.join(link, (links.c.link_id == links.link_id)).get(id)
+    lieux = unique_link.Link
+    print(lieux)
+    return render_template("pages/link.html", nom="Gazetteer", biblio=unique_link, lieux=lieux)
+
+
 @login_required
 @app.route("/create_link",methods=["POST", "GET"])
 def create_link():
@@ -286,12 +299,10 @@ def create_link():
         statut, donnees = links.create_link(
             lieu_1=request.form.get("ID du lieu 1", None),
             lieu_2=request.form.get("ID du lieu 1", None),
-            type=request.form.get("nature: topographique ou administrative ou historique", None),
-            description=request.form.get("deescription", None),
         )
         if statut is True:
-            flash("Enregistrement effectué. Vous avez ajouté une nouvelle connexion", "success")
-            return redirect("/")
+            flash("Enregistrement effectué. Vous avez ajouté une nouvelle connexion", "success","Vous pouvez ajouter des informations sur la nature de la connexion entre les lieux")
+            return redirect("pages/modif_link")
         else:
             flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
             return render_template("pages/create_link.html")
@@ -328,18 +339,6 @@ def modif_link(link_id):
         flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
         unique_link = link.query.join(link, (links.c.link_id == links.link_id)).get(id)
         return render_template("pages/modif_link.html", connection=unique_link)
-
-#je dois encore faire la route pour la page link/link_id
-@app.route("/link/<int:link_id>")
-def link(link_id):
-    """ Route permettant l'affichage des données d'une connexion
-    :param link_id: Identifiant numérique de la référence bibliographique
-    """
-    # On récupère le tuple correspondant aux champs de la classe Biblio
-    unique_link = link.query.join(link, (links.c.link_id == links.link_id)).get(id)
-    lieux = unique_link.Link
-    print(lieux)
-    return render_template("pages/link.html", nom="Gazetteer", biblio=unique_link, lieux=lieux)
 
 
 
