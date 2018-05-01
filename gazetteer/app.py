@@ -2,7 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 import os
-from .constantes import SECRET_KEY
+from .constantes import SECRET_KEY, config
 
 chemin_actuel = os.path.dirname(os.path.abspath(__file__))
 templates = os.path.join(chemin_actuel, "templates")
@@ -27,3 +27,13 @@ login = LoginManager(app)
 
 from .routes import generic
 from .routes import api
+
+def config_app(config_name="test"):
+    """ Create the application """
+    app.config.from_object(CONFIG[config_name])
+
+    # On initie les extensions
+    db.init_app(app)
+    login.init_app(app)
+
+    return app
