@@ -58,7 +58,6 @@ class Place(db.Model):
 #jointure biblio & utilisateur
     authorships = db.relationship("Authorship", back_populates="place")
     relations = db.relationship("Relation", back_populates="place")
-<<<<<<< HEAD
 #    link_place1 = db.relationship("link", primaryjoin="Place.place_id==link.link_place1_id")
 #    link_place2= db.relationship("link", primaryjoin="Place.place_id==link.link_place2_id")
 #    liens=db.relationship("link", back_populates="place")
@@ -68,11 +67,6 @@ class Place(db.Model):
         primaryjoin=(links.c.link_place1_id == place_id),
         secondaryjoin=(links.c.link_place2_id == place_id),
         backref=db.backref('place', lazy='dynamic'), lazy='dynamic')
-=======
-#jointure récursive many-to-many
-    link_place1 = db.relationship("link", primaryjoin="Place.place_id==link.link_place1_id")
-    link_place2= db.relationship("link", primaryjoin="Place.place_id==link.link_place2_id")
->>>>>>> upstream/master
 
 
     def to_jsonapi_dict(self):
