@@ -83,7 +83,58 @@ class RelationModelCase(unittest.TestCase):
         l = Place(relation_id=, relation_place_id=, relation_biblio_id=)
         self.assertEqual(l=l)"""
 
+class TestApi(Base):
+    places = [
+        Place(
+            place_nom='Hippana',
+            place_description='Ancient settlement in the western part of Sicily, probably founded in the seventh century B.C.',
+            place_longitude=37.7018481,
+            place_latitude=13.4357804,
+            place_type='settlement'
+        )
+    ]
 
+    def setUp(self):
+        self.app = config_app("test")
+        self.db = db
+        self.client = self.app.test_client()
+        self.db.create_all(app=self.app)
+
+    def tearDown(self):
+        self.db.drop_all(app=self.app)
+
+    def insert_all(self, places=True):
+        # On donne à notre DB le contexte d'exécution
+        with self.app.app_context():
+            if places:
+                for fixture in self.places:
+                    self.db.session.add(fixture)
+            self.db.session.commit()
+
+    def test_single_place(self):
+        """ Vérifie qu'un lieu est bien traité """
+        self.insert_all()
+        response = self.client.get("/api/places/1")
+        # Le corps de la réponse est dans .data
+        # .data est en "bytes". Pour convertir des bytes en str, on fait .decode()
+        content = response.data.decode()
+        self.assertEqual(
+            response.headers["Content-Type"], "application/json"
+        )
+        json_parse = loads(content)
+        self.assertEqual(json_parse["type"], "place")
+        self.assertEqual(
+            json_parse["attributes"],
+            {'name': 'Hippana', 'latitude': 13.4357804, 'longitude': 37.7018481, 'category': 'settlement',
+             'description': 'Ancient settlement in the western part of Sicily, probably '
+                            'founded in the seventh century B.C.'}
+        )
+        self.assertEqual(json_parse["links"]["self"], 'http://localhost/place/1')
+
+        # On vérifie que le lien est correct
+        seconde_requete = self.client.get(json_parse["links"]["self"])
+        self.assertEqual(seconde_requete.status_code, 200)
+        
 
 
 if __name__ == '__main__':
