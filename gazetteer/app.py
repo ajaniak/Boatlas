@@ -45,11 +45,9 @@ SQLALCHEMY_RECORD_QUERIES = True
 DATABASE_QUERY_TIMEOUT = 1
 
 #configuration d'un rapport d'erreurs via mail:
-# mail server settings
 MAIL_SERVER = 'localhost'
 MAIL_PORT = 25
 MAIL_USERNAME = 'ajaniak' , 'e.dureault'
-MAIL_PASSWORD = None #se renseigner sur la manière de gérer le mot de passe. 
-
-# administrator list
+MAIL_PASSWORD = None #se renseigner sur la manière de gérer le mot de passe.
+#mailing liste
 ADMINS = ['axelle.janiak@chartes.psl.eu', 'ella.duréault@chartes.psl.eu']
