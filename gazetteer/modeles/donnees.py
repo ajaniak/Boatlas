@@ -143,7 +143,7 @@ class Place(db.Model):
             return False, [str(erreur)]
 
     @staticmethod
-    def create_link(id,lieu_1, lieu_2, type, description):
+    def create_link(lieu_1, lieu_2):
         erreurs=[]
         if not lieu_1:
             erreurs.append("Le lieu 1 est nécessaire")
@@ -154,25 +154,18 @@ class Place(db.Model):
         if lieu_1 == lieu_2:
             erreurs.append("Le lieu 1 et le lieu 2 ne peuvent pas être identiques")
 
-        #contrôler du typage réalisé par l'internaute.
-        if not type== "topographique" or type=="administrative" or type=="historique":
-            erreurs.append("Le type est obligatoire: topographique, administrative, historique")
-
         #il faudrait vérifier qu'aucune connexion n'a été faite entre ces deux lieux...
-
+        if not self.is_linked(place):
+            self.linked.append(place)
         # si on a une erreur
         if len(erreurs)>o:
-            print(erreurs,lieu_1, lieu_2, type, description)
+            print(erreurs,lieu_1, lieu_2)
             return False, erreurs
 
-        connection = link.query.join(link, (links.c.link_id == links.link_id)) (
-        link_id=id,
+        connection= links(
         link_place1_id=lieu_1,
         link_place2_id=lieu_2,
-        link_relation_type = type,
-        link_relation_description = description,
         )
-
         print(connection)
         try:
             # On l'ajoute au transport vers la base de données
@@ -186,6 +179,15 @@ class Place(db.Model):
         except Exception as erreur:
             return False, [str(erreur)]
 
+#join impossible car création pas d'id attribué pour faire la jonction. La solution est de créer la liaison entre les deux lieux, puis de renvoyer directement au template de modif depuis celui de création.
+    """connection = link.query.join(link, (links.c.link_id == links.link_id)) (
+        link_place1_id=lieu_1,
+        link_place2_id=lieu_2,
+        link_relation_type = type,
+        link_relation_description = description,
+        )"""
+    def is_linked (self, place):
+        return self.liked.filter(links.c.link_place2_id == place_id).count() > 0
 
     @staticmethod
     def creer_lieu(nom, latitude, longitude, description, typep):
