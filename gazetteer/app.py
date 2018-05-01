@@ -28,6 +28,7 @@ login = LoginManager(app)
 from .routes import generic
 from .routes import api
 
+#configuration pour les tests.
 def config_app(config_name="test"):
     """ Create the application """
     app.config.from_object(CONFIG[config_name])
@@ -37,3 +38,8 @@ def config_app(config_name="test"):
     login.init_app(app)
 
     return app
+
+# configuration pour la performance du sql via la fonction get_debug_queries de SQLALCHEMY_DATABASE_URI
+SQLALCHEMY_RECORD_QUERIES = True
+#configuration de la limite au dela de laquelle la durée de query est trop longue, en seconde:
+DATABASE_QUERY_TIMEOUT = 1
