@@ -7,4 +7,3 @@ install:
 # command to run tests
 script:
   - python tests.py
-  - python -m smtpd -n -c DebuggingServer localhost:25
