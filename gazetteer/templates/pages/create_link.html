@@ -1,0 +1,27 @@
+{% extends "conteneur.html" %}
+
+{% block titre %}| Créer une nouvelle relation entre deux lieux{%endblock%}
+
+{% block corps %}
+
+<h1>Création d'une connexion entre deux lieux</h1>
+<p>Complétez le formulaire et cliquez sur "Ajouter".</p>
+<form class="form" method="POST" action="{{url_for("create_link")}}">
+  <div class="form-group row">
+    <label for="lieu_1" class="col-sm-4 col-form-label">ID du lieu 1</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="link_place1_id" name="link_place1" placeholder="ID du lieu">
+    </div>
+  <div>
+      <div class="form-group row">
+        <label for="lieu_2" class="col-sm-4 col-form-label">ID du lieu 2</label>
+        <div class="col-sm-8">
+          <input type="text" class="form-control" id="link_place2_id" name="link_place2" placeholder="ID du lieu">
+        </div>
+  <div class="form-group row">
+    <div class="col-sm-4">
+      <button type="submit" class="btn btn-primary">Ajouter</button>
+    </div>
+  </div>
+</form>
+{% endblock %}

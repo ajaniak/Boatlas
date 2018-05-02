@@ -3,9 +3,19 @@ from flask_login import current_user, login_user, logout_user, login_required
 
 from ..app import app, login
 from ..constantes import LIEUX_PAR_PAGE
-from ..modeles.donnees import Place, Biblio, Relation, Authorship, link
+from ..modeles.donnees import Place, Biblio, Relation, Authorship, Link, links
 from ..modeles.utilisateurs import User
 
+#configuration du test de performance de SQL Alchemy
+from flask_sqlalchemy import get_debug_queries
+from config import DATABASE_QUERY_TIMEOUT
+
+@app.after_request
+def after_request(response):
+    for query in get_debug_queries():
+        if query.duration >= DATABASE_QUERY_TIMEOUT:
+            app.logger.warning("SLOW QUERY: %s\nParameters: %s\nDuration: %fs\nContext: %s\n" % (query.statement, query.parameters, query.duration, query.context))
+    return response
 
 @app.route("/")
 def accueil():
@@ -279,51 +289,71 @@ def modif_biblio(biblio_id):
         unique_biblio = Biblio.query.get(biblio_id)
         return render_template("pages/modif_biblio.html", biblio=unique_biblio)
 
+#je dois encore faire la route pour la page link/link_id
+@app.route("/link/<int:link_id>")
+def link(link_id):
+    """ Route permettant l'affichage des données d'une connexion
+    :param link_id: Identifiant numérique de la référence bibliographique
+    """
+    # On récupère le tuple correspondant aux champs de la classe Biblio
+    unique_link = link.query.join(link, (links.c.link_id == links.link_id)).get(id)
+    lieux = unique_link.Link
+    print(lieux)
+    return render_template("pages/link.html", nom="Gazetteer", biblio=unique_link, lieux=lieux)
+
+
 @login_required
-@app.route("/creer_liaison", methods=["GET", "POST"])
-def creer_liaison():
-        """ Route pour créer une ou plusieurs connexions entre des lieux.
-        """
-        if request.method == "POST":
-            # méthode statique créer_liaison() à créer sous Link
-            status, donnees = link.creer_liaison_1(
-            link_place1_id=request.form.get("lieu1", None),
-            link_relation_type=request.form.get("type_liaison", None),
-            link_place2_id=request.form.get("lieu2", None),
-            link_relation_description=request.form.get("description", None)
-            )
-
-            if status is True:
-                flash("Enregistrement effectué. Vous avez ajouté une nouvelle relation.", "success")
-                return redirect("/creer_liaison")
-            else:
-                flash("La création d'une nouvelle relation a échoué")
-                return render_template("pages/creer_liaison.html")
-
+@app.route("/create_link",methods=["POST", "GET"])
+def create_link():
+    """ Route permettant l' affichage du formulaire de la création de la connexion entre deux.
+    :param link_id: Identifiant numérique de la référence connexion
+    """
+    if request.method == "POST":
+        statut, donnees = links.create_link(
+            lieu_1=request.form.get("ID du lieu 1", None),
+            lieu_2=request.form.get("ID du lieu 1", None),
+        )
+        if statut is True:
+            flash("Enregistrement effectué. Vous avez ajouté une nouvelle connexion", "success","Vous pouvez ajouter des informations sur la nature de la connexion entre les lieux")
+            return redirect("pages/modif_link")
         else:
-            return render_template("pages/creer_liaison.html")
+            flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
+            return render_template("pages/create_link.html")
+    else:
+        return render_template("pages/create_link.html")
 
-
-
-@app.route("/liaison/<int:link_id>")
-def lieu_liaison(link_id):
-    """
-    Route permettant l'affichage des données d'une relation
-    :param link_id: Identifiant numérique de la relation
-    """
-# On a bien sûr aussi modifié le template pour refléter le changement
-    unique_liaison = link.query.get(link_id)
-    return render_template("pages/liaison.html", nom="Gazetteer", lieu_liaison=unique_liaison)
-
-
-@app.route("/modif_liaison/<int:link_id>", methods=["POST", "GET"])
 @login_required
-def modif_liaison(link_id):
-    status, donnees = link_lieu.modif_liaison(
+@app.route("/modif_link/<int:link_id>", methods=["POST", "GET"])
+def modif_link(link_id):
+    """ Route permettant l' affichage du formulaire de modification de la connexion entre deux.
+    :param link_id: Identifiant numérique de la référence connexion
+    """
+    """état fonctionnel pour seulement la connexion sans la caractérisation
+    status, donnees = links.modif_link(
         id=link_id,
-        nom_lieu_1=request.args.get("nom_lieu_1", None),
-        nom_lieu_2=request.args.get("nom_lieu_2", None),
+        lieu_1=request.args.get("ID du lieu 1", None),
+        lieu_2=request.args.get("ID du lieu 2", None),
+    )"""
+#db.and pour essayer de mettre dans la même route les fonctions de caractéristations et de connexions entre les lieux
+    status, donnees = link.query.join(link, (links.c.link_id == links.link_id)).modif_link(
+    id = link_id,
+    lieu_1=request.args.get("ID du lieu 1", None),
+    lieu_2=request.args.get("ID du lieu 2", None),
+    type=request.args.get("nature: topographique ou administrative ou historique", None),
+    description=request.args.get("description", None),
     )
+
+    if status is True :
+        flash("Merci pour votre contribution !", "success")
+        unique_link = link.query.join(link, (links.c.link_id == links.link_id)).get(id)
+        return redirect("/") #vers la connexion qu'il vient de créer.
+
+    else:
+        flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
+        unique_link = link.query.join(link, (links.c.link_id == links.link_id)).get(id)
+        return render_template("pages/modif_link.html", connection=unique_link)
+
+
 
 @app.route("/associer_reference/<int:place_id>", methods=["POST", "GET"])
 def index_biblio(place_id):
