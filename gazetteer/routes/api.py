@@ -93,17 +93,17 @@ def api_places_browse():
 
     response = jsonify(dict_resultats)
     return response
-
+"""
 @app.route(API_ROUTE+"/places/searchproximity")
 def api_places_browse_proximity():
-        """
-        On s'inspire du code pour la recherche en plein texte.
-        loc lieu à partir duquel l'utilisateur souhaite faire sa recherche: il a une latitude et une longitude
-        radius: le rayon de recherche de l'utilisateur
-        """
-    #il faut ajouter la capacité pour l'utilisateur de donner le radius et de préciser la latitude et la longitude qu'il veut voir appliquerself.
-    #seulement je ne vois pas comment faire cette demande dans le cadre de l'API.
-    loc_latitude = request.args.get("y", None)
+
+        #On s'inspire du code pour la recherche en plein texte.
+        #loc lieu à partir duquel l'utilisateur souhaite faire sa recherche: il a une latitude et une longitude
+        #radius: le rayon de recherche de l'utilisateur
+
+        #il faut ajouter la capacité pour l'utilisateur de donner le radius et de préciser la latitude et la longitude qu'il veut voir appliquerself.
+        #seulement je ne vois pas comment faire cette demande dans le cadre de l'API.
+        loc_latitude = request.args.get("y", None)
     loc_longitude = request.args.get("x", None)
     radius = request.args.get("q", None)
     page = request.args.get("page", 1)
@@ -206,7 +206,7 @@ def api_places_browse_area():
     except Exception:
         return Json_404()
 
-#on reprend la même structure pour cette portion de code que pour la fonction par rayon. 
+#on reprend la même structure pour cette portion de code que pour la fonction par rayon.
     dict_resultats = {
         "links": {
             "self": request.url
@@ -241,3 +241,4 @@ def api_places_browse_area():
 
     response = jsonify(dict_resultats)
     return response
+    """
