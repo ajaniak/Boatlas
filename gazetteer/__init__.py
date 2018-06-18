@@ -1,3 +1,8 @@
+from flask import Flask
+
+app = Flask(__name__)
+
+"""
 if not app.debug:
     import logging
     from logging.handlers import RotatingFileHandler
@@ -19,3 +24,4 @@ if not app.debug:
     mail_handler = SMTPHandler((MAIL_SERVER, MAIL_PORT), 'no-reply@' + MAIL_SERVER, ADMINS, 'gazetteer failure', credentials)
     mail_handler.setLevel(logging.ERROR)
     app.logger.addHandler(mail_handler)
+    """
