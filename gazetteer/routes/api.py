@@ -93,7 +93,7 @@ def api_places_browse():
 
     response = jsonify(dict_resultats)
     return response
-"""
+
 @app.route(API_ROUTE+"/places/searchproximity")
 def api_places_browse_proximity():
 
@@ -103,7 +103,8 @@ def api_places_browse_proximity():
 
         #il faut ajouter la capacité pour l'utilisateur de donner le radius et de préciser la latitude et la longitude qu'il veut voir appliquerself.
         #seulement je ne vois pas comment faire cette demande dans le cadre de l'API.
-        loc_latitude = request.args.get("y", None)
+
+    loc_latitude = request.args.get("y", None)
     loc_longitude = request.args.get("x", None)
     radius = request.args.get("q", None)
     page = request.args.get("page", 1)
@@ -123,9 +124,7 @@ def api_places_browse_proximity():
         query = Place.query
 
     if loc_latitude and loc_longitude and radius:
-            pointofsearch = Place.query.filter(func.acos(func.sin(func.radians(loc_latitude)) * func.sin(func.radians(Place.place_latitude)) + func.cos(func.radians(loc_latitude)) * func.cos(func.radians(Place.place_latitude)) * func.cos(func.radians(Place.place_longitude) - (func.radians(loc_longitude)))) * 6371 <= radius)
-            .order_by(Place.place_nom.desc(), Place.place_nom.desc()).all()
-
+        pointofsearch = Place.query.filter(func.acos(func.sin(func.radians(loc_latitude)) * func.sin(func.radians(Place.place_latitude)) + func.cos(func.radians(loc_latitude)) * func.cos(func.radians(Place.place_latitude)) * func.cos(func.radians(Place.place_longitude) - (func.radians(loc_longitude)))) * 6371 <= radius).order_by(Place.place_nom.desc(), Place.place_nom.desc()).all()
 
 #ce bout de code est conservé de la fonction si dessus par défaut.
     try:
@@ -241,4 +240,3 @@ def api_places_browse_area():
 
     response = jsonify(dict_resultats)
     return response
-    """
