@@ -6,9 +6,10 @@ from ..constantes import LIEUX_PAR_PAGE
 from ..modeles.donnees import Place, Biblio, Relation, Authorship, Link, links
 from ..modeles.utilisateurs import User
 
+"""
 #configuration du test de performance de SQL Alchemy
 from flask_sqlalchemy import get_debug_queries
-from config import DATABASE_QUERY_TIMEOUT
+#from config import DATABASE_QUERY_TIMEOUT
 
 @app.after_request
 def after_request(response):
@@ -16,7 +17,7 @@ def after_request(response):
         if query.duration >= DATABASE_QUERY_TIMEOUT:
             app.logger.warning("SLOW QUERY: %s\nParameters: %s\nDuration: %fs\nContext: %s\n" % (query.statement, query.parameters, query.duration, query.context))
     return response
-
+"""
 @app.route("/")
 def accueil():
     """ Route permettant l'affichage d'une page accueil
