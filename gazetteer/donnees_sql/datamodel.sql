@@ -117,40 +117,40 @@ ENGINE = InnoDB;
 COMMIT;
 
 -- -----------------------------------------------------
--- Table `gazetteer`.`relation`
+-- Table `gazetteer`.`link`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `gazetteer`.`link` ;
 
-CREATE TABLE IF NOT EXISTS `gazetteer`.`relation` (
+CREATE TABLE IF NOT EXISTS `gazetteer`.`link` (
   `link_id` INT NOT NULL AUTO_INCREMENT,
   `nature_id` INT NOT NULL,
   `link_place1_id` INT NOT NULL,
   `link_place2_id` INT NOT NULL,
   PRIMARY KEY (`link_id`),
-  INDEX `fk_link_1_idx` (`link_nature_id` ASC),
-  INDEX `fk_link_2_idx` (`link_place_id` ASC),
-  INDEX `fk_link_3_idx` (`link_place_id` ASC),
+  INDEX `fk_link_1_idx` (`nature_id` ASC),
+  INDEX `fk_link_2_idx` (`link_place1_id` ASC),
+  INDEX `fk_link_3_idx` (`link_place2_id` ASC),
   CONSTRAINT `fk_link_1`
-    FOREIGN KEY (`link_nature_id`)
-    REFERENCES `gazetteer`.`link-relation` (`nature_id`)
+    FOREIGN KEY (`nature_id`)
+    REFERENCES `gazetteer`.`link_relation` (`nature_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_link_2`
-    FOREIGN KEY (`link_place_id`)
+    FOREIGN KEY (`link_place1_id`)
     REFERENCES `gazetteer`.`place` (`place_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
     CONSTRAINT `fk_link_3`
-      FOREIGN KEY (`link_place_id`)
+      FOREIGN KEY (`link_place2_id`)
       REFERENCES `gazetteer`.`place` (`place_id`)
       ON DELETE NO ACTION
       ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
--- Table `gazetteer`.`link-relation`
+-- Table `gazetteer`.`link_relation`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `gazetteer`.`link` ;
+DROP TABLE IF EXISTS `gazetteer`.`link_relation` ;
 
 CREATE TABLE IF NOT EXISTS `gazetteer`.`link` (
   `nature_id` INT NOT NULL AUTO_INCREMENT,
