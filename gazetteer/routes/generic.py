@@ -3,7 +3,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 
 from ..app import app, login
 from ..constantes import LIEUX_PAR_PAGE
-from ..modeles.donnees import Place, Biblio, Relation, Authorship, Link, links
+from ..modeles.donnees import Place, Biblio, Relation, Authorship, Link, Link_relation
 from ..modeles.utilisateurs import User
 
 """
