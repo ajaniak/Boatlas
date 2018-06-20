@@ -93,4 +93,4 @@ Utilisez MySQL Workbench: y ouvrir le fichier datamodel.sql et exécutez-le. La 
 ou
 
 dans le terminal (remplacer xxx par le chemin du repertoire ou se trouve le fichier sql.)
-mysql -uroot -p < gazetteer/donnnee_sql/datamodel.sql
+mysql -uroot -p < gazetteer/donnees_sql/datamodel.sql
