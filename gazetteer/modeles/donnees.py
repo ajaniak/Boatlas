@@ -23,9 +23,9 @@ class Authorship(db.Model):
 #    db.Column('link_place1_id', db.Integer, db.ForeignKey('place.place_id')),
 #    db.Column('link_place2_id', db.Integer, db.ForeignKey('place.place_id')),
 #    )
-
+"""
 # On crée une class link pour gérer la nature des relations.
-class Link-relation(db.Model):
+class Link_relation(db.Model):
     nature_id = db.Column(db.Integer, nullable=False, autoincrement=True, primary_key=True)
     link_relation_type = db.Column(db.String(45), nullable=False)
     link_relation_description = db.Column(db.String(240))
@@ -33,21 +33,21 @@ class Link-relation(db.Model):
 
 #classe Relation
 class Link(db.Model):
-    """Création d'une table d'associations entre table Nature
-    et la table Place"""
+    #Création d'une table d'associations entre table Nature
+    #et la table Place
     __tablename__ = "link"
     link_id = db.Column(db.Integer, nullable=False, autoincrement=True, primary_key=True)
-    nature_id = db.Column(db.Integer, db.ForeignKey('link-relation.nature_id'))
+    nature_id = db.Column(db.Integer, db.ForeignKey('link_relation.nature_id'))
     link_place1_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
     link_place2_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
 #Jointure
-    links = db.relationship("link-relation", back_populates="typed")
+    links = db.relationship("Link_relation", back_populates="typed")
     lien = db.relationship("Place", back_populates="connexions")
 
 def to_jsonapi_dict(self):
-    """ It ressembles a little JSON API format but it is not completely compatible
-    :return:
-    """
+    #It ressembles a little JSON API format but it is not completely compatible
+    #:return:
+
     return {
         "type": "place",
         "id": self.link_id,
@@ -57,6 +57,7 @@ def to_jsonapi_dict(self):
              }
 
         }
+"""
 # On crée notre modèle
 class Place(db.Model):
     """Définit une classe lieu sur le modèle SQL"""
@@ -69,12 +70,13 @@ class Place(db.Model):
 #jointure biblio & utilisateur
     authorships = db.relationship("Authorship", back_populates="place")
     relations = db.relationship("Relation", back_populates="place")
-#pour la prise en compte de l'ordre des deux place_id.
-    connexions = db.relationship(
-          'Place', secondary=links,
-            primaryjoin=(links.c.link_place1_id == place_id),
-            secondaryjoin=(links.c.link_place2_id == place_id),
-            backref=db.backref('place', lazy='dynamic'), lazy='dynamic')
+#sans prise en compte de l'ordre des deux place_id.
+    #connexions = db.relationship("Link", )
+    """connexions = db.relationship(
+          "Place", secondary="Link",
+            primaryjoin="Link.c.link_place1_id == place_id",
+            secondaryjoin="Link.c.link_place2_id == place_id",
+            back_populates="lien")"""
 
 
     def to_jsonapi_dict(self):
@@ -197,7 +199,7 @@ class Place(db.Model):
             return False, erreurs
 
         connection= link(
-        link_id= id
+        link_id=id,
         link_place1_id=lieu_1,
         link_place2_id=lieu_2
         )
@@ -221,7 +223,7 @@ class Place(db.Model):
         link_relation_type = type,
         link_relation_description = description,
         )"""
-        
+
     def is_linked (self, place):
         return self.liked.filter(links.c.link_place2_id == place_id).count() > 0
 
