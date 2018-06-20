@@ -169,8 +169,8 @@ def deconnexion():
     flash("Vous êtes déconnecté-e", "info")
     return redirect("/")
 
-@login_required
 @app.route("/depot", methods=["POST", "GET"])
+@login_required
 def depot():
     """Route gérant la création de lieux"""
     if request.method == "POST":
@@ -218,8 +218,8 @@ def modif_lieu(place_id):
         return render_template("pages/modif_lieu.html", lieu=unique_lieu)
 
 
-@login_required
 @app.route("/creer_biblio", methods=["POST", "GET"])
+@login_required
 def creer_biblio():
     """
     Route gérant la création de références bibliographiques
@@ -244,8 +244,8 @@ def creer_biblio():
 
 @app.route("/biblio/<int:biblio_id>")
 def biblio(biblio_id):
-    """ Route permettant l'affichage des données d'une référence bibliographique
-    :param biblio_id: Identifiant numérique de la référence bibliographique
+    """ Route permettant l'affichage des données d'une donnée bibliographique
+    :param biblio_id: Identifiant numérique de la donnée bibliographique
     """
     # On récupère le tuple correspondant aux champs de la classe Biblio
     unique_biblio = Biblio.query.get(biblio_id)
@@ -254,11 +254,13 @@ def biblio(biblio_id):
     print(lieux)
     return render_template("pages/biblio.html", nom="Gazetteer", biblio=unique_biblio, lieux=lieux)
 
-@login_required
+
 @app.route("/modif_biblio/<int:biblio_id>", methods=["POST", "GET"])
+@login_required
 def modif_biblio(biblio_id):
     """
-    Route permettant la modification des données d'une référence bibliographique
+    Route permettant la modification des données d'une donnée bibliographique
+    :param biblio_id: Identifiant numérique de la donnée bibliographique
     """
     status, donnees = Biblio.modif_biblio(
         id=biblio_id,
@@ -272,7 +274,7 @@ def modif_biblio(biblio_id):
     if status is True :
         flash("Merci pour votre contribution !", "success")
         unique_biblio = Biblio.query.get(biblio_id)
-        return redirect("/") #vers le lieu qu'il vient de créer.
+        return redirect("/pages/biblio.html", biblio=unique_biblio) #vers la donnée que l'utilisateur vient de créer.
 
     else:
         flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
@@ -380,6 +382,7 @@ def index_lieux(biblio_id):
         lieux=lieux)
 
 @app.route("/supprimer_association/<int:relation_id>", methods=["POST", "GET"])
+@login_required
 def supprimer_association(relation_id):
     """Route pour supprimer la relation
     entre une référence et un lieu
@@ -393,18 +396,46 @@ def supprimer_association(relation_id):
         relation_biblio_id = request.form.get("reference", None),
         relation_place_id = request.form.get("lieu", None)
         )
-#Problème de chargement de la session
-        error = "sqlalchemy.orm.exc.DetachedInstanceError"
-        if error:
+#Erreur SQLAlchemy qui n'empêche pas la bonne mise en oeuvre de la manipulation
+        detached_error = "sqlalchemy.orm.exc.DetachedInstanceError"
+        if detached_error:
             flash("Suppression réussie!", "success")
             return redirect("/")
-        if status is True:
+        elif status is True:
             flash("Suppression réussie!", "success")
-            return redirect("/", )
+            return redirect("/")
         else:
             flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
             return render_template("pages/supprimer_association.html", relation=relation)
     else:
         return render_template("pages/supprimer_association.html", relation=relation)
-    flash("")
-    return redirect("/supprimer_association.html", relation=relation)
+
+@app.route("/supprimer_biblio/<int:biblio_id>", methods=["POST", "GET"])
+@login_required
+def supprimer_biblio(biblio_id):
+    """Route pour supprimer une donnée bibliographique
+    :param biblio_id: identifiant numérique de la donnée bibliographique
+    """
+    biblio = Biblio.query.get(biblio_id)
+    #associations = endroit.relations
+    if request.method == "POST":
+        status, donnees = Biblio.supprimer_biblio(
+        id=biblio_id,
+        titre=request.args.get("titre", None),
+        auteur=request.args.get("auteur", None),
+        date=request.args.get("date", None),
+        lieu=request.args.get("lieu", None),
+        typep=request.args.get("typep", None))
+#Erreur SQLAlchemy qui n'empêche pas la bonne mise en oeuvre de la manipulation
+        detached_error = "sqlalchemy.orm.exc.DetachedInstanceError"
+        if detached_error:
+            flash("Suppression réussie!", "success")
+            return redirect("/")
+        elif status is True:
+            flash("Suppression réussie!", "success")
+            return redirect("/")
+        else:
+            flash("Les erreurs suivantes ont été rencontrées : " + ",".join(donnees), "error")
+            return render_template("pages/supprimer_biblio.html", biblio=biblio)
+    else:
+        return render_template("pages/supprimer_biblio.html", biblio=biblio)
