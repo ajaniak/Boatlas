@@ -25,37 +25,72 @@ Pré-requis: Python 3 et MySQL.
 Vous devez avoir installé Python et Mysql sur votre poste. Avant l’installation de Python, vous devez installer le gestionnaire de paquets HomeBrew (équivalent apt-get sous linux)
 
 Installation de HomeBrew Pour installer Homebrew, ouvrez le Terminal et exécutez
-```shell
- /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)
- ```
+`/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)`
 
-Pour installer Python 3: ```shell brew install python3```
+Pour installer Python 3:
+` brew install python3`
 
-Pour lancer un environnement virtuel:  virtualenv
-```shell
-pip install virtualenv
-```
+Pour lancer un environnement virtuel:
 
-Installation Mysql ```shell brew install mysql```
+`pip install virtualenv`
+
+Installation Mysql:
+ ` brew install mysql`
 
 ####Première utilisation
+Téléchargez le dossier Boatlas depuis Github.
+Placez vous dans le dossier Boatlas dans un terminal et tapez :
+`virtualenv ~/.Boatlas -p python3`
+Cela crée un environnement virtuel. Pour l'activez, tapez la commande :
+`source activate Boatlas`
 
-Lancez le dossier dico-proso/ dans un terminal et tapez :
-virtualenv ~/.dicoproso -p python3
-Cela crée un environnement virtuel dans lequel pourront être installés les packages utilisés. Pour activer cet environnement virtuel, tapez :
-source ~/.dicoproso/bin/activate
-Cette commande sera nécessaire à chaque fois que vous voudrez activer l'environnement virtuel pour utiliser l'application.
+Tapez ensuite
+`pip install -r requirements.txt`
+pour installer les packages nécessaires au fonctionnement de l'application.
 
-Dans le même terminal, tapez :
-pip install -r requirements.txt
-Cela installe les packages requis pour faire fonctionner l'application.
+Lancez l'application avec
+`python3 run.py`
 
-Pour lancer l'application, tapez :
-python3 run.py
+####Utilisations suivantes:
 
-Utilisations ultérieures :
+A partir du terminal, lancez l'environnement virtuel puis lancez l'application:
+`source activate Boatlas`
+et
+`python3 run.py`
 
-Lancez le terminal depuis le dossier principal et entrez :
-source ~/.dicoproso/bin/activate
-puis
-python3 run.py
+
+### Linux (Ubuntu/Debian)
+#### Première utilisation  
+Pour installer Python3 et l'environnement virtuel, ouvrez un terminal et tapez :  
+`sudo apt-get install python3 python3-pip python3-virtualenv python3-dev libmysqlclient-dev libfreetype6-dev`  
+et  
+`sudo apt install virtualenv`  
+
+Téléchargez les dossiers de l'application sur Github.
+Depuis son dossier dans un terminal, tapez :  
+`virtualenv ~/.dicoproso -p python3`  pour initialiser l'environnement virtuel.
+Pour l'activer, utilisez:
+`source ~/.dicoproso/bin/activate`  
+
+Dans le même terminal, tapez :  
+`pip install -r requirements.txt` pour installer les différents packages nécessaires pour faire tourner l'application.  
+
+Pour lancer l'application, tapez :  
+`python3 run.py`  
+
+#### Utilisations ultérieures :
+A partir du terminal, lancez l'environnement virtuel puis lancez l'application:
+`source ~/.dicoproso/bin/activate`  
+et
+`python3 run.py`
+
+## Pour chargez la base de données sql
+## Creation de la base de données "hoozhoo"
+Nous avons déjà installé MySQL, créez-vous un compte administrateur si ça n'est pas déjà fait.
+Deux possibilités s'offrent à vous:
+Utilisez MySQL Workbench: y ouvrir le fichier datamodel.sql et exécutez-le. La base est installée.
+
+ou
+
+dans le terminal (remplacer xxx par le chemin du repertoire ou se trouve le fichier sql.)
+mysql -uroot -p < gazetteer/donnnee_sql/datamodel.sql
