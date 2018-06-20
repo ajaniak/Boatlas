@@ -27,7 +27,6 @@ class Authorship(db.Model):
 # On crée une class link pour gérer la nature des relations.
 class Link-relation(db.Model):
     nature_id = db.Column(db.Integer, nullable=False, autoincrement=True, primary_key=True)
-    link_id = db.Column(db.Integer, db.ForeignKey('link.link_id'))
     link_relation_type = db.Column(db.String(45), nullable=False)
     link_relation_description = db.Column(db.String(240))
     typed = db.relationship("Link", back_populates="links")
@@ -38,6 +37,7 @@ class Link(db.Model):
     et la table Place"""
     __tablename__ = "link"
     link_id = db.Column(db.Integer, nullable=False, autoincrement=True, primary_key=True)
+    nature_id = db.Column(db.Integer, db.ForeignKey('link-relation.nature_id'))
     link_place1_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
     link_place2_id = db.Column(db.Integer, db.ForeignKey('place.place_id'))
 #Jointure
@@ -69,14 +69,12 @@ class Place(db.Model):
 #jointure biblio & utilisateur
     authorships = db.relationship("Authorship", back_populates="place")
     relations = db.relationship("Relation", back_populates="place")
-    connexions = db.relationship("link", back_populates="lien")
-
-#création d'un mapping avec la table de liaison
-#    linked = db.relationship(
-#        'Place', secondary=links,
-#        primaryjoin=(links.c.link_place1_id == place_id),
-#        secondaryjoin=(links.c.link_place2_id == place_id),
-#        backref=db.backref('place', lazy='dynamic'), lazy='dynamic')
+#pour la prise en compte de l'ordre des deux place_id.
+    connexions = db.relationship(
+          'Place', secondary=links,
+            primaryjoin=(links.c.link_place1_id == place_id),
+            secondaryjoin=(links.c.link_place2_id == place_id),
+            backref=db.backref('place', lazy='dynamic'), lazy='dynamic')
 
 
     def to_jsonapi_dict(self):
