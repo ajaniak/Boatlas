@@ -117,15 +117,46 @@ ENGINE = InnoDB;
 COMMIT;
 
 -- -----------------------------------------------------
--- Table `gazetteer`.`link`
+-- Table `gazetteer`.`relation`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `gazetteer`.`link` ;
+
+CREATE TABLE IF NOT EXISTS `gazetteer`.`relation` (
+  `link_id` INT NOT NULL AUTO_INCREMENT,
+  `nature_id` INT NOT NULL,
+  `link_place1_id` INT NOT NULL,
+  `link_place2_id` INT NOT NULL,
+  PRIMARY KEY (`link_id`),
+  INDEX `fk_link_1_idx` (`link_nature_id` ASC),
+  INDEX `fk_link_2_idx` (`link_place_id` ASC),
+  INDEX `fk_link_3_idx` (`link_place_id` ASC),
+  CONSTRAINT `fk_link_1`
+    FOREIGN KEY (`link_nature_id`)
+    REFERENCES `gazetteer`.`link-relation` (`nature_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_link_2`
+    FOREIGN KEY (`link_place_id`)
+    REFERENCES `gazetteer`.`place` (`place_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+    CONSTRAINT `fk_link_3`
+      FOREIGN KEY (`link_place_id`)
+      REFERENCES `gazetteer`.`place` (`place_id`)
+      ON DELETE NO ACTION
+      ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `gazetteer`.`link-relation`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `gazetteer`.`link` ;
 
 CREATE TABLE IF NOT EXISTS `gazetteer`.`link` (
-  `link_id` INT NOT NULL AUTO_INCREMENT,
+  `nature_id` INT NOT NULL AUTO_INCREMENT,
   `link_relation_type` VARCHAR(45) NOT NULL,
   `link_relation_description` VARCHAR(240),
-  PRIMARY KEY (`link_id`))
+  PRIMARY KEY (`nature_id`))
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
