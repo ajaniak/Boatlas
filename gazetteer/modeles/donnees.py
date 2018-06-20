@@ -454,6 +454,30 @@ class Biblio(db.Model):
         except Exception as erreur:
             return False, [str(erreur)]
 
+    @staticmethod
+    def supprimer_biblio(id, titre, auteur, date, lieu, typep):
+        """
+        Fonction supprimant la donnée bibliographique
+        :param biblio_id: identifiant de la donnée bibliographique conservé dans la table d'association
+        :returns: booleen
+        """
+
+        biblio = Biblio.query.get(id)
+        biblio.biblio_titre = titre
+        biblio.biblio_auteur = auteur
+        biblio.biblio_date = date
+        biblio.biblio_lieu = lieu
+        biblio.biblio_type = typep
+
+
+        try:
+            db.session.delete(biblio)
+            db.session.commit()
+            return True, biblio
+
+        except Exception as erreur:
+            return False, [str(erreur)]
+
 
 #classe Relation
 class Relation(db.Model):
