@@ -155,7 +155,7 @@ class Place(db.Model):
             print(erreurs, titre, auteur, date, lieu, typep)
             return False, erreurs
 
-        connection = link.query.join(link, (links.c.link_id == links.link_id)).get(id)
+        connection = link.query.join(link, (link.c.link_id == links.link_id)).get(id)
 
         link.link_id=id
         link.link_relation_type=type
@@ -177,7 +177,7 @@ class Place(db.Model):
             return False, [str(erreur)]
 
     @staticmethod
-    def create_link(lieu_1, lieu_2):
+    def create_link(link_id,lieu_1, lieu_2):
         erreurs=[]
         if not lieu_1:
             erreurs.append("Le lieu 1 est nécessaire")
@@ -196,9 +196,10 @@ class Place(db.Model):
             print(erreurs,lieu_1, lieu_2)
             return False, erreurs
 
-        connection= links(
+        connection= link(
+        link_id= id
         link_place1_id=lieu_1,
-        link_place2_id=lieu_2,
+        link_place2_id=lieu_2
         )
         print(connection)
         try:
@@ -220,6 +221,7 @@ class Place(db.Model):
         link_relation_type = type,
         link_relation_description = description,
         )"""
+        
     def is_linked (self, place):
         return self.liked.filter(links.c.link_place2_id == place_id).count() > 0
 
