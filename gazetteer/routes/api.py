@@ -18,7 +18,7 @@ def Json_404():
     response.status_code = 404
     return response
 
-
+"""
 @app.route(API_ROUTE+"/places/<int:place_id>")
 def api_places_single(place_id):
     lieu = Place.query.get(place_id)
@@ -28,20 +28,33 @@ def api_places_single(place_id):
         return jsonify(lieu.to_jsonapi_dict())
 
 
-@app.route(API_ROUTE+"/biblios/<biblio_id>")
-def api_biblios_single(biblio_id):
+@app.route(API_ROUTE+"/biblios/<int:biblio_id>")
+def api_biblios(biblio_id):
     biblio = Biblio.query.get(biblio_id)
     if not biblio:
         return Json_404
     else:
-        return jsonify(biblio.to_jsonapi_dict())
+        return jsonify(biblio.to_jsonapi_dict())"""
+
+@app.route(API_ROUTE+"/places/<int:id>", methods=["GET"])
+def get_place(id):
+    return jsonify(Place.query.get_or_404(id).to_jsonapi_dict())
+
+@app.route(API_ROUTE+"/relations/<int:relation_place_id>", methods=["GET"])
+def get_relations_places(relation_place_id):
+    return jsonify(Relation.query.get_or_404(relation_place_id).to_jsonapi_dict())
+
+@app.route(API_ROUTE+"/biblios/<int:id>")
+def get_biblio(id):
+    return jsonify(Biblio.query.get_or_404(id).to_jsonapi_dict())
 
 
 @app.route(API_ROUTE+"/places")
 def api_places_browse():
     """ Route permettant la recherche plein-texte
 
-    On s'inspirera de http://jsonapi.org/ faute de pouvoir trouver temps d'y coller à 100%
+    On s'inspirera de http://jsonapi.org/ faute de pouvoir trouver le
+    temps d'y coller à 100%
     """
     # q est très souvent utilisé pour indiquer une capacité de recherche
     motclef = request.args.get("q", None)
