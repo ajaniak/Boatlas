@@ -85,7 +85,6 @@ et
 `python3 run.py`
 
 ## Pour chargez la base de données sql
-## Creation de la base de données "hoozhoo"
 Nous avons déjà installé MySQL, créez-vous un compte administrateur si ça n'est pas déjà fait.
 Deux possibilités s'offrent à vous:
 Utilisez MySQL Workbench: y ouvrir le fichier datamodel.sql et exécutez-le. La base est installée.
