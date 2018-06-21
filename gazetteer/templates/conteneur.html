@@ -66,4 +66,117 @@
         </div>
       </div>
     </body>
+    <!-- Footer -->
+<footer class="page-footer font-small stylish-color-dark pt-4 mt-4 text-white bg-dark justify-content-between">
+  <!-- Footer Links -->
+  <div class="container text-center text-md-left">
+    <!-- Grid row -->
+    <div class="row">
+      <!-- Grid column -->
+      <div class="col-md-4 mx-auto">
+
+        <!-- Content -->
+        <h5 class="font-weight-bold color-white text-uppercase mt-3 mb-4">Boatlas</h5>
+        <p>Gazetteer est produit dans le cadre du cours Python de l'Ecole Nationales des Chartes par Ella Duréault et Axelle Janiak</p>
+
+      </div>
+      <!-- Grid column -->
+
+      <hr class="clearfix w-100 d-md-none">
+
+      <!-- Grid column -->
+      <div class="col-md-2 mx-auto">
+        <!-- Links -->
+<h5 class="font-weight-bold text-uppercase mt-3 mb-4"></h5>
+        <ul class="list-unstyled">
+          <li>
+            <a href="{{url_for('accueil')}}">Home</a>
+          </li>
+          <li>
+            <a href="{{url_for("apropos")}}">À propos</a>
+          </li>
+          <li>
+            <a href="{{url_for("inscription")}}">Inscription</a>
+          </li>
+      </div>
+      <!-- Grid column -->
+      <hr class="clearfix w-100 d-md-none">
+      <!-- Grid column -->
+      <div class="col-md-2 mx-auto">
+        <!-- Links -->
+        <h5 class="font-weight-bold text-uppercase mt-3 mb-4"></h5>
+        <ul class="list-unstyled">
+          <li>
+            <a href="https://github.com/ajaniak/Boatlas">Repository Github</a>
+          </li>
+          <li>
+            <a href="{{url_for("depot")}}">Index des lieux</a>
+          </li>
+          <li>
+            <a href="{{url_for('moteur_biblio')}}">Index bibliographique</a>
+          </li>
+      </div>
+      <!-- Grid column -->
+      <hr class="clearfix w-100 d-md-none">
+      <!-- Grid column -->
+      <div class="col-md-2 mx-auto">
+        <h5 class="font-weight-bold text-uppercase mt-3 mb-4"></h5>
+        <ul class="list-unstyled">
+        {% if not current_user.is_authenticated %}
+                   <li><a class="text-success" href="{{url_for('connexion')}}">Connexion</a></li>
+                   {% endif %}
+                   {% if current_user.is_authenticated %}
+                   <li><a class="text-success" href="{{url_for('deconnexion')}}">Déconnexion</a></li>
+                   {% endif %}
+      </div>
+      <!-- Grid column -->
+    </div>
+    <!-- Grid row -->
+  </div>
+  <!-- Footer Links -->
+
+  <hr>
+  <!-- Call to action -->
+  <ul class="list-unstyled list-inline text-center py-2">
+    <ul class="list-unstyled list-inline text-center">
+      <li class="list-inline-item">
+        <a class="fb-ic">
+          <i class="fa fa-facebook fa-lg white-text mr-md-5 mr-3 fa-2x"> </i>
+        </a></li>
+        <!-- Twitter -->
+        <li class="list-inline-item">
+        <a class="tw-ic">
+          <i class="fa fa-twitter fa-lg white-text mr-md-5 mr-3 fa-2x"> </i>
+        </a></li>
+        <!-- Google +-->
+        <li class="list-inline-item">
+        <a class="gplus-ic">
+          <i class="fa fa-google-plus fa-lg white-text mr-md-5 mr-3 fa-2x"> </i>
+        </a></li>
+        <!--Linkedin -->
+        <li class="list-inline-item">
+        <a class="li-ic">
+          <i class="fa fa-linkedin fa-lg white-text mr-md-5 mr-3 fa-2x"> </i>
+        </a></li>
+        <!--Instagram-->
+        <li class="list-inline-item">
+        <a class="ins-ic">
+          <i class="fa fa-instagram fa-lg white-text mr-md-5 mr-3 fa-2x"> </i>
+        </a></li>
+        <!--Pinterest-->
+        <li class="list-inline-item">
+        <a class="pin-ic">
+          <i class="fa fa-pinterest fa-lg white-text fa-2x"> </i>
+        </a></li>
+    </ul>
+  </ul>
+  <hr>
+  <!-- Copyright -->
+  <div class="footer-copyright text-center py-3">© 2018 Copyright:
+    <a> Ella Duréault and Axelle Janiak</a>
+  </div>
+  <!-- Copyright -->
+
+</footer>
+<!-- Footer -->
 </html>
