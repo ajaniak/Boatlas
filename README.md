@@ -21,7 +21,7 @@ Compléter l'API :
 Pré-requis: Python 3 et MySQL.
 
 ### OS X
-#### python 3 et MySQL
+### python 3 et MySQL
 Vous devez avoir installé Python et Mysql sur votre poste. Avant l’installation de Python, vous devez installer le gestionnaire de paquets HomeBrew (équivalent apt-get sous linux)
 
 Installation de HomeBrew Pour installer Homebrew, ouvrez le Terminal et exécutez
@@ -37,7 +37,7 @@ Pour lancer un environnement virtuel:
 Installation Mysql:
  ` brew install mysql`
 
-####Première utilisation
+###Première utilisation
 Téléchargez le dossier Boatlas depuis Github.
 Placez vous dans le dossier Boatlas dans un terminal et tapez :
 `virtualenv ~/.Boatlas -p python3`
