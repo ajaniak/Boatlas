@@ -27,6 +27,11 @@ def accueil():
     references = Biblio.query.order_by(Biblio.biblio_id.desc()).limit(5).all()
     return render_template("pages/accueil.html", nom="Gazetteer", lieux=lieux, references=references)
 
+@app.route("/apropos")
+def apropos():
+    """ Route permettant l'affichage de la page à propos
+    """
+    return render_template("pages/apropos.html", nom="Gazetteer")
 
 @app.route("/place/<int:place_id>")
 def lieu(place_id):
@@ -293,13 +298,13 @@ def modif_biblio(biblio_id):
         return render_template("pages/modif_biblio.html", biblio=unique_biblio)
 
 #je dois encore faire la route pour la page link/link_id
-@app.route("/link/<int:link_id>")
+@app.route("/Link/<int:link_id>")
 def link(link_id):
     """ Route permettant l'affichage des données d'une connexion
     :param link_id: Identifiant numérique de la référence bibliographique
     """
     # On récupère le tuple correspondant aux champs de la classe Biblio
-    unique_link = link.query.join(link, (links.c.link_id == links.link_id)).get(id)
+    unique_link = Link.query.join(link, (Link.c.link_id == link.link_id)).get(id)
     lieux = unique_link.Link
     print(lieux)
     return render_template("pages/link.html", nom="Gazetteer", biblio=unique_link, lieux=lieux)
