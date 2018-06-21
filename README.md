@@ -51,7 +51,7 @@ pour installer les packages nécessaires au fonctionnement de l'application.
 Lancez l'application avec
 `python3 run.py`
 
-####Utilisations suivantes:
+###Utilisations suivantes:
 
 A partir du terminal, lancez l'environnement virtuel puis lancez l'application:
 `source activate Boatlas`
@@ -60,7 +60,7 @@ et
 
 
 ### Linux (Ubuntu/Debian)
-#### Première utilisation  
+###Première utilisation  
 Pour installer Python3 et l'environnement virtuel, ouvrez un terminal et tapez :  
 `sudo apt-get install python3 python3-pip python3-virtualenv python3-dev libmysqlclient-dev libfreetype6-dev`  
 et  
@@ -78,7 +78,7 @@ Dans le même terminal, tapez :
 Pour lancer l'application, tapez :  
 `python3 run.py`  
 
-#### Utilisations ultérieures :
+### Utilisations ultérieures :
 A partir du terminal, lancez l'environnement virtuel puis lancez l'application:
 `source ~/.dicoproso/bin/activate`  
 et
