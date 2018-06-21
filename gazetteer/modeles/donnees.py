@@ -39,34 +39,18 @@ class Place(db.Model):
         but it is not completely compatible
         :return: dictionnaire avec infos de la table SQL
         """
-        return {
-            "type": "place",
-            "id": self.place_id,
-            "attributes": {
-                "name": self.place_nom,
-                "description": self.place_description,
-                "longitude": self.place_longitude,
-                "latitude": self.place_latitude,
-                "category": self.place_type,
-
-            },
-            "links": {
-                "self": url_for("lieu", place_id=self.place_id, _external=True),
-                "json": url_for("api_places_single", place_id=self.place_id, _external=True),
-                },
-
-            "relations": {
+        data = {
             "editions":[
             author.author_to_json()
             for author in self.authorships
             ],
             #biblio fait référence à ce sur quoi l'on boucle
-                "references":[reference.association_to_json()
-                 for reference in self.relations]
-
-                 }
+                "datas":[reference.association_to_json()
+                 for reference in self.relations
+                              ]
 
              }
+        return data
 
     def dictionnaire_2(self):
         """ Permet d'éviter une boucle infinie lors
@@ -74,7 +58,7 @@ class Place(db.Model):
         Problème cependant car la boucle fonctionne une fois de trop
         :return: dictionnaire avec infos de la table SQL
         """
-        return {
+        data = {
                 "type": "place",
                 "id": self.place_id,
                 "attributes": {
@@ -87,8 +71,10 @@ class Place(db.Model):
                 },
                 "links": {
                     "self": url_for("lieu", place_id=self.place_id, _external=True),
-                    "json": url_for("api_places_single", place_id=self.place_id, _external=True),
-                    }}
+                    "json": url_for("get_place", id=self.place_id, _external=True)
+                    }
+        }
+        return data
 
 
 
@@ -197,29 +183,13 @@ class Biblio(db.Model):
         """ Semblant d'API en JSON mais défauts de compatibilité
         :return: dictionnaire biblio avec infos contenues dans la table SQL
         """
-        biblio = {
-            "type": "biblio",
-            "id": self.biblio_id,
-            "attributes": {
-                "titre": self.biblio_titre,
-                "auteur": self.biblio_auteur,
-                "date": self.biblio_date,
-                "lieu": self.biblio_lieu,
-                "category": self.biblio_type,
-
-            },
-            "links": {
-                "self": url_for("biblio", biblio_id=self.biblio_id, _external=True),
-                "json": url_for("api_biblios_single", biblio_id=self.biblio_id, _external=True)
-            },
-
-            "relationships": {
-                     "endroits" : [
+        data = {
+                     "data" : [
                               endroit.association_to_json()
                               for endroit in self.relations
                           ]
-                     }}
-        return biblio
+                     }
+        return data
 
     def dictionnaire_2(self):
         """ Semblant d'API en JSON mais défauts de compatibilité
@@ -236,8 +206,8 @@ class Biblio(db.Model):
 
             },
             "links": {
-            #    "self": url_for("biblio", biblio_id=self.biblio_id, _external=True),
-                "json": url_for("api_biblios_single", biblio_id=self.biblio_id, _external=True)
+                "self": url_for("biblio", biblio_id=self.biblio_id, _external=True),
+                "json": url_for("get_biblio", id=self.biblio_id, _external=True)
             }}
         return reference
 
@@ -368,11 +338,12 @@ class Relation(db.Model):
 #Jointure
     biblio = db.relationship("Biblio", back_populates="relations")
     place = db.relationship("Place", back_populates="relations")
-#Problème de mini-boucle
+
+#Problème de boucle dans la boucle pour l'API
     def association_to_json(self):
         return {
-            "reference": self.biblio.dictionnaire_2(),
-            "endroit": self.place.dictionnaire_2()
+            "biblio": self.biblio.dictionnaire_2(),
+            "place": self.place.dictionnaire_2()
         }
 
     @staticmethod
