@@ -25,6 +25,9 @@
               <li class="nav-item">
                 <a class="nav-link" href="{{url_for("browse")}}">Navigation</a>
               </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{{url_for("apropos")}}">À propos</a>
+              </li>
             {% if not current_user.is_authenticated %}
               <li class="nav-item">
                 <a class="nav-link" href="{{url_for("inscription")}}">Inscription</a>
