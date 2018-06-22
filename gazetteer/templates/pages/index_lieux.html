@@ -6,19 +6,24 @@
 
     <h1>Index des lieux</h1>
 
-  <div class="row">
+
+<div class="row">
 <form class="form" method="POST" action="{{url_for('index_lieux', biblio_id=biblio.biblio_id)}}">
   {%for lieu in lieux.items %}
-<div class="checkbox col-sm-2">
-  <label><input type="checkbox" name="place_id" id="place_id" value="{{lieu.place_id}}">
-    {{lieu.place_nom}}</label>
-</div>
+      <ul>
+          <input type="radio" name="place_id" id="place_id" value="{{lieu.place_id}}">
+    {{lieu.place_nom}}
+
+      </ul>
 {%endfor%}
 
     <div>
       <button type="submit" class="btn btn-primary" >Contribuer</button>
     </div>
+</form>
     </div>
+
+</div>
 <nav aria-label="research-pagination">
 <ul class="pagination">
   {%- for page in lieux.iter_pages() %}
