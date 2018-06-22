@@ -155,7 +155,7 @@ def api_biblios_browse():
         dict_resultats["links"]["prev"] = url_for("api_biblios_browse", _external=True)+"?"+urlencode(arguments)
 
     response = jsonify(dict_resultats)
-return response
+    return response
 
 @app.route(API_ROUTE+"/places/searchproximity")
 def api_places_browse_proximity():
@@ -302,4 +302,4 @@ def api_places_browse_area():
         dict_resultats["links"]["prev"] = url_for("api_places_browse_area", _external=True)+"?"+urlencode(arguments)
 
     response = jsonify(dict_resultats)
-return response
+    return response
