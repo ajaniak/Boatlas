@@ -417,6 +417,7 @@ def supprimer_association(relation_id):
 def supprimer_biblio(biblio_id):
     """Route pour supprimer une donnée bibliographique
     :param biblio_id: identifiant numérique de la donnée bibliographique
+    :return render_template or redirect : redirection vers une nouvelle route
     """
     biblio = Biblio.query.get(biblio_id)
     #associations = endroit.relations
