@@ -230,7 +230,7 @@ class Biblio(db.Model):
         """ Semblant d'API en JSON mais défauts de compatibilité
         :return: dictionnaire reference
         """
-        reference ={
+        data ={
             #"id": self.biblio_id,
             "attributes": {
                 "titre": self.biblio_titre,
@@ -244,7 +244,7 @@ class Biblio(db.Model):
                 "self": url_for("biblio", biblio_id=self.biblio_id, _external=True),
                 "json": url_for("get_biblio", id=self.biblio_id, _external=True)
             }}
-        return reference
+        return data
 
 
     @staticmethod
