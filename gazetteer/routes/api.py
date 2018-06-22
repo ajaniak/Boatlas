@@ -20,29 +20,35 @@ def Json_404():
     return response
 
 
-@app.route(API_ROUTE+"/places/<int:place_id>")
-def api_places_single(place_id):
-    lieu = Place.query.get(place_id)
-    if not lieu:
-        return Json_404
-    else:
-        return jsonify(lieu.to_jsonapi_dict())
+@app.route(API_ROUTE+"/places/<int:id>", methods=["GET"])
+def get_place(id):
+    """
+    Route permettant l'affichage des données d'un lieu
+    et, le cas échéant, des données bibliographiques qui lui sont liées
+
+    :param id: identifiant numérique du lieu
+    :return: dictionnaire data
+    """
+    return jsonify(Place.query.get_or_404(id).to_jsonapi_dict())
 
 
-@app.route(API_ROUTE+"/biblios/<biblio_id>")
-def api_biblios_single(biblio_id):
-    biblio = Biblio.query.get(biblio_id)
-    if not biblio:
-        return Json_404
-    else:
-        return jsonify(biblio.to_jsonapi_dict())
+@app.route(API_ROUTE+"/biblios/<int:id>")
+def get_biblio(id):
+    """
+    Route permettant l'affichage des données d'une référence bibliographique
+    et, le cas échéant, des lieux qui lui sont associés
+    :param id: identifiant numérique de la donnée bibliographique
+    :return: dictionnaire data
+    """
+    return jsonify(Biblio.query.get_or_404(id).to_jsonapi_dict())
 
 
 @app.route(API_ROUTE+"/places")
 def api_places_browse():
-    """ Route permettant la recherche plein-texte
+    """ Route permettant la recherche plein-texte parmi les lieux
 
-    On s'inspirera de http://jsonapi.org/ faute de pouvoir trouver temps d'y coller à 100%
+    On s'inspirera de http://jsonapi.org/ faute de pouvoir trouver le
+    temps d'y coller à 100%
     """
     # q est très souvent utilisé pour indiquer une capacité de recherche
     motclef = request.args.get("q", None)
@@ -70,7 +76,7 @@ def api_places_browse():
             "self": request.url
         },
         "data": [
-            place.to_jsonapi_dict()
+            place.to_jsonapi_dict_2()
             for place in resultats.items
         ]
     }
@@ -93,6 +99,63 @@ def api_places_browse():
 
     response = jsonify(dict_resultats)
     return response
+
+@app.route(API_ROUTE+"/biblios")
+def api_biblios_browse():
+    """ Route permettant la recherche plein-texte parmi les données
+    bibliographiques
+    On s'inspire de http://jsonapi.org/ faute de pouvoir trouver le
+    temps d'y coller à 100%
+    """
+    # q est très souvent utilisé pour indiquer une capacité de recherche
+    motclef = request.args.get("q", None)
+    page = request.args.get("page", 1)
+
+    if isinstance(page, str) and page.isdigit():
+        page = int(page)
+    else:
+        page = 1
+
+    if motclef:
+        query = Biblio.query.filter(
+            Biblio.biblio_titre.like("%{}%".format(motclef))
+        )
+    else:
+        query = Biblio.query
+
+    try:
+        resultats = query.paginate(page=page, per_page=LIEUX_PAR_PAGE)
+    except Exception:
+        return Json_404()
+
+    dict_resultats = {
+        "links": {
+            "self": request.url
+        },
+        "data": [
+            biblio.to_jsonapi_dict_2()
+            for biblio in resultats.items
+        ]
+    }
+
+    if resultats.has_next:
+        arguments = {
+            "page": resultats.next_num
+        }
+        if motclef:
+            arguments["q"] = motclef
+        dict_resultats["links"]["next"] = url_for("api_biblios_browse", _external=True)+"?"+urlencode(arguments)
+
+    if resultats.has_prev:
+        arguments = {
+            "page": resultats.prev_num
+        }
+        if motclef:
+            arguments["q"] = motclef
+        dict_resultats["links"]["prev"] = url_for("api_biblios_browse", _external=True)+"?"+urlencode(arguments)
+
+    response = jsonify(dict_resultats)
+return response
 
 @app.route(API_ROUTE+"/places/searchproximity")
 def api_places_browse_proximity():
@@ -239,4 +302,4 @@ def api_places_browse_area():
         dict_resultats["links"]["prev"] = url_for("api_places_browse_area", _external=True)+"?"+urlencode(arguments)
 
     response = jsonify(dict_resultats)
-    return response
+return response

@@ -265,9 +265,11 @@ def biblio(biblio_id):
     """
     # On récupère le tuple correspondant aux champs de la classe Biblio
     unique_biblio = Biblio.query.get(biblio_id)
+    if not unique_biblio:
+        flash("Cette donnée n'existe pas encore mais vous pouvez la créer !")
+        return render_template("pages/creer_biblio.html", nom="Gazetteer")
     lieux = unique_biblio.relations
-#Je capture dans une varible la liste des relations
-    print(lieux)
+#Liste des relations
     return render_template("pages/biblio.html", nom="Gazetteer", biblio=unique_biblio, lieux=lieux)
 
 
@@ -451,6 +453,7 @@ def supprimer_association(relation_id):
 def supprimer_biblio(biblio_id):
     """Route pour supprimer une donnée bibliographique
     :param biblio_id: identifiant numérique de la donnée bibliographique
+    :return render_template or redirect : redirection vers une nouvelle route
     """
     biblio = Biblio.query.get(biblio_id)
     #associations = endroit.relations
