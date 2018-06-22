@@ -38,20 +38,30 @@ def api_biblios(biblio_id):
 
 @app.route(API_ROUTE+"/places/<int:id>", methods=["GET"])
 def get_place(id):
+    """
+    Route permettant l'affichage des données d'un lieu
+    et, le cas échéant, des données bibliographiques qui lui sont liées
+
+    :param id: identifiant numérique du lieu
+    :return: dictionnaire data
+    """
     return jsonify(Place.query.get_or_404(id).to_jsonapi_dict())
 
-@app.route(API_ROUTE+"/relations/<int:relation_place_id>", methods=["GET"])
-def get_relations_places(relation_place_id):
-    return jsonify(Relation.query.get_or_404(relation_place_id).to_jsonapi_dict())
 
 @app.route(API_ROUTE+"/biblios/<int:id>")
 def get_biblio(id):
+    """
+    Route permettant l'affichage des données d'une référence bibliographique
+    et, le cas échéant, des lieux qui lui sont associés
+    :param id: identifiant numérique de la donnée bibliographique
+    :return: dictionnaire data
+    """
     return jsonify(Biblio.query.get_or_404(id).to_jsonapi_dict())
 
 
 @app.route(API_ROUTE+"/places")
 def api_places_browse():
-    """ Route permettant la recherche plein-texte
+    """ Route permettant la recherche plein-texte parmi les lieux
 
     On s'inspirera de http://jsonapi.org/ faute de pouvoir trouver le
     temps d'y coller à 100%
@@ -108,9 +118,10 @@ def api_places_browse():
 
 @app.route(API_ROUTE+"/biblios")
 def api_biblios_browse():
-    """ Route permettant la recherche plein-texte
+    """ Route permettant la recherche plein-texte parmi les données
+    bibliographiques
 
-    On s'inspirera de http://jsonapi.org/ faute de pouvoir trouver le
+    On s'inspire de http://jsonapi.org/ faute de pouvoir trouver le
     temps d'y coller à 100%
     """
     # q est très souvent utilisé pour indiquer une capacité de recherche
