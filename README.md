@@ -91,5 +91,5 @@ Utilisez MySQL Workbench: y ouvrir le fichier datamodel.sql et exécutez-le. La 
 
 ou
 
-dans le terminal (remplacer xxx par le chemin du repertoire ou se trouve le fichier sql.)
+dans le terminal 
 mysql -uroot -p < gazetteer/donnees_sql/datamodel.sql
