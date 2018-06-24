@@ -7,6 +7,7 @@ from ..modeles.donnees import Place, Biblio, Relation, Authorship#, Link, Link_r
 from ..modeles.utilisateurs import User
 
 """
+# a debugger
 #configuration du test de performance de SQL Alchemy
 from flask_sqlalchemy import get_debug_queries
 #from config import DATABASE_QUERY_TIMEOUT
