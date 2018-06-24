@@ -236,7 +236,7 @@ def api_places_browse_area():
     latitude_nord = request.args.get("w", None)
     latitude_sud = request.args.get("x", None)
     longitude_ouest = request.args.get("y", None)
-    longitude_est = request.args.get("z", 1)
+    longitude_est = request.args.get("z", None)
     page = request.args.get("page", 1)
 
 #on conserve la partie sur les gestions des pages afin de gérer l'affiche des résultats (enfin je crois...)
