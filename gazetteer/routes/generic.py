@@ -42,10 +42,10 @@ def lieu(place_id):
     unique_lieu = Place.query.get(place_id)
 #Après avoir capturé un objet dans la variable unique_lieu
     reference = unique_lieu.relations
-    liaison = unique_lieu.link_place2
+    #liaison = unique_lieu.link_place2
 #Je capture dans une varible la liste des relations
 
-    return render_template("pages/place.html", nom="Gazetteer", lieu=unique_lieu, reference=reference, liaison=liaison)
+    return render_template("pages/place.html", nom="Gazetteer", lieu=unique_lieu, reference=reference)#, liaison=liaison)
 
 
 @app.route("/recherche")
@@ -299,12 +299,13 @@ def modif_biblio(biblio_id):
         unique_biblio = Biblio.query.get(biblio_id)
         return render_template("pages/modif_biblio.html", biblio=unique_biblio)
 
+"""
 #je dois encore faire la route pour la page link/link_id
 @app.route("/Link/<int:link_id>")
 def link(link_id):
-    """ Route permettant l'affichage des données d'une connexion
-    :param link_id: Identifiant numérique de la référence bibliographique
-    """
+    # Route permettant l'affichage des données d'une connexion
+    #:param link_id: Identifiant numérique de la référence bibliographique
+
     # On récupère le tuple correspondant aux champs de la classe Biblio
     unique_link = Link.query.join(link, (Link.c.link_id == link.link_id)).get(id)
     lieux = unique_link.Link
@@ -315,9 +316,9 @@ def link(link_id):
 @login_required
 @app.route("/create_link",methods=["POST", "GET"])
 def create_link():
-    """ Route permettant l' affichage du formulaire de la création de la connexion entre deux.
-    :param link_id: Identifiant numérique de la référence connexion
-    """
+    # Route permettant l' affichage du formulaire de la création de la connexion entre deux.
+    #:param link_id: Identifiant numérique de la référence connexion
+
     if request.method == "POST":
         statut, donnees = links.create_link(
             lieu_1=request.form.get("ID du lieu 1", None),
@@ -335,15 +336,15 @@ def create_link():
 @login_required
 @app.route("/modif_link/<int:link_id>", methods=["POST", "GET"])
 def modif_link(link_id):
-    """ Route permettant l' affichage du formulaire de modification de la connexion entre deux.
-    :param link_id: Identifiant numérique de la référence connexion
-    """
-    """état fonctionnel pour seulement la connexion sans la caractérisation
+    #Route permettant l' affichage du formulaire de modification de la connexion entre deux.
+    #param link_id: Identifiant numérique de la référence connexion
+    #
+    #état fonctionnel pour seulement la connexion sans la caractérisation
     status, donnees = links.modif_link(
         id=link_id,
         lieu_1=request.args.get("ID du lieu 1", None),
         lieu_2=request.args.get("ID du lieu 2", None),
-    )"""
+    )
 #db.and pour essayer de mettre dans la même route les fonctions de caractéristations et de connexions entre les lieux
     status, donnees = link.query.join(link, (links.c.link_id == links.link_id)).modif_link(
     id = link_id,
@@ -363,7 +364,7 @@ def modif_link(link_id):
         unique_link = link.query.join(link, (links.c.link_id == links.link_id)).get(id)
         return render_template("pages/modif_link.html", connection=unique_link)
 
-
+"""
 
 @app.route("/associer_reference/<int:place_id>", methods=["POST", "GET"])
 def index_biblio(place_id):
