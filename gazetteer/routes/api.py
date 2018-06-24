@@ -231,7 +231,7 @@ def api_places_browse_proximity():
 
 @app.route(API_ROUTE+"/places/searcharea")
 def api_places_browse_area():
-    # on tente d'ajouter une fonctionalité de recherche par zone avec 4 coordonnées soit 2 latitudes et 2 longitudes chacun représentant un minimum et un maximum...
+    # on tente d'ajouter une fonctionalité de recherche par zone avec 4 coordonnées soit 2 latitudes et 2 longitudes chacun représentant un minimum et un maximum...puisqu'il s'agit de lignes.
 #On peut supposer qu'en ayant une latitude min et max, et une longitude min et max, on peut tenter d'écrire un query pour identifier les lieux dont les coordonnées sont compris entre ces 4 points.
     latitude_nord = request.args.get("w", None)
     latitude_sud = request.args.get("x", None)
