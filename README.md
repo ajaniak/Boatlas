@@ -91,5 +91,15 @@ Utilisez MySQL Workbench: y ouvrir le fichier datamodel.sql et exécutez-le. La 
 
 ou
 
-dans le terminal 
+dans le terminal
 mysql -uroot -p < gazetteer/donnees_sql/datamodel.sql
+
+### Pour tester la fonction de reception des mails d'erreurs:
+Ce mettre dans une nouvelle fenêtre du terminal toujours dans l'environnement virtuel en utilisant le *SMTP debugging server* de Python. Il s'agit d'un faux service de serveur mail qui les imprime en fait sur le terminal.
+ `python -m smtpd -n -c DebuggingServer localhost:8025`
+
+Dans la première fenêtre du terminal:
+`export FLASK_DEBUG=0`
+`export MAIL_SERVER=localhost`
+`MAIL_PORT=8025`
+Provoquez une erreur SQL pour recevoir un message d'erreur!
