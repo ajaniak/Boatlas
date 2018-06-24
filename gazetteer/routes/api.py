@@ -167,8 +167,8 @@ def api_places_browse_proximity():
         #il faut ajouter la capacité pour l'utilisateur de donner le radius et de préciser la latitude et la longitude qu'il veut voir appliquerself.
         #seulement je ne vois pas comment faire cette demande dans le cadre de l'API.
 
-    loc_latitude = request.args.get("y", None)
-    loc_longitude = request.args.get("x", None)
+    loc_latitude = request.args.get("x", None)
+    loc_longitude = request.args.get("y", None)
     radius = request.args.get("q", None)
     page = request.args.get("page", 1)
 #on conserve la partie sur les gestions des pages afin de gérer l'affiche des résultats (enfin je crois...)
