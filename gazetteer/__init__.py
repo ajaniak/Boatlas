@@ -9,7 +9,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 
-#suite du code pour les erreurs envoyé par mail, version 2.
+#suite du code pour les erreurs envoyé par mail, version 2. Code largement inspiré de Miguel Grimberg. 
 if not app.debug:
     if app.config['MAIL_SERVER']:
         auth = None
@@ -25,7 +25,7 @@ if not app.debug:
             credentials=auth, secure=secure)
         mail_handler.setLevel(logging.ERROR)
         app.logger.addHandler(mail_handler)
-        
+
 #mise en place d'un fichier logs afin de suivre l'évolution de l'appli et résoudre certains bugs.
     if not os.path.exists('logs'):
         os.mkdir('logs')
