@@ -41,17 +41,24 @@ def config_app(config_name="test"):
     # Register Jinja template functions
 
     return app
+
+#configuration d'un rapport d'erreurs via mail, Version 2:
+from dotenv import load_dotenv
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+MAIL_SERVER = os.environ.get('MAIL_SERVER')
+MAIL_PORT = int(os.environ.get('MAIL_PORT') or 25)
+MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') is not None
+MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+ADMINS = ['axelle.janiak@chartes.psl.eu', 'ella.duréault@chartes.psl.eu']
+
+
 """
 # configuration pour la performance du sql via la fonction get_debug_queries de SQLALCHEMY_DATABASE_URI
 SQLALCHEMY_RECORD_QUERIES = True
 #configuration de la limite au dela de laquelle la durée de query est trop longue, en seconde:
 DATABASE_QUERY_TIMEOUT = 1
-
-#configuration d'un rapport d'erreurs via mail:
-MAIL_SERVER = 'localhost'
-MAIL_PORT = 25
-MAIL_USERNAME = 'ajaniak' , 'e.dureault'
-MAIL_PASSWORD = None #se renseigner sur la manière de gérer le mot de passe.
-#mailing liste
-ADMINS = ['axelle.janiak@chartes.psl.eu', 'ella.duréault@chartes.psl.eu']
+A debugger si le temps. 
 """
