@@ -4,12 +4,11 @@ import os
 from flask import Flask
 from config import Config
 
-
 app = Flask(__name__)
 app.config.from_object(Config)
 
 
-#suite du code pour les erreurs envoyé par mail, version 2. Code largement inspiré de Miguel Grimberg. 
+#suite du code pour les erreurs envoyé par mail, version 2. Code largement inspiré de Miguel Grimberg.
 if not app.debug:
     if app.config['MAIL_SERVER']:
         auth = None
