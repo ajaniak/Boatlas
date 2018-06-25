@@ -113,7 +113,8 @@ def browse():
 
 @app.route("/moteur_biblio")
 def moteur_biblio():
-    """ Route permettant la recherche plein-texte
+    """ Route permettant l'affichage des dernières
+    données bibliographiques enregistrées
     """
     # On préfèrera l'utilisation de .get() ici
     #   qui nous permet d'éviter un if long (if "clef" in dictionnaire and dictonnaire["clef"])
