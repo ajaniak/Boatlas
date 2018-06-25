@@ -23,11 +23,11 @@ def Json_404():
 @app.route(API_ROUTE+"/places/<int:place_id>")
 def api_places_single(place_id):
     """
-        Route permettant l'affichage des données d'un lieu
-        et, le cas échéant, des données bibliographiques qui lui sont liées
+    Route permettant l'affichage des données d'un lieu
+    et, le cas échéant, des données bibliographiques qui lui sont liées
 
-        :param id: identifiant numérique du lieu
-        :return: dictionnaire data
+    :param id: identifiant numérique du lieu
+    :return: dictionnaire data
     """
     lieu = Place.query.get(place_id)
     if not lieu:
@@ -42,6 +42,7 @@ def api_biblios_single(biblio_id):
     """
     Route permettant l'affichage des données d'une référence bibliographique
     et, le cas échéant, des lieux qui lui sont associés
+
     :param id: identifiant numérique de la donnée bibliographique
     :return: dictionnaire data
     """
