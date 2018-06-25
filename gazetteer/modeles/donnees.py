@@ -81,6 +81,7 @@ class Place(db.Model):
     def to_jsonapi_dict(self):
         """ It ressembles a little JSON API format
         but it is not completely compatible
+
         Affichage des données d'un lieu lorsque celui-ci
         n'est pas lié à une donnée bibliographique
         :return: dictionnaire
@@ -113,7 +114,9 @@ class Place(db.Model):
 
     def to_jsonapi_2_dict(self):
         """
-        Fonction pour gérer l'affichage des données en cas de relation
+        Fonction pour gérer l'affichage des données
+        sans redondance
+        en cas de relation
         entre une donnée bibliographique et un lieu dans l'API
         :return: dictionnaire data
         """
