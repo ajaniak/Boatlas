@@ -25,7 +25,7 @@ def api_places_single(place_id):
     """
     Route permettant l'affichage des données d'un lieu
     et, le cas échéant, des données bibliographiques qui lui sont liées
-
+    
     :param id: identifiant numérique du lieu
     :return: dictionnaire data
     """
