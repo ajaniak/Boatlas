@@ -78,51 +78,23 @@ class Place(db.Model):
             secondaryjoin="Link.c.link_place2_id == place_id",
             back_populates="lien")"""
 
-
     def to_jsonapi_dict(self):
         """ It ressembles a little JSON API format
         but it is not completely compatible
-        :return: dictionnaire avec infos de la table SQL
+
+        Affichage des données d'un lieu lorsque celui-ci
+        n'est pas lié à une donnée bibliographique
+        :return: dictionnaire
         """
-        data = {
-            "editions":[
-            author.author_to_json()
-            for author in self.authorships
-            ],
-            #biblio fait référence à ce sur quoi l'on boucle
-                "datas":[reference.association_to_json()
-                 for reference in self.relations
-                              ]
-
-             }
-        return data
-
-    def to_jsonapi_dict_2(self):
-        data = {
-            "type": "place",
-            "id": self.place_id,
-            "attributes": {
-                "name": self.place_nom,
-                "description": self.place_description,
-                "longitude": self.place_longitude,
-                "latitude": self.place_latitude,
-                "category": self.place_type,
-
-            },
-            "links": {
-                "api": url_for("get_place", id=self.place_id, _external=True),
-                "self": url_for("lieu", place_id=self.place_id, _external=True)
-            }
-        }
-        return data
-
-    def dictionnaire_2(self):
-        """ Permet d'éviter une boucle infinie lors
-        de l'établissement des relations
-        Problème cependant car la boucle fonctionne une fois de trop
-        :return: dictionnaire avec infos de la table SQL
-        """
-        data = {
+        return {
+            "relations": {
+                "editions": [
+                    author.author_to_json()
+                    for author in self.authorships
+                ],
+                # biblio fait référence à ce sur quoi l'on boucle
+                "references": [reference.association_to_json()
+                               for reference in self.relations]},
                 "type": "place",
                 "id": self.place_id,
                 "attributes": {
@@ -135,7 +107,77 @@ class Place(db.Model):
                 },
                 "links": {
                     "self": url_for("lieu", place_id=self.place_id, _external=True),
-                    "json": url_for("get_place", id=self.place_id, _external=True)
+                    "json": url_for("api_places_single", place_id=self.place_id, _external=True),
+                },
+
+            }
+
+    def to_jsonapi_2_dict(self):
+        """
+        Fonction pour gérer l'affichage des données
+        sans redondance
+        en cas de relation
+        entre une donnée bibliographique et un lieu dans l'API
+        :return: dictionnaire data
+        """
+        data = {
+            "editions":[
+            author.author_to_json()
+            for author in self.authorships
+            ],
+            #biblio fait référence à ce sur quoi l'on boucle
+                "relation":[reference.association_to_json()
+                 for reference in self.relations
+                              ]
+
+             }
+        return data
+
+
+    def to_jsonapi_dict_2(self):
+        """
+        Fonction pour gérer l'affichage des lieux
+        dans le moteur de recherche de l'API
+        :return: dictionnaire data
+        """
+        data = {
+            "type": "place",
+            "id": self.place_id,
+            "attributes": {
+                "name": self.place_nom,
+                "description": self.place_description,
+                "longitude": self.place_longitude,
+                "latitude": self.place_latitude,
+                "category": self.place_type,
+
+            },
+            "links": {
+                "json": url_for("api_places_single", place_id=self.place_id, _external=True),
+                "self": url_for("lieu", place_id=self.place_id, _external=True)
+            }
+        }
+        return data
+
+    def dictionnaire_2(self):
+        """
+        Fonction pour gérer l'affichage des infos de la donnée bibliographique
+        en cas de relation avec un lieu dans l'API
+        :return: dictionnaire data
+        """
+        data = {
+                "id": self.place_id,
+                "type" : "place",
+                    "attributes": {
+                    "name": self.place_nom,
+                    "description": self.place_description,
+                    "longitude": self.place_longitude,
+                    "latitude": self.place_latitude,
+                    "category": self.place_type,
+
+                },
+                "links": {
+                    "self": url_for("lieu", place_id=self.place_id, _external=True),
+                    "json": url_for("api_places_single", place_id=self.place_id, _external=True)
                     }
         }
         return data
@@ -331,18 +373,12 @@ class Biblio(db.Model):
     relations = db.relationship("Relation", back_populates="biblio")
 
     def to_jsonapi_dict(self):
-        """ Semblant d'API en JSON mais défauts de compatibilité
-        :return: dictionnaire biblio avec infos contenues dans la table SQL
         """
-        data = {
-                     "data" : [
-                              endroit.association_to_json()
-                              for endroit in self.relations
-                          ]
-                     }
-        return data
-
-    def to_jsonapi_dict_2(self):
+        Semblant d'API en JSON mais défauts de compatibilité
+        Fonction pour gérer l'affichage d'une donnée bibliographique
+        lorsque celle-ci n'est pas en relation avec un lieu dans l'API
+        :return: dictionnaire data
+        """
         data = {
             "type": "biblio",
             "id": self.biblio_id,
@@ -356,27 +392,74 @@ class Biblio(db.Model):
             },
             "links": {
                 "self": url_for("biblio", biblio_id=self.biblio_id, _external=True),
-                "json": url_for("get_biblio", id=self.biblio_id, _external=True)
+                "json": url_for("api_biblios_single", biblio_id=self.biblio_id, _external=True)
+            },
+
+            "relationships": {
+                "endroits": [
+                    endroit.association_to_json()
+                    for endroit in self.relations
+                ]
+            }}
+        return data
+
+    def to_jsonapi_2_dict(self):
+        """ Semblant d'API en JSON mais défauts de compatibilité
+        Fonction pour gérer l'affichage sans redondance
+        des infos d'une donnée bibliographique
+        en cas de relation avec un lieu
+        :return: dictionnaire data
+        """
+        data = {
+            "infos": [
+                endroit.association_to_json()
+                for endroit in self.relations
+            ]
+        }
+        return data
+
+    def to_jsonapi_dict_2(self):
+        """
+        Fonction pour gérer l'affichage des données bibliographiques
+        dans le moteur de recherche dans l'API
+        :return: dictionnaire data
+        """
+        data = {
+            "type": "biblio",
+            "id": self.biblio_id,
+            "attributes": {
+                "titre": self.biblio_titre,
+                "auteur": self.biblio_auteur,
+                "date": self.biblio_date,
+                "lieu": self.biblio_lieu,
+                "category": self.biblio_type,
+
+            },
+            "links": {
+                "self": url_for("biblio", biblio_id=self.biblio_id, _external=True),
+                "json": url_for("api_biblios_single", biblio_id=self.biblio_id, _external=True)
             }}
         return data
 
     def dictionnaire_2(self):
         """ Semblant d'API en JSON mais défauts de compatibilité
-        :return: dictionnaire reference
+        Pour gérer l'affichage des infos de la table lieu
+        si la donnée bibliographique est en relation avec un lieu
+        :return: dictionnaire data
         """
-        data ={
-            #"id": self.biblio_id,
+        data = {
+            "id": self.biblio_id,
             "attributes": {
                 "titre": self.biblio_titre,
                 "auteur": self.biblio_auteur,
                 "date": self.biblio_date,
                 "category": self.biblio_type,
-            #    "type": "biblio",
+                 "type": "biblio",
 
             },
             "links": {
                 "self": url_for("biblio", biblio_id=self.biblio_id, _external=True),
-                "json": url_for("get_biblio", id=self.biblio_id, _external=True)
+                "json": url_for("api_biblios_single", biblio_id=self.biblio_id, _external=True)
             }}
         return data
 
