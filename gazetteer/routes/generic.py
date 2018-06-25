@@ -73,7 +73,6 @@ def recherche():
         lieux = Place.query.filter(
             Place.place_nom.like("%{}%".format(motclef))
         ).paginate(page=page, per_page=LIEUX_PAR_PAGE)
-        titre = "Résultat pour la recherche `" + motclef + "`"
         references = Biblio.query.filter(
             Biblio.biblio_titre.like("%{}%".format(motclef))
         ).paginate(page=page, per_page=LIEUX_PAR_PAGE)
@@ -89,6 +88,7 @@ def recherche():
         titre=titre,
         keyword=motclef
     )
+
 
 
 @app.route("/browse")
@@ -113,7 +113,8 @@ def browse():
 
 @app.route("/moteur_biblio")
 def moteur_biblio():
-    """ Route permettant la recherche plein-texte
+    """ Route permettant l'affichage des dernières
+    données bibliographiques enregistrées
     """
     # On préfèrera l'utilisation de .get() ici
     #   qui nous permet d'éviter un if long (if "clef" in dictionnaire and dictonnaire["clef"])
@@ -370,7 +371,7 @@ def modif_link(link_id):
 @app.route("/associer_reference/<int:place_id>", methods=["POST", "GET"])
 def index_biblio(place_id):
     """ Route permettant d'afficher toutes les références bibliographiques
-    en vue de créer une relation
+    pour créer une relation
     :param place_id: identifiant numérique du lieu qu'on veut rattacher
     à une référence bibliographique
     """
@@ -398,7 +399,7 @@ def index_biblio(place_id):
 @app.route("/index_lieux/<int:biblio_id>", methods=["POST", "GET"])
 def index_lieux(biblio_id):
     """ Route permettant d'afficher toutes les lieux
-    en vue de créer une relation avec la référence bibliographique affichée
+    pour une relation avec la référence bibliographique affichée
     :param biblio_id: identifiant numérique du lieu qu'on veut rattacher
     à une référence bibliographique
     """
