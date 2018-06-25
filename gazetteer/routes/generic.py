@@ -73,7 +73,6 @@ def recherche():
         lieux = Place.query.filter(
             Place.place_nom.like("%{}%".format(motclef))
         ).paginate(page=page, per_page=LIEUX_PAR_PAGE)
-        titre = "Résultat pour la recherche `" + motclef + "`"
         references = Biblio.query.filter(
             Biblio.biblio_titre.like("%{}%".format(motclef))
         ).paginate(page=page, per_page=LIEUX_PAR_PAGE)
@@ -89,6 +88,7 @@ def recherche():
         titre=titre,
         keyword=motclef
     )
+
 
 
 @app.route("/browse")
