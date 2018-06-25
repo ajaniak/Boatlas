@@ -20,27 +20,38 @@ def Json_404():
     return response
 
 
-@app.route(API_ROUTE+"/places/<int:id>", methods=["GET"])
-def get_place(id):
+@app.route(API_ROUTE+"/places/<int:place_id>")
+def api_places_single(place_id):
     """
-    Route permettant l'affichage des données d'un lieu
-    et, le cas échéant, des données bibliographiques qui lui sont liées
+        Route permettant l'affichage des données d'un lieu
+        et, le cas échéant, des données bibliographiques qui lui sont liées
 
-    :param id: identifiant numérique du lieu
-    :return: dictionnaire data
+        :param id: identifiant numérique du lieu
+        :return: dictionnaire data
     """
-    return jsonify(Place.query.get_or_404(id).to_jsonapi_dict())
+    lieu = Place.query.get(place_id)
+    if not lieu:
+        return Json_404
+    if lieu.relations:
+        return jsonify(lieu.to_jsonapi_2_dict())
+    else:
+        return jsonify(lieu.to_jsonapi_dict())
 
-
-@app.route(API_ROUTE+"/biblios/<int:id>")
-def get_biblio(id):
+@app.route(API_ROUTE+"/biblios/<biblio_id>")
+def api_biblios_single(biblio_id):
     """
     Route permettant l'affichage des données d'une référence bibliographique
     et, le cas échéant, des lieux qui lui sont associés
     :param id: identifiant numérique de la donnée bibliographique
     :return: dictionnaire data
     """
-    return jsonify(Biblio.query.get_or_404(id).to_jsonapi_dict())
+    biblio = Biblio.query.get(biblio_id)
+    if not biblio:
+        return Json_404
+    if biblio.relations:
+        return jsonify(biblio.to_jsonapi_2_dict())
+    else:
+        return jsonify(biblio.to_jsonapi_dict())
 
 
 @app.route(API_ROUTE+"/places")
