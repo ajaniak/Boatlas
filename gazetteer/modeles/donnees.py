@@ -113,8 +113,8 @@ class Place(db.Model):
 
     def to_jsonapi_2_dict(self):
         """
-        Route pour gérer l'affichage des données en cas de relation
-        entre une donnée bibliographique et un lieu
+        Fonction pour gérer l'affichage des données en cas de relation
+        entre une donnée bibliographique et un lieu dans l'API
         :return: dictionnaire data
         """
         data = {
@@ -133,9 +133,9 @@ class Place(db.Model):
 
     def to_jsonapi_dict_2(self):
         """
-        Route pour gérer l'affichage des lieux
-        dans le moteur de recherche
-        :return: dictionnaire
+        Fonction pour gérer l'affichage des lieux
+        dans le moteur de recherche de l'API
+        :return: dictionnaire data
         """
         data = {
             "type": "place",
@@ -156,14 +156,15 @@ class Place(db.Model):
         return data
 
     def dictionnaire_2(self):
-        """ Route pour gérer l'affichage des infos de la donnée bibliographique
-        en cas de relation avec un lieu
-        :return: dictionnaire
+        """
+        Fonction pour gérer l'affichage des infos de la donnée bibliographique
+        en cas de relation avec un lieu dans l'API
+        :return: dictionnaire data
         """
         data = {
-                "type": "place",
                 "id": self.place_id,
-                "attributes": {
+                "type" : "place",
+                    "attributes": {
                     "name": self.place_nom,
                     "description": self.place_description,
                     "longitude": self.place_longitude,
@@ -371,9 +372,9 @@ class Biblio(db.Model):
     def to_jsonapi_dict(self):
         """
         Semblant d'API en JSON mais défauts de compatibilité
-        Route pour gérer l'affichage d'une donnée bibliographique
-        lorsque celle-ci n'est pas en relation avec un lieu
-        :return: dictionnaire
+        Fonction pour gérer l'affichage d'une donnée bibliographique
+        lorsque celle-ci n'est pas en relation avec un lieu dans l'API
+        :return: dictionnaire data
         """
         data = {
             "type": "biblio",
@@ -401,10 +402,13 @@ class Biblio(db.Model):
 
     def to_jsonapi_2_dict(self):
         """ Semblant d'API en JSON mais défauts de compatibilité
-        :return: dictionnaire biblio avec infos contenues dans la table SQL
+        Fonction pour gérer l'affichage sans redondance
+        des infos d'une donnée bibliographique
+        en cas de relation avec un lieu
+        :return: dictionnaire data
         """
         data = {
-            "data": [
+            "infos": [
                 endroit.association_to_json()
                 for endroit in self.relations
             ]
@@ -413,9 +417,9 @@ class Biblio(db.Model):
 
     def to_jsonapi_dict_2(self):
         """
-        Route pour gérer l'affichage des données bibliographiques
-        dans le moteur de recherche
-        :return: dictionnaire
+        Fonction pour gérer l'affichage des données bibliographiques
+        dans le moteur de recherche dans l'API
+        :return: dictionnaire data
         """
         data = {
             "type": "biblio",
@@ -438,16 +442,16 @@ class Biblio(db.Model):
         """ Semblant d'API en JSON mais défauts de compatibilité
         Pour gérer l'affichage des infos de la table lieu
         si la donnée bibliographique est en relation avec un lieu
-        :return: dictionnaire
+        :return: dictionnaire data
         """
         data = {
-            #"id": self.biblio_id,
+            "id": self.biblio_id,
             "attributes": {
                 "titre": self.biblio_titre,
                 "auteur": self.biblio_auteur,
                 "date": self.biblio_date,
                 "category": self.biblio_type,
-            #    "type": "biblio",
+                 "type": "biblio",
 
             },
             "links": {
